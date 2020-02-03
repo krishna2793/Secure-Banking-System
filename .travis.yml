@@ -6,7 +6,15 @@ dist: trusty
 jdk: oraclejdk8
 
 script:
-  - ./gradlew build --scan -s
+#  - gradle wrapper --gradle-version 6.1.1 --distribution-type all
+  - gradle build --scan -s -x test
+
+before_install:
+  - wget https://services.gradle.org/distributions/gradle-6.1.1-bin.zip
+  - unzip -qq gradle-6.1.1-bin.zip
+  - export GRADLE_HOME=$PWD/gradle-6.1.1
+  - export PATH=$GRADLE_HOME/bin:$PATH
+  - gradle -v
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
