@@ -2,7 +2,6 @@ package edu.asu.sbs.services;
 
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
