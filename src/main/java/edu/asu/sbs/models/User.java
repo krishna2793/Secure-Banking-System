@@ -2,11 +2,9 @@ package edu.asu.sbs.models;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.sql.Date;
 
 @Entity
 @Data
@@ -17,6 +15,7 @@ public class User {
     private Integer id;
 
     @NotNull
+    @Column(unique = true)
     private String userName;
 
     @NotNull
@@ -28,12 +27,21 @@ public class User {
     private String lastName;
 
     @NotNull
+    private Date dateOfBirth;
+
+    @NotNull
+    @Column(unique = true)
+    private String ssn;
+
+    @NotNull
     private String userType;
 
     @NotNull
+    @Column(unique = true)
     private String phoneNumber;
 
     @NotNull
+    @Column(unique = true)
     private String emailAddress;
 
     @NotNull
