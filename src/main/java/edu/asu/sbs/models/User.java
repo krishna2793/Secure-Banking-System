@@ -30,6 +30,9 @@ public class User {
     private Date dateOfBirth;
 
     @NotNull
+    private boolean isActive;
+
+    @NotNull
     @Column(unique = true)
     private String ssn;
 
@@ -42,7 +45,7 @@ public class User {
 
     @NotNull
     @Column(unique = true)
-    private String emailAddress;
+    private String email;
 
     @NotNull
     private String password;
