@@ -1,10 +1,9 @@
 <Html>
 <head>
-<Html>
-<Head>
+	<meta charset="UTF-8">
 <title> Secure Banking System Register</title>
 	<link rel="stylesheet" href="signup_style.css">
-</Head>
+</head>
 <body>
 	<div class="Signup-page">
 	<div class="form">
@@ -16,33 +15,34 @@
 		<label for="Customer">Customer</label>
 		<input type="text" placeholder="Name"/>
 		<input type="text" placeholder="Email"/>
-		<input type="password" id="pass" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,}" placeholder="Password"/>
+		<input type="password" id="pass" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,}" placeholder="Password" required>
 		<input type="text" id="SSN" name="SSN" placeholder="SSN">
 		<input type="submit" value="Submit">
 		</form>
 	</div>
 	</div>
 	<div id="message">
-		<p id="length" class="invalid">Minimum <b>4 characters</b> </p>
+		<p id="len" class="invalid">Minimum <b>4 characters</b> </p>
 	</div>
 	<script>
-		var len=document.getElementById("length");
-		var myInput=document.getElementById("pass");
-		myInput.onfocus = function() {
+		var len=document.getElementById("len");
+		var m=document.getElementById("pass");
+		m.onfocus = function() {
 			document.getElementById("message").style.display = "block";
 		}
-		myInput.onblur = function() {
+		m.onblur = function() {
 			document.getElementById("message").style.display = "none";
 		}
 
-		myInput.onkeyup = function() {
-			if (len.value.length >= 4) {
-				length.classList.remove("invalid");
-				length.classList.add("valid");
+		m.onkeyup = function() {
+			if(m.value.length >= 4) {
+				len.classList.remove("invalid");
+				len.classList.add("valid");
 			} else {
-				length.classList.remove("valid");
-				length.classList.add("invalid");
+				len.classList.remove("valid");
+				len.classList.add("invalid");
 			}
+
 		}
 	</script>
 
