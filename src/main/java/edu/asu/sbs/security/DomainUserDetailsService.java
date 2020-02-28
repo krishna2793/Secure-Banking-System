@@ -38,7 +38,7 @@ public class DomainUserDetailsService implements UserDetailsService {
         }
 
         String lowercaselogin = username.toLowerCase(Locale.ENGLISH);
-        return userRepository.findOneWithAuthoritiesByLogin(lowercaselogin)
+        return userRepository.findOneWithUserTypeByUserName(lowercaselogin)
                 .map(user -> createSpringSecurityUser(lowercaselogin, user))
                 .orElseThrow(() -> new UsernameNotFoundException("User "+lowercaselogin+" does not exist"));
 

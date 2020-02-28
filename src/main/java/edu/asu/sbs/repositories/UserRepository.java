@@ -9,5 +9,5 @@ public interface UserRepository extends CrudRepository<User, Integer> {
 
     Optional<User> findOneWithAuthoritiesByEmailIgnoreCase(String username);
 
-    Optional<User> findOneWithAuthoritiesByLogin(String lowercaselogin);
+    Optional<User> findOneWithUserTypeByUserName(String lowercaselogin);
 }
