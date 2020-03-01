@@ -7,17 +7,17 @@
 <body>
 	<div class="Signup-page">
 	<div class="form">
-		<form class="Signup-form">
+		<form class="Signup">
 		
 		<input type="radio" id="Employee" name="Selectoption" value="Employee">
 		<label for="Employee">Employee</label>
 		<input type="radio" id="Customer" name="Selectoption" value="Customer">
 		<label for="Customer">Customer</label>
-		<input type="text" placeholder="Name"/>
+		<input id="email" name="email" type="text" placeholder="Name"/>
 		<input type="text" placeholder="Email"/>
-		<input type="password" id="pass" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,}" placeholder="Password" required>
+		<input type="password" id="pass" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,}" placeholder="Password" required/>
 		<input type="text" id="SSN" name="SSN" placeholder="SSN">
-		<input type="submit" value="Submit">
+		<input type="submit" value="Submit" onclick="ValidateEmail(document.Signup.email)";
 		</form>
 	</div>
 	</div>
@@ -43,6 +43,15 @@
 				len.classList.add("invalid");
 			}
 
+		}
+		function ValidateEmail(mail)
+		{
+			if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(Signup-form.email.value))
+			{
+				return (true)
+			}
+			alert("You have entered an invalid email address!")
+			return (false)
 		}
 	</script>
 
