@@ -8,6 +8,7 @@ public final class Constants {
     public static final String PHONE_NUMBER_REGEX = "^\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})$";
     public static final int PASSWORD_MIN_LENGTH = 4;
     public static final int PASSWORD_MAX_LENGTH = 100;
+    public static final String ACCOUNT_NUMBER_REGEX = "^\\w{1,17}$";
 
     private Constants() {
 
