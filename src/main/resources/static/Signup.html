@@ -7,10 +7,10 @@
 	<body>
 		<div class="Signup-page">
 			<div class="form">
-				<form method="POST" class="Signup">
-					<input type="radio" id="Employee" name="Selectoption" value="Employee">
+				<form method="post" class="Signup" action="login.html">
+					<input type="radio" id="Employee" name="selectOption" value="Employee">
 					<label for="Employee">Employee</label>
-					<input type="radio" id="Customer" name="Selectoption" value="Customer">
+					<input type="radio" id="Customer" name="selectOption" value="Customer">
 					<label for="Customer">Customer</label>
 					<input id="email" name="email" type="text" placeholder="Name" required/>
 					<input type="text" placeholder="Email" pattern="\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b" required/>
@@ -37,7 +37,6 @@
 			var len=document.getElementById("len");
 			var password=document.getElementById("password");
 			var confirmPassword=document.getElementById("confirmPassword");
-			var email = document.getElementById("email")
 
 			password.onfocus = function() {
 				document.getElementById("message").style.display = "block";
