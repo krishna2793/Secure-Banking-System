@@ -1,60 +1,72 @@
 <Html>
-<head>
-	<meta charset="UTF-8">
-<title> Secure Banking System Register</title>
-	<link rel="stylesheet" href="signup_style.css">
-</head>
-<body>
-	<div class="Signup-page">
-	<div class="form">
-		<form class="Signup">
-		
-		<input type="radio" id="Employee" name="Selectoption" value="Employee">
-		<label for="Employee">Employee</label>
-		<input type="radio" id="Customer" name="Selectoption" value="Customer">
-		<label for="Customer">Customer</label>
-		<input id="email" name="email" type="text" placeholder="Name"/>
-		<input type="text" placeholder="Email"/>
-		<input type="password" id="pass" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,}" placeholder="Password" required/>
-		<input type="text" id="SSN" name="SSN" placeholder="SSN">
-		<input type="submit" value="Submit" onclick="ValidateEmail(document.Signup.email)";
-		</form>
-	</div>
-	</div>
-	<div id="message">
-		<p id="len" class="invalid">Minimum <b>4 characters</b> </p>
-	</div>
-	<script>
-		var len=document.getElementById("len");
-		var m=document.getElementById("pass");
-		m.onfocus = function() {
-			document.getElementById("message").style.display = "block";
-		}
-		m.onblur = function() {
-			document.getElementById("message").style.display = "none";
-		}
+	<head>
+		<meta charset="UTF-8">
+	<title> Secure Banking System Register</title>
+		<link rel="stylesheet" href="signup_style.css">
+	</head>
+	<body>
+		<div class="Signup-page">
+			<div class="form">
+				<form method="POST" class="Signup">
+					<input type="radio" id="Employee" name="Selectoption" value="Employee">
+					<label for="Employee">Employee</label>
+					<input type="radio" id="Customer" name="Selectoption" value="Customer">
+					<label for="Customer">Customer</label>
+					<input id="email" name="email" type="text" placeholder="Name" required/>
+					<input type="text" placeholder="Email" pattern="\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b" required/>
+					<input type="password" id="password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" placeholder="Password" required/>
+					<input type="password" id="confirmPassword" name="confirmPassword" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" placeholder="Confirm Password" required/>
+					<input type="text" id="SSN" name="SSN" maxlength="9" placeholder="SSN">
+					<input type="submit" value="Submit">
+				</form>
+			</div>
+		</div>
+		<div id="message">
+			<p id="len" class="invalid">
+				<ul>
+					<li>Minimum eight characters</li>
+					<li>At least one uppercase letter</li>
+					<li>At least one lowercase letter</li>
+					<li>At least one number</li>
+					<li>At least one special character</li>
+				</ul>
+			</p>
+		</div>
 
-		m.onkeyup = function() {
-			if(m.value.length >= 4) {
-				len.classList.remove("invalid");
-				len.classList.add("valid");
-			} else {
-				len.classList.remove("valid");
-				len.classList.add("invalid");
+		<script>
+			var len=document.getElementById("len");
+			var password=document.getElementById("password");
+			var confirmPassword=document.getElementById("confirmPassword");
+			var email = document.getElementById("email")
+
+			password.onfocus = function() {
+				document.getElementById("message").style.display = "block";
+			}
+			password.onblur = function() {
+				document.getElementById("message").style.display = "none";
 			}
 
-		}
-		function ValidateEmail(mail)
-		{
-			if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(Signup-form.email.value))
-			{
-				return (true)
-			}
-			alert("You have entered an invalid email address!")
-			return (false)
-		}
-	</script>
+			function validatePassword() {
+				if (password.value.length >= 4) {
+					len.classList.remove("invalid");
+					len.classList.add("valid");
+				} else {
+					len.classList.remove("valid");
+					len.classList.add("invalid");
+				}
 
-</body>
+				if(password.value != confirmPassword.value) {
+					confirmPassword.setCustomValidity("Passwords Don't Match");
+				} else {
+					confirmPassword.setCustomValidity('');
+				}
+			}
+
+			password.onchange = validatePassword;
+			confirmPassword.onkeyup = validatePassword;
+
+		</script>
+
+	</body>
 </Html>
 
