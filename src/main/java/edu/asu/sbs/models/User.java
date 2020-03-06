@@ -73,7 +73,7 @@ public class User implements Serializable {
     @NotNull
     @Size(min = 60, max = 60)
     @Column(nullable = false, length = 60)
-    private String password;
+    private String passwordHash;
 
     @Size(max = 20)
     @Column(length = 20)
@@ -81,5 +81,10 @@ public class User implements Serializable {
     private String resetKey;
 
     private Instant resetDate = null;
+
+    @Size(max = 20)
+    @Column(length = 20)
+    @JsonIgnore
+    private String activationKey;
 
 }

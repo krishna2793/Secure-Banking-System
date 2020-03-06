@@ -3,7 +3,7 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:mysql://localhost:3306/sbs?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
     username: root
-    password: root
+    password:
     hikari:
       poolName: Hikari
       auto-commit: false
@@ -39,7 +39,7 @@ sbs:
         token-validity-in-seconds-for-remember-me: 2592000
 
 server:
-  port: 8081
+  port: 8080
 #  ssl:
 #    key-store: classpath:config/tls/keystore.p12
 #    key-store-password: Sbs@Application56

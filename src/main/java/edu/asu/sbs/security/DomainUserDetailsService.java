@@ -6,6 +6,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -51,7 +52,8 @@ public class DomainUserDetailsService implements UserDetailsService {
         }
 
         List<GrantedAuthority> grantedAuthorities = Lists.newArrayList();
+        grantedAuthorities.add(new SimpleGrantedAuthority(user.getUserType()));
 
-        return new User(user.getUserName(), user.getPassword(), grantedAuthorities);
+        return new User(user.getUserName(), user.getPasswordHash(), grantedAuthorities);
     }
 }
