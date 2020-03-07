@@ -51,7 +51,8 @@ public class User implements Serializable {
 
     @NotNull
     @Pattern(regexp = Constants.SSN_REGEX)
-    @Column(unique = true, nullable = false)
+    @Size(min = 11, max = 11)
+    @Column(unique = true, nullable = false, length = 11)
     private String ssn;
 
     @NotNull

@@ -10,9 +10,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.filter.CorsFilter;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 
@@ -51,34 +53,33 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         httpSecurity
                 .csrf()
                 .disable()
+                .antMatcher("/**")
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()
-                    .authenticationEntryPoint(securityProblemSupport)
-                    .accessDeniedHandler(securityProblemSupport)
+//                    .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+////                    .authenticationEntryPoint(securityProblemSupport)
+//                    .accessDeniedHandler(securityProblemSupport)
                 .and()
-//                    .headers()
-//                    .contentSecurityPolicy("default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:")
-//                .and()
-//                    .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
-//                .and()
-//                    .featurePolicy("geolocation 'none'; midi 'none'; sync-xhr 'none'; microphone 'none'; camera 'none'; magnetometer 'none'; gyroscope 'none'; speaker 'none'; fullscreen 'self'; payment 'none'")
-//                .and()
-//                    .frameOptions()
-//                    .deny()
-//                .and()
-//                    .sessionManagement()
-//                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
-//                    .authorizeRequests()
-//                    .antMatchers("/api/authenticate").permitAll()
-//                    .antMatchers("/api/register").permitAll()
-//                    .antMatchers("/api/account/reset-password/init").permitAll()
-//                    .antMatchers("/api/account/password-reset/finish").permitAll()
-//                    .antMatchers("/api/**").authenticated()
-//                    .antMatchers("/management/**").hasAuthority(UserType.ADMIN_ROLE)
-//                .and()
-//                    .httpBasic()
-//                .and()
+                    .headers()
+                    .contentSecurityPolicy("default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:")
+                .and()
+                    .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+                .and()
+                    .featurePolicy("geolocation 'none'; midi 'none'; sync-xhr 'none'; microphone 'none'; camera 'none'; magnetometer 'none'; gyroscope 'none'; speaker 'none'; fullscreen 'self'; payment 'none'")
+                .and()
+                    .frameOptions()
+                    .deny()
+                .and()
+                    .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                    .authorizeRequests()
+                    .antMatchers("/api/v1/user/authenticate", "/api/v1/user/activate", "/api/v1/user/register", "/api/account/reset-password/init", "/api/account/password-reset/finish", "/swagger-ui.html").permitAll()
+                    .antMatchers("/management/**").hasAuthority(UserType.ADMIN_ROLE)
+                    .anyRequest().authenticated()
+                .and()
+                    .httpBasic()
+                .and()
                     .apply(securityConfigurerAdapter());
     }
 

@@ -15,8 +15,6 @@ import edu.asu.sbs.vm.LoginVM;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.util.Calendar;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -65,7 +64,7 @@ public class UserService {
     }
 
 
-    public ResponseEntity<JSONObject> authenticate(LoginVM loginVM) throws JSONException {
+    public ResponseEntity<JWTToken> authenticate(LoginVM loginVM) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(loginVM.getUserName(), loginVM.getPassword());
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(usernamePasswordAuthenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -73,9 +72,7 @@ public class UserService {
         String jwt = tokenProvider.createToken(authentication, rememberMe);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("token", jwt);
-        return new ResponseEntity<>(jsonObject, httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
     }
 
     @Transactional
@@ -94,7 +91,6 @@ public class UserService {
         user.setUserType(UserType.USER_ROLE);
         user.setPhoneNumber(userDTO.getPhoneNumber());
         userRepository.save(user);
-
     }
 
     private void validateUserDTO(UserDTO userDTO) {
@@ -121,6 +117,18 @@ public class UserService {
         userRepository.delete(existingUser);
         userRepository.flush();
         return true;
+    }
+
+    public Optional<User> activateRegistration(String key) {
+        log.debug("Activating user for activation key {}", key);
+        return userRepository.findOneByActivationKey(key)
+                .map(user -> {
+                    user.setActive(true);
+                    user.setActivationKey(null);
+                    userRepository.save(user);
+                    log.debug("Activated user: {}", user);
+                    return user;
+                });
     }
 
     @Getter
