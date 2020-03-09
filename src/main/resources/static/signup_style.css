@@ -30,7 +30,7 @@ body{
 }
 .form input[type="radio"] {float: left; width: 20px; margin-right: 10px;}
 .form label               {float: left; width: 100px;}
-.form input[type="submit"] {
+.form button {
 	font-family: "Roboto", sans-serif;
 	text-transform: uppercase;
 	outline: 0;
@@ -42,7 +42,7 @@ body{
 	font-size: 14px;
 	cursor: pointer;
 }
-.form input[type="submit"]:hover,.form input[type="submit"]:active{
+.form button:hover,.form button:active{
 	background: #228B22;
 }
 #message {

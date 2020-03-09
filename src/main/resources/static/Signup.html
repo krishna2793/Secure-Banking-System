@@ -16,8 +16,8 @@
 					<input type="text" placeholder="Email" pattern="\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b" required/>
 					<input type="password" id="password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" placeholder="Password" required/>
 					<input type="password" id="confirmPassword" name="confirmPassword" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" placeholder="Confirm Password" required/>
-					<input type="text" id="SSN" name="SSN" maxlength="9" placeholder="SSN">
-					<input type="submit" value="Submit">
+					<input type="text" id="SSN" name="SSN" maxlength="9" placeholder="SSN" required/>
+					<button> Submit<butoon>
 				</form>
 			</div>
 		</div>
@@ -33,38 +33,7 @@
 			</p>
 		</div>
 
-		<script>
-			var len=document.getElementById("len");
-			var password=document.getElementById("password");
-			var confirmPassword=document.getElementById("confirmPassword");
-
-			password.onfocus = function() {
-				document.getElementById("message").style.display = "block";
-			}
-			password.onblur = function() {
-				document.getElementById("message").style.display = "none";
-			}
-
-			function validatePassword() {
-				if (password.value.length >= 4) {
-					len.classList.remove("invalid");
-					len.classList.add("valid");
-				} else {
-					len.classList.remove("valid");
-					len.classList.add("invalid");
-				}
-
-				if(password.value != confirmPassword.value) {
-					confirmPassword.setCustomValidity("Passwords Don't Match");
-				} else {
-					confirmPassword.setCustomValidity('');
-				}
-			}
-
-			password.onchange = validatePassword;
-			confirmPassword.onkeyup = validatePassword;
-
-		</script>
+		<script src="signup.js"></script>
 
 	</body>
 </Html>
