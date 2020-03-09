@@ -13,9 +13,12 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.sql.Date;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
+@Table(name = "BankUser")
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -80,6 +83,9 @@ public class User implements Serializable {
     @Column(length = 20)
     @JsonIgnore
     private String resetKey;
+
+    @OneToMany(mappedBy="user")
+    private Set<Account> accounts = new HashSet<Account>();
 
     private Instant resetDate = null;
 
