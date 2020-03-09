@@ -8,14 +8,13 @@ import java.sql.Timestamp;
 
 @Data
 @Entity
-@Table(name = "Transaction")
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transactionId;
 
     @NotNull
-    @Column(name = "status", nullable = false, length = 50)
+    @Column(nullable = false, length = 50)
     private String status;
 
     @NotNull
@@ -28,11 +27,11 @@ public class Transaction {
     private Timestamp updatedTime;
 
     @ManyToOne
-    @JoinColumn(name="FkFromAccount", nullable=false)
+    @JoinColumn(nullable = false)
     private Account fromAccount;
 
     @ManyToOne
-    @JoinColumn(name="FkToAccount", nullable=false)
+    @JoinColumn(nullable = false)
     private Account toAccount;
 
 }
