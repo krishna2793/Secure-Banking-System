@@ -140,4 +140,33 @@ public class UserService {
             this.token = token;
         }
     }
+
+    public Optional<User> getCurrentUser() {
+        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (username == null) {
+            return null;
+        }
+
+        log.info("Getting current logged in user");
+        return userRepository.findByUsernameOrEmail(username);
+    }
+
+    public Optional<User> editUser(User user) {
+        Optional<User> current = userRepository.findById(user.getId());
+        current.setEmail(user.getEmail());
+        current.setPhone(user.getPhone());
+        current.setFirstName(user.getFirstName());
+        current.setMiddleName(user.getMiddleName());
+        current.setLastName(user.getLastName());
+        current.setAddressLine1(user.getAddressLine1());
+        current.setAddressLine2(user.getAddressLine2());
+        current.setCity(user.getCity());
+        current.setState(user.getState());
+        current.setZip(user.getZip());
+        current.setModifiedOn(LocalDateTime.now());
+        current.setRole(user.getRole());
+        current = userDao.update(current);
+
+        return current;
+    }
 }
