@@ -3,21 +3,25 @@
 		<meta charset="UTF-8">
 	<title> Secure Banking System Register</title>
 		<link rel="stylesheet" href="signup_style.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script src="postrequest.js"></script>
 	</head>
 	<body>
 		<div class="Signup-page">
 			<div class="form">
-				<form method="post" class="Signup" action="login.html">
+				<h1> SignUp Page</h1>
+				<form method="post" class="Signup" action="login.html" id="signupform">
 					<input type="radio" id="Employee" name="selectOption" value="Employee">
 					<label for="Employee">Employee</label>
 					<input type="radio" id="Customer" name="selectOption" value="Customer">
 					<label for="Customer">Customer</label>
-					<input id="email" name="email" type="text" placeholder="Name" required/>
-					<input type="text" placeholder="Email" pattern="\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b" required/>
-					<input type="password" id="password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" placeholder="Password" required/>
-					<input type="password" id="confirmPassword" name="confirmPassword" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" placeholder="Confirm Password" required/>
+					<input id="name" name="name" type="text" placeholder="Name" required/>
+					<input id="email" type="text" placeholder="Email" pattern="\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b" required/>
+					<input id="pass" type="password" id="password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" placeholder="Password" required/>
+					<input id="cpass" type="password" id="confirmPassword" name="confirmPassword" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" placeholder="Confirm Password" required/>
 					<input type="text" id="SSN" name="SSN" maxlength="9" placeholder="SSN" required/>
-					<button> Submit<butoon>
+					<button> Submit</button>
 				</form>
 			</div>
 		</div>
@@ -33,7 +37,6 @@
 			</p>
 		</div>
 
-		<script src="signup.js"></script>
 
 	</body>
 </Html>
