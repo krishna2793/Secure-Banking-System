@@ -25,7 +25,7 @@ public interface UserRepository extends CrudRepository<User, Integer> {
 
     Optional<User> findOneByActivationKey(String activationKey);
 
-    Optional<User> findByUsernameOrEmail(String username);
+    User findByUsernameOrEmail(String username);
 
-    Optional<User> findById(Long id);
+    User findById(Long id);
 }

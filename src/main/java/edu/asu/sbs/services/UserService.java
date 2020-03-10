@@ -141,7 +141,7 @@ public class UserService {
         }
     }
 
-    public Optional<User> getCurrentUser() {
+    public User getCurrentUser() {
         String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (username == null) {
             return null;
@@ -151,22 +151,22 @@ public class UserService {
         return userRepository.findByUsernameOrEmail(username);
     }
 
-    public Optional<User> editUser(User user) {
-        Optional<User> current = userRepository.findById(user.getId());
-        current.setEmail(user.getEmail());
-        current.setPhone(user.getPhone());
-        current.setFirstName(user.getFirstName());
-        current.setMiddleName(user.getMiddleName());
-        current.setLastName(user.getLastName());
-        current.setAddressLine1(user.getAddressLine1());
-        current.setAddressLine2(user.getAddressLine2());
-        current.setCity(user.getCity());
-        current.setState(user.getState());
-        current.setZip(user.getZip());
-        current.setModifiedOn(LocalDateTime.now());
-        current.setRole(user.getRole());
-        current = userDao.update(current);
+    @Transactional
+    public User editUser(User userDTO) {
+        User user = userRepository.findById(userDTO.getId());
 
-        return current;
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        //user.setAddressLine1(userDTO.getAddressLine1());
+        //user.setAddressLine2(userDTO.getAddressLine2());
+        //user.setCity(userDTO.getCity());
+        //user.setState(userDTO.getState());
+        //user.setZip(userDTO.getZip());
+        //user.setModifiedOn(LocalDateTime.now());
+        user.setUserType(userDTO.getUserType());
+        userRepository.save(userDTO);
+
+        return user;
     }
 }
