@@ -25,10 +25,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -131,6 +135,8 @@ public class UserService {
                 });
     }
 
+
+
     @Getter
     @Setter
     public static class JWTToken {
@@ -168,5 +174,64 @@ public class UserService {
         userRepository.save(userDTO);
 
         return user;
+    }
+
+
+    public User createNewUserRequest(User newUserRequest) {
+        newUserRequest.setCreatedOn(LocalDateTime.now());
+        newUserRequest.setExpireOn(LocalDateTime.now().plusDays(1));
+        newUserRequest.setActive(true);
+        newUserRequest = userRepository.save(newUserRequest);
+
+        log.info("Creating new internal user request");
+
+        /*
+        //setup up email message
+        message = new SimpleMailMessage();
+        message.setText(env.getProperty("internal.user.verification.body").replace(":id:",newUserRequest.getActivationKey().toString()));
+        message.setSubject(env.getProperty("internal.user.verification.subject"));
+        message.setTo(newUserRequest.getEmail());
+
+        // send email
+        if (emailService.sendEmail(message) == false) {
+            // Deactivate request if email fails
+            newUserRequest.setActive(false);
+            newUserRequestDao.update(newUserRequest);
+            logger.warn("Email message failed");
+
+            return null;
+        };
+         */
+        return newUserRequest;
+    }
+
+    public List<User> getUsersByType(String type) {
+        List<User> users = userRepository.findAllByType(type);
+        log.info("Getting users by type");
+
+        return users;
+    }
+
+    public User getUserByIdAndActive(Long id) {
+        User user = userRepository.findById(id);
+        if (user == null || user.isActive() == false) {
+            return null;
+        }
+
+        log.info("Getting user by id");
+
+        return user;
+    }
+
+
+    public void deleteUser(Long id) {
+        User current = userRepository.findById(id);
+        current.setActive(false);
+        userRepository.save(current);
+
+        return;
+    }
+
+    public List<ModificationRequest> getModificationRequests(String pending, String internal) {
     }
 }

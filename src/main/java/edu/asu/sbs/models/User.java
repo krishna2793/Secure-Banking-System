@@ -3,6 +3,7 @@ package edu.asu.sbs.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.asu.sbs.config.Constants;
 import lombok.Data;
+import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -13,7 +14,9 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.sql.Date;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
+@Getter
 @Entity
 @Data
 public class User implements Serializable {
@@ -88,4 +91,24 @@ public class User implements Serializable {
     @JsonIgnore
     private String activationKey;
 
+    private LocalDateTime createdOn;
+
+    public LocalDateTime getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(LocalDateTime createdOn) {
+        this.createdOn = createdOn;
+    }
+
+    private LocalDateTime expireOn;
+
+    public void setExpireOn(LocalDateTime expireOn) {
+
+        this.expireOn = expireOn;
+    }
+
+    public LocalDateTime getExpireOn() {
+        return expireOn;
+    }
 }
