@@ -32,4 +32,7 @@ public interface UserRepository extends CrudRepository<User, Integer> {
     User findById(Long id);
 
     List<User> findAllByType(String type);
+
+    boolean findByEmail(String email);
+    boolean findByPhoneNumber( String ph);
 }

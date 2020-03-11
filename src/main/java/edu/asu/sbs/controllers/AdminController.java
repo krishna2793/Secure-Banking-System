@@ -3,6 +3,7 @@ package edu.asu.sbs.controllers;
 import edu.asu.sbs.errors.*;
 import edu.asu.sbs.models.*;
 import edu.asu.sbs.services.AdminService;
+import edu.asu.sbs.services.ModificationRequestService;
 import edu.asu.sbs.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.Model;
@@ -18,7 +19,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -242,7 +242,7 @@ public class AdminController{
 
     @GetMapping("/admin/user/request")
     public String getAllUserRequest(Model model) {
-        List<ModificationRequest> modificationRequests = userService.getModificationRequests("pending", "internal");
+        List<ModificationRequest> modificationRequests = ModificationRequestService.getModificationRequests("pending", "internal");
         if (modificationRequests == null) {
             model.addAttribute("modificationrequests", new ArrayList<ModificationRequest>());
         }
@@ -256,26 +256,26 @@ public class AdminController{
 
     @GetMapping("/admin/user/request/view/{id}")
     public String getUserRequest(Model model, @PathVariable() UUID id) throws Exceptions {
-        ModificationRequest modificationRequest = userService.getModificationRequest(id);
+        ModificationRequest modificationRequest = ModificationRequestService.getModificationRequest(id);
 
         if (modificationRequest == null) {
             //return "redirect:/error?code=404&path=request-invalid";
             throw new Exceptions("404","Invalid Request !");
         }
         if (!modificationRequest.getUserType().equals("internal")) {
-            logger.warn("GET request: Admin unauthrorised request access");
+            log.warn("GET request: Admin unauthrorised request access");
 
             //return "redirect:/error?code=401&path=request-unauthorised";
             throw new Exceptions("401","Unauthorised Request !");
         }
         model.addAttribute("modificationrequest", modificationRequest);
-        logger.info("GET request: User modification request by ID");
+        log.info("GET request: User modification request by ID");
 
         return "admin/modificationrequest_detail";
     }
 
     @PostMapping("/admin/user/request/{requestId}")
-    public String approveEdit(@PathVariable UUID requestId, @ModelAttribute ModificationRequest request, BindingResult bindingResult) throws Exceptions {
+    public String approveEdit(@PathVariable UUID requestId, @ModelAttribute ModificationRequest request) throws Exceptions {
         String status = request.getStatus();
         if (status == null || !(request.getStatus().equals("approved") || request.getStatus().equals("rejected"))) {
             //return "redirect:/error?code=400&path=request-action-invalid";
@@ -283,20 +283,15 @@ public class AdminController{
         }
 
         // checks validity of request
-        if (userService.getModificationRequest(requestId) == null) {
+        if (ModificationRequestService.getModificationRequest(requestId) == null) {
             //return "redirect:/error?code=404&path=request-invalid";
             throw new Exceptions("404","Invalid Request !");
         }
         request.setModificationRequestId(requestId);
-        approvalUserRequestFormValidator.validate(request, bindingResult);
-        if (bindingResult.hasErrors()) {
-            //return "redirect:/error?code=400&path=request-action-validation";
-            throw new Exceptions("400","Invalid Request Action !");
-        }
 
         // checks if admin is authorized for the request to approve
-        if (!userService.verifyModificationRequestUserType(requestId, "internal")) {
-            logger.warn("GET request: Admin unauthrorised request access");
+        if (!ModificationRequestService.verifyModificationRequestUserType(requestId, "internal")) {
+            log.warn("GET request: Admin unauthrorised request access");
 
             //return "redirect:/error?code=401&path=request-unauthorised";
             throw new Exceptions("401","Unauthorised Request !");
@@ -305,33 +300,33 @@ public class AdminController{
         request.setUserType("internal");
         request.setStatus(status);
         if (status.equals("approved")) {
-            userService.approveModificationRequest(request);
+            ModificationRequestService.approveModificationRequest(request);
         }
         // rejects request
         else {
-            userService.rejectModificationRequest(request);
+            ModificationRequestService.rejectModificationRequest(request);
         }
-        logger.info("POST request: Admin approves modification request");
+        log.info("POST request: Admin approves modification request");
 
         return "redirect:/admin/user/request?successAction=true";
     }
 
     @GetMapping("/admin/user/request/delete/{id}")
     public String getDeleteRequest(Model model, @PathVariable() UUID id) throws Exceptions {
-        ModificationRequest modificationRequest = userService.getModificationRequest(id);
+        ModificationRequest modificationRequest = ModificationRequestService.getModificationRequest(id);
 
         if (modificationRequest == null) {
             //return "redirect:/error?code=404&path=request-invalid";
             throw new Exceptions("404","Invalid Request !");
         }
         if (!modificationRequest.getUserType().equals("internal")) {
-            logger.warn("GET request: Admin unauthrorised request access");
+            log.warn("GET request: Admin unauthrorised request access");
 
             //return "redirect:/error?code=401&path=request-unauthorised";
             throw new Exceptions("401","Unauthorised Request !");
         }
         model.addAttribute("modificationrequest", modificationRequest);
-        logger.info("GET request: User modification request by ID");
+        log.info("GET request: User modification request by ID");
 
 
         return "admin/modificationrequest_delete";
@@ -339,7 +334,7 @@ public class AdminController{
 
     @PostMapping("/admin/user/request/delete/{requestId}")
     public String deleteRequest(@PathVariable UUID requestId, @ModelAttribute ModificationRequest request, BindingResult bindingResult) throws Exceptions {
-        request = userService.getModificationRequest(requestId);
+        request = ModificationRequestService.getModificationRequest(requestId);
 
         // checks validity of request
         if (request == null) {
@@ -347,14 +342,14 @@ public class AdminController{
             throw new Exceptions("404","Invalid Request !");
         }
 
-        if (!userService.verifyModificationRequestUserType(requestId, "internal")) {
-            logger.warn("GET request: Admin unauthrorised request access");
+        if (!ModificationRequestService.verifyModificationRequestUserType(requestId, "internal")) {
+            log.warn("GET request: Admin unauthrorised request access");
 
             //return "redirect:/error?code=401&path=request-unauthorised";
             throw new Exceptions("401","Unauthorised Request !");
         }
-        userService.deleteModificationRequest(request);
-        logger.info("POST request: Admin approves modification request");
+        ModificationRequestService.deleteModificationRequest(request);
+        log.info("POST request: Admin approves modification request");
 
         return "redirect:/admin/user/request?successDelete=true";
     }
@@ -367,7 +362,7 @@ public class AdminController{
     /**Returns a list of all users */
     @GetMapping("/admin/user/pii")
     public String adminAccessPII(Model model){
-        List <User> userList = userService.ListAllPII();
+        List <User> userList = ModificationRequestService.ListAllPII();
         model.addAttribute("users", userList);
 
         return "admin/accesspii";

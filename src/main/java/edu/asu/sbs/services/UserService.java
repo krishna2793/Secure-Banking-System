@@ -5,6 +5,7 @@ import edu.asu.sbs.errors.EmailAlreadyUsedException;
 import edu.asu.sbs.errors.PhoneNumberAlreadyUsedException;
 import edu.asu.sbs.errors.SsnAlreadyUsedException;
 import edu.asu.sbs.errors.UsernameAlreadyUsedException;
+import edu.asu.sbs.models.ModificationRequest;
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.repositories.UserRepository;
 import edu.asu.sbs.security.jwt.JWTFilter;
@@ -214,7 +215,7 @@ public class UserService {
 
     public User getUserByIdAndActive(Long id) {
         User user = userRepository.findById(id);
-        if (user == null || user.isActive() == false) {
+        if (user == null || !user.isActive()) {
             return null;
         }
 
@@ -228,10 +229,6 @@ public class UserService {
         User current = userRepository.findById(id);
         current.setActive(false);
         userRepository.save(current);
-
-        return;
     }
 
-    public List<ModificationRequest> getModificationRequests(String pending, String internal) {
-    }
 }
