@@ -1,19 +1,25 @@
 package edu.asu.sbs.models;
 
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import edu.asu.sbs.config.Constants;
 import lombok.Data;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Data
-public class Account {
+public class Account implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,7 +43,9 @@ public class Account {
     private boolean isActive;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(nullable = false)
+    @JsonUnwrapped
     private User user;
 
     @OneToMany(mappedBy = "fromAccount")
