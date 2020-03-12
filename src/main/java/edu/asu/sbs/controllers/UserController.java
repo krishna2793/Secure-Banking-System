@@ -1,21 +1,33 @@
 package edu.asu.sbs.controllers;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.github.jknack.handlebars.Template;
 import edu.asu.sbs.config.Constants;
 import edu.asu.sbs.errors.AccountResourceException;
 import edu.asu.sbs.errors.InvalidPasswordException;
+import edu.asu.sbs.loader.HandlebarsTemplateLoader;
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.services.UserService;
 import edu.asu.sbs.vm.LoginVM;
 import edu.asu.sbs.vm.ManageUserVM;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.Optional;
 
 @RestController
@@ -29,14 +41,41 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/authenticate")
-    public ResponseEntity<UserService.JWTToken> authenticate(@Valid @RequestBody LoginVM loginVM) throws JSONException {
+    @Autowired
+    private HandlebarsTemplateLoader handlebarsTemplateLoader;
+
+
+//    @InitBinder
+//    public void initBinder(WebDataBinder binder) {
+//        binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"), true));
+//    }
+
+    @RequestMapping(value="/signup", method=RequestMethod.GET, produces="text/html")
+    public String getHomeTemplate() throws  IOException {
+        Template template = handlebarsTemplateLoader.getTemplate("signup");
+        return template.apply("");
+    }
+
+    @RequestMapping(value="/login", method=RequestMethod.GET, produces="text/html")
+    public String getLoginTemplate() throws  IOException {
+        Template template = handlebarsTemplateLoader.getTemplate("login");
+        return template.apply("");
+    }
+
+    @PostMapping("/signup_test")
+    public void testing(@RequestBody HttpServletRequest payload){
+        System.out.println(payload);
+    }
+
+    @PostMapping(path = "/authenticate", consumes = "application/x-www-form-urlencoded")
+    public ResponseEntity<UserService.JWTToken> authenticate(LoginVM loginVM) throws JSONException {
         return userService.authenticate(loginVM);
     }
 
-    @PostMapping("/register")
+    @PostMapping( path = "/register", consumes = "application/x-www-form-urlencoded")
     @ResponseStatus(HttpStatus.CREATED)
-    public void registerUser(@Valid @RequestBody ManageUserVM manageUserVM) {
+    public void registerUser(ManageUserVM manageUserVM) {
+        System.out.println(manageUserVM);
         if (!checkPasswordLength(manageUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }

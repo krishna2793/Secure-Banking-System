@@ -11,8 +11,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.sql.Date;
+//import java.sql.Date;
 import java.time.Instant;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -44,7 +45,7 @@ public class User implements Serializable {
 
     @NotNull
     @Column(nullable = false)
-    @DateTimeFormat(pattern = "mm-dd-yyyy")
+    @DateTimeFormat(pattern = "yyyy-mm-dd")
     private Date dateOfBirth;
 
     @NotNull
