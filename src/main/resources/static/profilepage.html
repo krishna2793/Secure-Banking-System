@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Secure Banking System User Profile</title>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/4.4.1-1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <link rel="stylesheet" type="text/css" href="/webjars/datatables/1.10.19/css/dataTables.bootstrap.min.css"/>
+    <script type="text/javascript" src="/webjars/bootstrap/4.4.1-1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="webjars/datatables/1.10.19/js/dataTables.bootstrap.min.js"></script>
+    <script type="text/javascript" src="/webjars/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="./js/adminHandler.js"></script>
+    <script>
+        // compile the template
+        var template = Handlebars.compile("Handlebars <b>{{doesWhat}}</b>");
+        // execute the compiled template and print the output to the console
+        console.log(template({ doesWhat: "rocks!" }));
+    </script>
+</head>
+<body>
+<header>
+    <ul>
+        <li><a class="active" href="#home">Secure Banking System</a></li>
+    </ul>
+</header>
+<div >
+    <form method="POST" action="">
+        <table id="results" width="100%">
+            <thead>
+            <tr bgcolor="green">
+                <th class="col-sm-5 text-center">User Details</th>
+                <th class="col-sm-4 text-center">Update Details</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td align="center">
+                <table>
+                    <tr>
+                        <td align="center"><b>User Name : </b></td>
+                        <td align="center">ABC</td>
+                    </tr>
+                    <tr>
+                        <td align="center"><b>User Id : </b></td>
+                        <td align="center">123</td>
+                    </tr>
+                    <tr>
+                        <td align="center"><b>Password : </b></td>
+                        <td align="center">******</td>
+                    </tr>
+                    <tr>
+                        <td align="center"><b>First Name :</b></td>
+                        <td align="center">A</td>
+                    </tr>
+                    <tr>
+                        <td align="center"><b>Middle Name :</b></td>
+                        <td align="center">B</td>
+                    </tr>
+                    <tr>
+                        <td align="center"><b>Last Name :</b></td>
+                        <td align="center">C</td>
+                    </tr>
+                    <tr>
+                        <td align="center"><b>Phone Number :</b></td>
+                        <td align="center">+1 222 333 4444</td>
+                    </tr>
+                    <tr>
+                        <td align="center"><b>Email Address :</b></td>
+                        <td align="center">abc@email.com</td>
+                    </tr>
+                    <tr>
+                        <td align="center"><b>SSN :</b></td>
+                        <td align="center">222 333 4444</td>
+                    </tr>
+                    <tr>
+                        <td align="center"><b>Date Of Birth :</b></td>
+                        <td align="center">01/01/1990</td>
+                    </tr>
+                    <tr>
+                        <td align="center"><b>Address :</b></td>
+                        <td align="center">#11, 123 E Ave, Tempe, AZ</td>
+                    </tr>
+                </table>
+                </td>
+                <td align="center">
+                    <table>
+                        <tr bgcolor="yellow">
+                            <td><b><u>Change Password</u></b></td></tr>
+                        <tr>
+                           <td>Current Password : </td>
+                            <td><textarea>Enter Current Password</textarea></td>
+                        </tr>
+                        <tr>
+                            <td>New Password : </td>
+                            <td><textarea>Enter New Password</textarea></td>
+                        </tr>
+                        <tr>
+                            <td>ReEnter New Password : </td>
+                            <td><textarea>ReEnter New Password</textarea></td>
+                        </tr>
+                        <tr align="center">
+                            <td><button class="inline"><a href="">Update Password</a> </button></td>
+                        </tr>
+                        <tr bgcolor="yellow">
+                            <td><b><u>Change Address</u></b></td>
+                        </tr>
+                        <tr>
+                            <td>New Address : </td>
+                        </tr>
+                        <tr>
+                            <td>Address Line 1 : </td>
+                            <td><textarea>Enter Street</textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Address Line 2 : </td>
+                            <td><textarea>Enter Apartment Number</textarea></td>
+                        </tr>
+                        <tr>
+                            <td>City : </td>
+                            <td><textarea>Enter City</textarea></td>
+                        </tr>
+                        <tr>
+                            <td>State : </td>
+                            <td><textarea>Enter State</textarea></td>
+                        </tr>
+                        <tr>
+                            <td>ZipCode : </td>
+                            <td><textarea>Enter Zip</textarea></td>
+                        </tr>
+                        <tr align="center">
+                            <td><button class="inline"><a href="">Update Address</a> </button></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+</body>
+</html>
