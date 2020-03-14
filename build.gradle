@@ -41,6 +41,7 @@ dependencies {
     compile group: 'com.github.jknack', name: 'handlebars', version: '4.1.2'
     compile group: 'com.github.jknack', name: 'handlebars-jackson2', version: '4.1.2'
     compile group: 'com.github.jknack', name: 'handlebars-guava-cache', version: '4.1.2'
+    compile group: 'org.webjars', name: 'datatables', version: '1.10.20'
 
 //    compile group: 'org.openapitools', name: 'openapi-generator-core', version: '4.2.3'
     compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'

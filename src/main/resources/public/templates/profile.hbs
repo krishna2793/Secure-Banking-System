@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/4.4.1-1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/webjars/datatables/1.10.20/css/dataTables.bootstrap.min.css">
+    {{#block "head"}}
+    {{!-- Custom <head> content per page could be added. --}}
+    {{/block}}
+</head>
+<body>
+<header>
+    {{#block "bodyHeader"}}
+    {{!-- Hero content goes here. --}}
+    {{/block}}
+</header>
+
+<div class="container">
+        <!-- edit form column -->
+        <form class="form-horizontal" role="form">
+            <div class="form-group">
+                <label class="col-lg-3 control-label">User Name:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="userName" name="userName" value="" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">First Name:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="firstName" name="firstName" value="" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">Last Name:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="lastName" name="lastName" value="" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">Email:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="email" name="email" value="" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">Phone Number:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="phoneNumber" name="phoneNumber" value="" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">SSN:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="ssn" name="ssn" value="" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-8">
+                    {{#block "profileUser"}}
+
+                    {{/block}}
+                    <span></span>
+                    <input type="submit" id="save" class="btn btn-primary" value="Save" disabled>
+                </div>
+            </div>
+        </form>
+</div>
+
+
+<script type="text/javascript" src="/webjars/jquery/3.4.1/jquery.min.js"></script>
+<script type="text/javascript" src="/webjars/bootstrap/4.4.1-1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/js/profileHandler.js"></script>
+{{#block "scripts"}}
+{{!-- Hero content goes here. --}}
+{{/block}}
+</body>
+</html>

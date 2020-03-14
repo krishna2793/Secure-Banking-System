@@ -58,7 +58,7 @@ public class UserController {
 
     @RequestMapping(value="/login", method=RequestMethod.GET, produces="text/html")
     public String getLoginTemplate() throws  IOException {
-        Template template = handlebarsTemplateLoader.getTemplate("login");
+        Template template = handlebarsTemplateLoader.getTemplate("adminHome");
         return template.apply("");
     }
 
