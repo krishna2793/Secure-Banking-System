@@ -5,7 +5,6 @@ import edu.asu.sbs.errors.EmailAlreadyUsedException;
 import edu.asu.sbs.errors.PhoneNumberAlreadyUsedException;
 import edu.asu.sbs.errors.SsnAlreadyUsedException;
 import edu.asu.sbs.errors.UsernameAlreadyUsedException;
-import edu.asu.sbs.models.ModificationRequest;
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.repositories.UserRepository;
 import edu.asu.sbs.security.jwt.JWTFilter;
@@ -26,14 +25,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Service
