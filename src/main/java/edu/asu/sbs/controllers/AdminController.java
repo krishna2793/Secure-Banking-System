@@ -115,7 +115,6 @@ public class AdminController{
         //model.addAttribute("newUserRequest", new User());
         log.info("GET request: Admin new user request");
         jsonObject.put("user", new User());
-        jsonObject.put("Array", new JSONArray().put(1));
         return jsonObject;
 
         //return "admin/newuserrequest";
@@ -143,7 +142,6 @@ public class AdminController{
         log.info("GET request: All internal users");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("users", users);
-        jsonObject.put("Array", new JSONArray().put(1));
         return jsonObject;
         //return "admin/internalusers";
     }
@@ -162,7 +160,6 @@ public class AdminController{
         //model.addAttribute("user", user);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("user", user);
-        jsonObject.put("Array", new JSONArray().put(1));
 
         log.info("GET request: All internal users");
         return jsonObject;
@@ -204,7 +201,6 @@ public class AdminController{
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("user", user);
-        jsonObject.put("Array", new JSONArray().put(1));
         log.info("GET request: Delete internal user");
         return jsonObject;
 
@@ -245,7 +241,6 @@ public class AdminController{
         log.info("GET request: Internal user details by id");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("user", user);
-        jsonObject.put("Array", new JSONArray().put(1));
         return jsonObject;
 
         //return "admin/userdetail";
@@ -258,12 +253,10 @@ public class AdminController{
         List<UpdateRequest> updateRequests = UpdateRequestService.getUpdateRequests("pending", "internal");
         if (updateRequests == null) {
             jsonObject.put("modificationRequests", new ArrayList<UpdateRequest>());
-            jsonObject.put("Array", new JSONArray().put(1));
             //model.addAttribute("modificationrequests", new ArrayList<UpdateRequest>());
         }
         else {
             jsonObject.put("modificationRequests", updateRequests);
-            jsonObject.put("Array", new JSONArray().put(1));
             //model.addAttribute("modificationrequests", updateRequests);
         }
         log.info("GET request: All user requests");
