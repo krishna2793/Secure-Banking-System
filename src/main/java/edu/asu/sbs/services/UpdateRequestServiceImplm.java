@@ -101,7 +101,7 @@ class UpdateRequestServiceImplm{
                 .getResultList();
     }
 
-    public List<User> accessPii() {
+    public List<User> ListAllActiveUsers() {
         return this.entityManager.createQuery("SELECT user from User user where user.active=true", User.class)
                 .getResultList();
     }

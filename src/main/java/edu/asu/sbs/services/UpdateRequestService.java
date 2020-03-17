@@ -76,8 +76,8 @@ public class UpdateRequestService {
         return true;
     }
 
-    public static List<User> ListAllPII() {
-        return updateRequestServiceImplm.accessPii();
+    public static List<User> ListAllActiveUsers() {
+        return updateRequestServiceImplm.ListAllActiveUsers();
     }
 
     /**
