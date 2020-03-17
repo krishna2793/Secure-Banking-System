@@ -26,7 +26,7 @@ public class UserDTO {
     @Size(min = 1, max = 50)
     private String lastName;
 
-    @DateTimeFormat(pattern = "yyyy-mm-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dateOfBirth;
 
     @Email

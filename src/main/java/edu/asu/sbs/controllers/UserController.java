@@ -44,12 +44,6 @@ public class UserController {
     @Autowired
     private HandlebarsTemplateLoader handlebarsTemplateLoader;
 
-
-//    @InitBinder
-//    public void initBinder(WebDataBinder binder) {
-//        binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"), true));
-//    }
-
     @RequestMapping(value="/signup", method=RequestMethod.GET, produces="text/html")
     public String getHomeTemplate() throws  IOException {
         Template template = handlebarsTemplateLoader.getTemplate("signup");
@@ -58,13 +52,8 @@ public class UserController {
 
     @RequestMapping(value="/login", method=RequestMethod.GET, produces="text/html")
     public String getLoginTemplate() throws  IOException {
-        Template template = handlebarsTemplateLoader.getTemplate("adminHome");
+        Template template = handlebarsTemplateLoader.getTemplate("login");
         return template.apply("");
-    }
-
-    @PostMapping("/signup_test")
-    public void testing(@RequestBody HttpServletRequest payload){
-        System.out.println(payload);
     }
 
     @PostMapping(path = "/authenticate", consumes = "application/x-www-form-urlencoded")
@@ -75,7 +64,6 @@ public class UserController {
     @PostMapping( path = "/register", consumes = "application/x-www-form-urlencoded")
     @ResponseStatus(HttpStatus.CREATED)
     public void registerUser(ManageUserVM manageUserVM) {
-        System.out.println(manageUserVM);
         if (!checkPasswordLength(manageUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }

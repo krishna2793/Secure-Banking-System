@@ -7,6 +7,38 @@
         <input type="text" placeholder="Search..">
         <br>
         <button> Add Employee</button>
+        <table id="results" width="100%">
+            <thead>
+            <tr>
+                <th>Employee ID</th>
+                <th>User Name</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>SSN</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#each result }}
+                <form method="POST">
+                    <tr>
+                        <td align="center">{{ id }}</td>
+                        <td align="center">{{ userName }}</td>
+                        <td align="center">{{ firstName }}</td>
+                        <td align="center">{{ lastName }}</td>
+                        <td align="center">{{ email }}</td>
+                        <td align="center">{{ phoneNumber }}</td>
+                        <td align="center">{{ ssn }}</td>
+                        <td align="center">
+                            <input id="update" class="btn btn-primary" type="button" name="update" onclick="location.href='/api/v1/admin/update/{{ id }}'" value="Update"/>
+                            <input id="delete" class="btn btn-primary"  type="button" name="delete" onclick="location.href='/api/v1/admin/delete/{{ id }}'" value="Delete"/>
+                        </td>
+                    </tr>
+                </form>
+            {{/each}}
+            </tbody>
+        </table>
     </div>
 {{/partial}}
 
