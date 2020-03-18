@@ -5,9 +5,8 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-public interface UserRepository extends CrudRepository<User, Integer> {
+public interface UserRepository extends CrudRepository<User, Long> {
 
     Optional<User> findOneWithAuthoritiesByEmailIgnoreCase(String username);
 
@@ -27,11 +26,14 @@ public interface UserRepository extends CrudRepository<User, Integer> {
 
     Optional<User> findOneByActivationKey(String activationKey);
 
-    User findByUsernameOrEmail(String username);
+    Optional<User> findOneByResetKey(String key);
 
-    User findById(Long id);
 
-    List<User> findAllByType(String type);
+    User findByUserNameOrEmail(String userName, String email);
+
+    Optional<User> findById(Long id);
+
+    List<User> findByUserType(String type);
 
     boolean findByEmail(String email);
     boolean findByPhoneNumber( String ph);

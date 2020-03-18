@@ -3,7 +3,6 @@ package edu.asu.sbs.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.asu.sbs.config.Constants;
 import lombok.Data;
-import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -12,15 +11,15 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.sql.Date;
+//import java.sql.Date;
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.HashSet;
 
-@Getter
 @Entity
 @Data
 public class User implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -1L;
 
 
     @Id
@@ -45,7 +44,7 @@ public class User implements Serializable {
 
     @NotNull
     @Column(nullable = false)
-    @DateTimeFormat(pattern = "mm-dd-yyyy")
+    @DateTimeFormat(pattern = "yyyy-mm-dd")
     private Date dateOfBirth;
 
     @NotNull
@@ -84,6 +83,18 @@ public class User implements Serializable {
     @JsonIgnore
     private String resetKey;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="user")
+    private Set<Account> accounts = new HashSet<>();
+
+    @OneToOne(mappedBy="representative")
+    private Organization organization;
+
+    @OneToOne(mappedBy="requestBy")
+    private Request request;
+
+    @OneToOne(mappedBy="linkedUser")
+    private Session session;
+
     private Instant resetDate = null;
 
     @Size(max = 20)
@@ -91,24 +102,8 @@ public class User implements Serializable {
     @JsonIgnore
     private String activationKey;
 
-    private LocalDateTime createdOn;
+    private Instant createdOn;
 
-    public LocalDateTime getCreatedOn() {
-        return createdOn;
-    }
+    private Instant expireOn;
 
-    public void setCreatedOn(LocalDateTime createdOn) {
-        this.createdOn = createdOn;
-    }
-
-    private LocalDateTime expireOn;
-
-    public void setExpireOn(LocalDateTime expireOn) {
-
-        this.expireOn = expireOn;
-    }
-
-    public LocalDateTime getExpireOn() {
-        return expireOn;
-    }
 }
