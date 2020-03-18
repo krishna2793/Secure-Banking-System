@@ -66,14 +66,16 @@ public class UserController {
         return userService.authenticate(loginVM);
     }
 
-    @PostMapping(path = "/register", consumes = "application/x-www-form-urlencoded")
+    @PostMapping(path = "/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public void registerUser(ManageUserVM manageUserVM) {
+    public void registerUser(@RequestBody ManageUserVM manageUserVM) {
         System.out.println(manageUserVM);
-        if (!checkPasswordLength(manageUserVM.getPassword())) {
+        if (checkPasswordLength(manageUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
-        userService.registerUser(manageUserVM, manageUserVM.getPassword());
+        User user = userService.registerUser(manageUserVM, manageUserVM.getPassword());
+        mailService.sendActivationEmail(user);
+
     }
 
     @GetMapping("/activate")
@@ -98,7 +100,7 @@ public class UserController {
 
     @PostMapping(path = "/reset-password/finish")
     public void finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
-        if (!checkPasswordLength(keyAndPassword.getNewPassword())) {
+        if (checkPasswordLength(keyAndPassword.getNewPassword())) {
             throw new InvalidPasswordException();
         }
         Optional<User> user =
@@ -119,8 +121,11 @@ public class UserController {
     }
 
     private static boolean checkPasswordLength(String password) {
-        return !StringUtils.isEmpty(password) &&
-                password.length() >= Constants.PASSWORD_MIN_LENGTH &&
-                password.length() <= Constants.PASSWORD_MAX_LENGTH;
+        log.info(String.valueOf(StringUtils.isEmpty(password) ||
+                password.length() < Constants.PASSWORD_MIN_LENGTH ||
+                password.length() > Constants.PASSWORD_MAX_LENGTH));
+        return StringUtils.isEmpty(password) ||
+                password.length() < Constants.PASSWORD_MIN_LENGTH ||
+                password.length() > Constants.PASSWORD_MAX_LENGTH;
     }
 }
