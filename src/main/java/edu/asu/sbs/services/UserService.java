@@ -131,12 +131,12 @@ public class UserService {
     }
 
     @Transactional
-    public void registerUser(UserDTO userDTO, String password) {
-        registerUser(userDTO, password, UserType.USER_ROLE);
+    public User registerUser(UserDTO userDTO, String password) {
+        return registerUser(userDTO, password, UserType.USER_ROLE);
     }
 
     @Transactional
-    public void registerUser(UserDTO userDTO, String password, String userType) {
+    public User registerUser(UserDTO userDTO, String password, String userType) {
         validateUserDTO(userDTO);
         validateUserType(userType);
         User user = new User();
@@ -146,11 +146,14 @@ public class UserService {
         user.setLastName(userDTO.getLastName());
         user.setEmail(userDTO.getEmail().toLowerCase());
         user.setActive(false);
+        user.setUserType(userType);
         user.setActivationKey(RandomUtil.generateActivationKey());
         user.setDateOfBirth(userDTO.getDateOfBirth());
         user.setSsn(userDTO.getSsn());
         user.setPhoneNumber(userDTO.getPhoneNumber());
+        log.info(user.toString());
         userRepository.save(user);
+        return user;
     }
 
     private void validateUserDTO(UserDTO userDTO) {
@@ -171,7 +174,7 @@ public class UserService {
     }
 
     private void validateUserType(String userType) {
-        if (!(userType.equals(UserType.ADMIN_ROLE) || userType.equals(UserType.EMPLOYEE_ROLE1) || userType.equals(UserType.EMPLOYEE_ROLE2))) {
+        if (!(userType.equals(UserType.ADMIN_ROLE) || userType.equals(UserType.EMPLOYEE_ROLE1) || userType.equals(UserType.EMPLOYEE_ROLE2) || userType.equals(UserType.USER_ROLE))) {
             throw new UserTypeException();
         }
     }
