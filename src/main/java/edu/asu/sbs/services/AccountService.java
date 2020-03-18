@@ -16,10 +16,11 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
-
     public List<Account> getAccounts() {
         List<Account> accountList = Lists.newArrayList();
         accountRepository.findAll().forEach(accountList::add);
         return accountList;
     }
+
+
 }

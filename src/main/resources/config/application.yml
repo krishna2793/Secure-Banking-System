@@ -12,7 +12,6 @@ spring:
         prepStmtCacheSize: 250
         prepStmtCacheSqlLimit: 2048
         useServerPrepStmts: true
-#  security:
 
   jpa:
     hibernate:
@@ -32,6 +31,10 @@ spring:
       hibernate.query.in_clause_parameter_padding: true
       #      hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
       hiberante.dialect: org.hibernate.dialect.MySQL8Dialect
+
+  mail:
+    host:
+
 
 sbs:
   security:
