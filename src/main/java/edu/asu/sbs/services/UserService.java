@@ -1,10 +1,7 @@
 package edu.asu.sbs.services;
 
 import edu.asu.sbs.config.UserType;
-import edu.asu.sbs.errors.EmailAlreadyUsedException;
-import edu.asu.sbs.errors.PhoneNumberAlreadyUsedException;
-import edu.asu.sbs.errors.SsnAlreadyUsedException;
-import edu.asu.sbs.errors.UsernameAlreadyUsedException;
+import edu.asu.sbs.errors.*;
 import edu.asu.sbs.models.Account;
 import edu.asu.sbs.models.Transaction;
 import edu.asu.sbs.models.User;
@@ -228,38 +225,39 @@ public class UserService {
     }
 
     public User getCurrentUser() {
-        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (username == null) {
+        log.info("Getting current logged in user");
+        String userName = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> user = userRepository.findOneByUserName(userName);
+        if (userRepository.findOneByUserName(userName).isPresent()) {
+            return user.get();
+        } else {
             return null;
         }
-
-        log.info("Getting current logged in user");
-        return userRepository.findByUsernameOrEmail(username);
     }
 
     @Transactional
-    public User editUser(User userDTO) {
-        User user = userRepository.findById(userDTO.getId());
-
-        user.setPhoneNumber(userDTO.getPhoneNumber());
-        user.setFirstName(userDTO.getFirstName());
-        user.setLastName(userDTO.getLastName());
-        //user.setAddressLine1(userDTO.getAddressLine1());
-        //user.setAddressLine2(userDTO.getAddressLine2());
-        //user.setCity(userDTO.getCity());
-        //user.setState(userDTO.getState());
-        //user.setZip(userDTO.getZip());
-        //user.setModifiedOn(LocalDateTime.now());
-        user.setUserType(userDTO.getUserType());
-        userRepository.save(userDTO);
-
-        return user;
+    public Optional<User> editUser(User userDTO) {
+        return userRepository.findById(userDTO.getId())
+                .map(user -> {
+                    user.setPhoneNumber(userDTO.getPhoneNumber());
+                    user.setFirstName(userDTO.getFirstName());
+                    user.setLastName(userDTO.getLastName());
+                    //user.setAddressLine1(userDTO.getAddressLine1());
+                    //user.setAddressLine2(userDTO.getAddressLine2());
+                    //user.setCity(userDTO.getCity());
+                    //user.setState(userDTO.getState());
+                    //user.setZip(userDTO.getZip());
+                    //user.setModifiedOn(LocalDateTime.now());
+                    user.setUserType(userDTO.getUserType());
+                    userRepository.save(userDTO);
+                    return user;
+                });
     }
 
 
     public User createNewUserRequest(User newUserRequest) {
         newUserRequest.setCreatedOn(Instant.now());
-        newUserRequest.setExpireOn(LocalDateTime.now().plusDays(1));
+        newUserRequest.setExpireOn(Instant.now().plusSeconds(86400));
         newUserRequest.setActive(true);
         newUserRequest = userRepository.save(newUserRequest);
 
@@ -286,26 +284,25 @@ public class UserService {
     }
 
     public List<User> getUsersByType(String type) {
-        List<User> users = userRepository.findAllByType(type);
+        List<User> users = userRepository.findByUserType(type);
         log.info("Getting users by type");
 
         return users;
     }
 
-    public User getUserByIdAndActive(Long id) {
+    public Optional<User> getUserByIdAndActive(Long id) throws Exceptions {
         Optional<User> user = userRepository.findById(id);
         if (user == null) {
             return null;
         }
-
         log.info("Getting user by id");
 
-        return null;
+        return user;
     }
 
 
     public void deleteUser(Long id) {
-        Optional<User> current = userRepository.findById(id);
+        Optional<User> current = userRepository.findByIdAndActive(id, true);
         current.ifPresent(user -> {
             user.setActive(false);
             user.setExpireOn(Instant.now());

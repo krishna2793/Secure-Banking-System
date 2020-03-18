@@ -1,16 +1,15 @@
 package edu.asu.sbs.controllers;
 
-import edu.asu.sbs.errors.*;
-import edu.asu.sbs.models.*;
-//import edu.asu.sbs.services.AdminService;
+import com.google.gson.Gson;
+import edu.asu.sbs.errors.Exceptions;
+import edu.asu.sbs.errors.UnauthorizedAccessExcpetion;
+import edu.asu.sbs.models.UpdateRequest;
+import edu.asu.sbs.models.User;
 import edu.asu.sbs.services.UpdateRequestService;
 import edu.asu.sbs.services.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletContext;
@@ -22,7 +21,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+
+//import edu.asu.sbs.services.AdminService;
 
 @Slf4j
 @RestController
@@ -39,7 +41,7 @@ public class AdminController{
     //    this.userService = userService;
     //}
 
-    @GetMapping("/admin/details")
+    @GetMapping("/employee/details")
     @ResponseBody
     public JSONObject currentUserDetails() throws UnauthorizedAccessExcpetion, JSONException {
 
@@ -47,52 +49,37 @@ public class AdminController{
 
         if (user == null) {
             log.info("GET request: Unauthorized request for admin user detail");
-            throw new UnauthorizedAccessExcpetion("401","Unauthorized Access !");
+            throw new UnauthorizedAccessExcpetion("401", "Unauthorized Access !");
         }
 
         log.info("GET request: Admin user detail");
-        //model.addAttribute("user", user);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("user", user);
-        jsonObject.put("Array", new JSONArray().put(1));
-        return jsonObject;
-
-        //return "admin/detail";
+        return new JSONObject(new Gson().toJson(user));
     }
 
-    @GetMapping("/admin")
-    public String currentAdmin(){
-        return "redirect:/admin/details";
-    }
+    @GetMapping("/employee/edit")
+    public JSONObject editEmployee() throws UnauthorizedAccessExcpetion, JSONException {
 
-    @GetMapping("/admin/edit")
-    public JSONObject editUser() throws UnauthorizedAccessExcpetion, JSONException {
-    //public String editUser(Model model) throws UnauthorizedAccessExcpetion {
         User user = userService.getCurrentUser();
 
         if (user == null) {
             log.info("GET request: Unauthorized request for admin user detail");
-            throw new UnauthorizedAccessExcpetion("401"," ");
+            throw new UnauthorizedAccessExcpetion("401", " ");
         }
 
         log.info("GET request: Admin user detail");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("user", user);
-        jsonObject.put("Array", new JSONArray().put(1));
         return jsonObject;
-        //model.addAttribute("user", user);
-
-        //return "admin/edit";
     }
 
-    @PostMapping("/admin/edit")
+    @PostMapping("/employee/edit")
     @ResponseBody
-    public void editSubmit(@ModelAttribute User user) throws UnauthorizedAccessExcpetion {
+    public void editSubmit(User user) throws UnauthorizedAccessExcpetion {
         User current = userService.getCurrentUser();
 
         if (user == null) {
             log.info("GET request: Unauthorized request for admin user detail");
-            throw new UnauthorizedAccessExcpetion("401"," ");
+            throw new UnauthorizedAccessExcpetion("401", " ");
         }
 
         user.setUserType("ROLE_ADMIN");
@@ -101,199 +88,133 @@ public class AdminController{
         // create request
         userService.editUser(user);
         log.info("POST request: Admin edit");
-
-        //return "redirect:/admin/details?successEdit=true";
     }
 
-    @GetMapping("/admin/user/add")
+    @GetMapping("/employee/add")
     public JSONObject signupForm(@RequestParam(required = false) Boolean success) throws JSONException {
         JSONObject jsonObject = new JSONObject();
         if (success != null) {
-            //model.addAttribute("success", success);
             jsonObject.put("user", "Success");
         }
-        //model.addAttribute("newUserRequest", new User());
         log.info("GET request: Admin new user request");
         jsonObject.put("user", new User());
         return jsonObject;
-
-        //return "admin/newuserrequest";
     }
 
-    @PostMapping("/admin/user/add")
-    public void signupSubmit(@ModelAttribute User newUserRequest) throws Exceptions {
+    @PostMapping("/employee/add")
+    public void signupSubmit(User newUserRequest) throws Exceptions {
 
         if (userService.createNewUserRequest(newUserRequest) == null) {
-            throw new Exceptions("500"," Cannot create New User");
+            throw new Exceptions("500", " Cannot create New User");
         }
 
         log.info("POST request: Admin new user request");
-
-        //return "redirect:/admin/user/add?success=true";
     }
 
-    @GetMapping("/admin/user")
-    public JSONObject getUsers(Model model) throws Exceptions, JSONException {
+    @GetMapping("/allEmployees")
+    public JSONObject getUsers() throws Exceptions, JSONException {
         List<User> users = userService.getUsersByType("Tier_2");
         if (users == null) {
-            throw new Exceptions("500"," No users found for given type");
+            throw new Exceptions("500", " No users found for given type");
         }
-        model.addAttribute("users", users);
         log.info("GET request: All internal users");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("users", users);
         return jsonObject;
-        //return "admin/internalusers";
     }
 
-    @GetMapping("/admin/user/edit/{id}")
+    @GetMapping("/edit/{id}")
     public JSONObject editUser(@PathVariable Long id) throws Exceptions, JSONException {
-        User user = userService.getUserByIdAndActive(id);
+        Optional<User> user = userService.getUserByIdAndActive(id);
         if (user == null) {
-            throw new Exceptions("404"," ");
+            throw new Exceptions("404", " ");
         }
-        if (!user.getUserType().equals("internal")) {
+        if (!user.get().getUserType().equals("EMPLOYEE_ROLE1")) {
             log.warn("GET request: Admin unauthrorised request access");
-            throw new Exceptions("401","Unauthorized Request !");
+            throw new Exceptions("401", "Unauthorized Request !");
         }
 
-        //model.addAttribute("user", user);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("user", user);
 
         log.info("GET request: All internal users");
         return jsonObject;
-
-        //return "admin/internalusers_edit";
     }
 
-    @PostMapping("/admin/user/edit/{id}")
-    public void editSubmit(@ModelAttribute User user, @PathVariable Long id) throws Exceptions {
-        User current = userService.getUserByIdAndActive(id);
+    @PostMapping("/delete/{id}")
+    public void deleteUser(@PathVariable Long id) throws Exceptions {
+        Optional<User> current = userService.getUserByIdAndActive(id);
         if (current == null) {
-            throw new Exceptions("404"," ");
+            throw new Exceptions("404", " ");
         }
-
-        if (!current.getUserType().equals("internal")) {
+        if (!current.get().getUserType().equals("EMPLOYEE_ROLE1")) {
             log.warn("GET request: Admin unauthrorised request access");
-            throw new Exceptions("401","request.unauthorized");
-        }
-        user.setId(id);
-        log.info("POST request: Internal user edit");
-        user = userService.editUser(user);
-        if (user == null) {
-            throw new Exceptions("500"," Internal User Edit request Failed");
-        }
-
-        //return "redirect:/admin/user?successEdit=true";
-    }
-
-    @GetMapping("/admin/user/delete/{id}")
-    public JSONObject deleteUser(@PathVariable Long id) throws Exceptions, JSONException {
-        User user = userService.getUserByIdAndActive(id);
-        if (user == null) {
-            throw new Exceptions("404"," ");
-        }
-        if (!user.getUserType().equals("internal")) {
-            log.warn("GET request: Admin unauthrorised request access");
-            throw new Exceptions("401","request.unauthorized");
-        }
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("user", user);
-        log.info("GET request: Delete internal user");
-        return jsonObject;
-
-
-        //return "admin/internalusers_delete";
-    }
-
-    @PostMapping("/admin/user/delete/{id}")
-    public void deleteSubmit(@ModelAttribute User user, @PathVariable Long id, BindingResult bindingResult) throws Exceptions {
-        User current = userService.getUserByIdAndActive(id);
-        if (current == null) {
-            throw new Exceptions("404"," ");
-        }
-        if (!current.getUserType().equals("internal")) {
-            log.warn("GET request: Admin unauthrorised request access");
-            throw new Exceptions("401","Unauthorized request !!");
+            throw new Exceptions("401", "Unauthorized request !!");
         }
 
         userService.deleteUser(id);
         log.info("POST request: Employee New modification request");
-
-        //return "redirect:/admin/user?successDelete=true";
     }
 
 
-    @GetMapping("/admin/user/{id}")
+    @GetMapping("/viewEmployee/{id}")
     public JSONObject getUserDetail(@PathVariable Long id) throws Exceptions, JSONException {
-        User user = userService.getUserByIdAndActive(id);
+        Optional<User> user = userService.getUserByIdAndActive(id);
         if (user == null) {
-            throw new Exceptions("404"," ");
+            throw new Exceptions("404", " ");
         }
-        if (!user.getUserType().equals("internal")) {
+        if (!user.get().getUserType().equals("EMPLOYEE_ROLE1")) {
             log.warn("GET request: Unauthorized request for external user");
-            throw new Exceptions("409"," ");
+            throw new Exceptions("409", " ");
         }
 
-        //model.addAttribute("user", user);
         log.info("GET request: Internal user details by id");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("user", user);
         return jsonObject;
-
-        //return "admin/userdetail";
     }
 
-    @GetMapping("/admin/user/request")
-    public JSONObject getAllUserRequest(Model model) throws JSONException {
+    @GetMapping("/requests")
+    public JSONObject getAllUserRequest() throws JSONException {
         JSONObject jsonObject = new JSONObject();
 
         List<UpdateRequest> updateRequests = UpdateRequestService.getUpdateRequests("pending", "internal");
         if (updateRequests == null) {
             jsonObject.put("modificationRequests", new ArrayList<UpdateRequest>());
-            //model.addAttribute("modificationrequests", new ArrayList<UpdateRequest>());
-        }
-        else {
+        } else {
             jsonObject.put("modificationRequests", updateRequests);
-            //model.addAttribute("modificationrequests", updateRequests);
         }
         log.info("GET request: All user requests");
         return jsonObject;
-        //return "admin/modificationrequests";
     }
 
-    @GetMapping("/admin/user/request/view/{id}")
-    public JSONObject getUserRequest(Model model, @PathVariable() UUID id) throws Exceptions, JSONException {
+    @GetMapping("/employee/requests/view/{id}")
+    public JSONObject getUserRequest(@PathVariable() UUID id) throws Exceptions, JSONException {
         UpdateRequest updateRequest = UpdateRequestService.getUpdateRequest(id);
         JSONObject jsonObject = new JSONObject();
         if (updateRequest == null) {
-            throw new Exceptions("404","Invalid Request !");
+            throw new Exceptions("404", "Invalid Request !");
         }
         if (!updateRequest.getUserType().equals("internal")) {
             log.warn("GET request: Admin unauthrorised request access");
-            throw new Exceptions("401","Unauthorised Request !");
+            throw new Exceptions("401", "Unauthorised Request !");
         }
-        //model.addAttribute("modificationrequest", updateRequest);
         jsonObject.put("modificationRequests", updateRequest);
-        //jsonObject.put("Array", new JSONArray().put(1));
         log.info("GET request: User modification request by ID");
 
         return jsonObject;
-        //return "admin/modificationrequest_detail";
     }
 
-    @PostMapping("/admin/user/request/{requestId}")
-    public void approveEdit(@PathVariable UUID requestId, @ModelAttribute UpdateRequest request) throws Exceptions {
+    @PostMapping("/requests/{requestId}")
+    public void approveEdit(@PathVariable UUID requestId, UpdateRequest request) throws Exceptions {
         String status = request.getStatus();
         if (status == null || !(request.getStatus().equals("approved") || request.getStatus().equals("rejected"))) {
-            throw new Exceptions("400","Invalid Request Action !");
+            throw new Exceptions("400", "Invalid Request Action !");
         }
 
         // checks validity of request
         if (UpdateRequestService.getUpdateRequest(requestId) == null) {
-            throw new Exceptions("404","Invalid Request !");
+            throw new Exceptions("404", "Invalid Request !");
         }
         request.setUpdateRequestId(requestId);
 
@@ -329,32 +250,28 @@ public class AdminController{
             log.warn("GET request: Admin unauthrorised request access");
             throw new Exceptions("401","Unauthorised Request !");
         }
-        //model.addAttribute("modificationrequest", updateRequest);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("modificationRequests", updateRequest);
         log.info("GET request: User modification request by ID");
 
         return jsonObject;
-        //return "admin/modificationrequest_delete";
     }
 
     @PostMapping("/admin/user/request/delete/{requestId}")
-    public void deleteRequest(@PathVariable UUID requestId, @ModelAttribute UpdateRequest request, BindingResult bindingResult) throws Exceptions {
-        request = UpdateRequestService.getUpdateRequest(requestId);
+    public void deleteRequest(@PathVariable UUID requestId) throws Exceptions {
+        UpdateRequest request = UpdateRequestService.getUpdateRequest(requestId);
 
         // checks validity of request
         if (request == null) {
-            throw new Exceptions("404","Invalid Request !");
+            throw new Exceptions("404", "Invalid Request !");
         }
 
         if (!UpdateRequestService.verifyUpdateRequestUserType(requestId, "internal")) {
             log.warn("GET request: Admin unauthrorised request access");
-            throw new Exceptions("401","Unauthorised Request !");
+            throw new Exceptions("401", "Unauthorised Request !");
         }
         UpdateRequestService.deleteUpdateRequest(request);
         log.info("POST request: Admin approves modification request");
-
-        //return "redirect:/admin/user/request?successDelete=true";
     }
 
     /*
@@ -364,16 +281,17 @@ public class AdminController{
     }
      */
 
-    /**Returns a list of all users
-     * @return*/
-    @GetMapping("/admin/user/pii")
-    public JSONObject adminAccessPII(Model model) throws JSONException {
-        List <User> userList = UpdateRequestService.ListAllActiveUsers();
-        //model.addAttribute("users", userList);
+    /**
+     * Returns a list of all users
+     *
+     * @return
+     */
+    @GetMapping("/allActiveEmployees")
+    public JSONObject adminAccessActiveEmployees() throws JSONException {
+        List<User> userList = UpdateRequestService.ListAllActiveUsers();
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("users", userList);
         return jsonObject;
-        //return "admin/accesspii";
     }
 
     @GetMapping("/admin/logDownload")

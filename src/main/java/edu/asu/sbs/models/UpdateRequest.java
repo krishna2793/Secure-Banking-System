@@ -1,15 +1,14 @@
 package edu.asu.sbs.models;
 
+import edu.asu.sbs.config.Constants;
+import lombok.Data;
+import lombok.Getter;
+
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import edu.asu.sbs.config.Constants;
-import lombok.Data;
-import lombok.Getter;
-import org.hibernate.annotations.GenericGenerator;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -80,7 +79,6 @@ public class UpdateRequest implements Serializable {
     @NotNull
     private String userType;
     @NotNull
-    //@Column(name = "createdOn", updatable = false)
     private LocalDateTime createdOn;
 
     private LocalDateTime modifiedOn;
@@ -92,11 +90,9 @@ public class UpdateRequest implements Serializable {
     private Boolean active;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    //@JoinColumn(name = "approvedByUserId", referencedColumnName = "userId")
     private User approvedBy;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    // @JoinColumn(name = "userId", referencedColumnName = "userId")
     private User user;
 
     /**
