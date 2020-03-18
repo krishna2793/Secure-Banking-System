@@ -121,9 +121,6 @@ public class UserController {
     }
 
     private static boolean checkPasswordLength(String password) {
-        log.info("LOLOLOLOLOL");
-        log.info(password);
-        log.info(String.valueOf(password.length()));
         log.info(String.valueOf(StringUtils.isEmpty(password) ||
                 password.length() < Constants.PASSWORD_MIN_LENGTH ||
                 password.length() > Constants.PASSWORD_MAX_LENGTH));
