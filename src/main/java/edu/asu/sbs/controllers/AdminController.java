@@ -7,9 +7,11 @@ import edu.asu.sbs.models.UpdateRequest;
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.services.UpdateRequestService;
 import edu.asu.sbs.services.UserService;
+import edu.asu.sbs.services.dto.UserDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletContext;
@@ -82,7 +84,7 @@ public class AdminController{
             throw new UnauthorizedAccessExcpetion("401", " ");
         }
 
-        user.setUserType("ROLE_ADMIN");
+        user.setUserType("TIER_1");
         user.setId(current.getId());
 
         // create request
@@ -102,12 +104,9 @@ public class AdminController{
     }
 
     @PostMapping("/employee/add")
-    public void signupSubmit(User newUserRequest) throws Exceptions {
-
-        if (userService.createNewUserRequest(newUserRequest) == null) {
-            throw new Exceptions("500", " Cannot create New User");
-        }
-
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void signupSubmit(UserDTO newUserRequest, String userType) throws Exceptions {
+        userService.registerUser(newUserRequest, userType);
         log.info("POST request: Admin new user request");
     }
 
@@ -205,23 +204,24 @@ public class AdminController{
         return jsonObject;
     }
 
-    @PostMapping("/requests/{requestId}")
-    public void approveEdit(@PathVariable UUID requestId, UpdateRequest request) throws Exceptions {
+    @PutMapping("/requests/{id}")
+    public void approveEdit(@PathVariable UUID id) throws Exceptions {
+        UpdateRequest request = UpdateRequestService.getUpdateRequest(id);
         String status = request.getStatus();
         if (status == null || !(request.getStatus().equals("approved") || request.getStatus().equals("rejected"))) {
             throw new Exceptions("400", "Invalid Request Action !");
         }
 
         // checks validity of request
-        if (UpdateRequestService.getUpdateRequest(requestId) == null) {
+        if (UpdateRequestService.getUpdateRequest(id) == null) {
             throw new Exceptions("404", "Invalid Request !");
         }
-        request.setUpdateRequestId(requestId);
+        request.setUpdateRequestId(id);
 
         // checks if admin is authorized for the request to approve
-        if (!UpdateRequestService.verifyUpdateRequestUserType(requestId, "internal")) {
+        if (!UpdateRequestService.verifyUpdateRequestUserType(id, "internal")) {
             log.warn("GET request: Admin unauthrorised request access");
-            throw new Exceptions("401","Unauthorised Request !");
+            throw new Exceptions("401", "Unauthorised Request !");
         }
 
         request.setUserType("internal");
@@ -234,9 +234,6 @@ public class AdminController{
             UpdateRequestService.rejectUpdateRequest(request);
         }
         log.info("POST request: Admin approves modification request");
-        //JSONObject jsonObject = new JSONObject();
-        //jsonObject.put("modificationRequests", updateRequest);
-        //return "redirect:/admin/user/request?successAction=true";
     }
 
     @GetMapping("/admin/user/request/delete/{id}")
@@ -294,7 +291,7 @@ public class AdminController{
         return jsonObject;
     }
 
-    @GetMapping("/admin/logDownload")
+    @GetMapping("/logDownload")
     public void doDownload(HttpServletRequest request,
                            HttpServletResponse response) throws IOException {
 

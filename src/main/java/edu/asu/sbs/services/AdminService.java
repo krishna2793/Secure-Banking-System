@@ -1,15 +1,17 @@
 package edu.asu.sbs.services;
 
+import edu.asu.sbs.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class AdminService<AdminRepository> {
+public class AdminService {
 
-    final AdminRepository adminRepository;
+    private final UserRepository userRepository;
 
-    public AdminService(AdminRepository adminRepository) {
-        this.adminRepository = adminRepository;
+    public AdminService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
+
 }
