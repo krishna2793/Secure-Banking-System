@@ -1,5 +1,6 @@
 package edu.asu.sbs.services;
 
+import com.google.common.collect.Lists;
 import edu.asu.sbs.config.UserType;
 import edu.asu.sbs.errors.*;
 import edu.asu.sbs.models.Account;
@@ -31,6 +32,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -227,6 +229,12 @@ public class UserService {
                 });
     }
 
+    public void updateUserType(User requestBy, String userType) {
+
+        requestBy.setUserType(userType);
+        userRepository.save(requestBy);
+    }
+
     @Getter
     @Setter
     public static class JWTToken {
@@ -236,4 +244,60 @@ public class UserService {
             this.token = token;
         }
     }
+
+    public User getCurrentUser() {
+        log.info("Getting current logged in user");
+        String userName = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> user = userRepository.findOneByUserName(userName);
+        if (userRepository.findOneByUserName(userName).isPresent()) {
+            return user.get();
+        } else {
+            return null;
+        }
+    }
+
+    @Transactional
+    public Optional<User> editUser(User userDTO) {
+        return userRepository.findById(userDTO.getId())
+                .map(user -> {
+                    user.setPhoneNumber(userDTO.getPhoneNumber());
+                    user.setFirstName(userDTO.getFirstName());
+                    user.setLastName(userDTO.getLastName());
+                    //user.setAddressLine1(userDTO.getAddressLine1());
+                    //user.setAddressLine2(userDTO.getAddressLine2());
+                    //user.setCity(userDTO.getCity());
+                    //user.setState(userDTO.getState());
+                    //user.setZip(userDTO.getZip());
+                    //user.setModifiedOn(LocalDateTime.now());
+                    user.setUserType(userDTO.getUserType());
+                    userRepository.save(userDTO);
+                    return user;
+                });
+    }
+
+
+    public List<User> getAllEmployees() {
+        return userRepository.findByUserTypeIn(Lists.newArrayList(UserType.EMPLOYEE_ROLE1, UserType.EMPLOYEE_ROLE2));
+    }
+
+    public Optional<User> getUserByIdAndActive(Long id) throws Exceptions {
+        Optional<User> user = userRepository.findById(id);
+        if (user == null) {
+            return null;
+        }
+        log.info("Getting user by id");
+
+        return user;
+    }
+
+
+    public void deleteUser(Long id) {
+        Optional<User> current = userRepository.findById(id);
+        current.ifPresent(user -> {
+            user.setActive(false);
+            user.setExpireOn(Instant.now());
+            userRepository.save(user);
+        });
+    }
+
 }

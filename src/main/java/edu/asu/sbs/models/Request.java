@@ -1,5 +1,6 @@
 package edu.asu.sbs.models;
 
+import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -9,6 +10,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.Instant;
 
+@Data
 @Entity
 public class Request implements Serializable {
 
