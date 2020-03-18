@@ -35,9 +35,9 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     List<User> findByUserType(String type);
 
+    List<User> findByUserTypeIn(List<String> typeList);
+
     boolean findByEmail(String email);
 
     boolean findByPhoneNumber(String ph);
-
-    Optional<User> findByIdAndActive(Long id, boolean b);
 }

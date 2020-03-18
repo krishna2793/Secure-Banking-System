@@ -1,17 +1,21 @@
 package edu.asu.sbs.controllers;
 
 import com.google.gson.Gson;
+import edu.asu.sbs.config.RequestType;
+import edu.asu.sbs.config.UserType;
 import edu.asu.sbs.errors.Exceptions;
 import edu.asu.sbs.errors.UnauthorizedAccessExcpetion;
-import edu.asu.sbs.models.UpdateRequest;
+import edu.asu.sbs.models.Request;
 import edu.asu.sbs.models.User;
-import edu.asu.sbs.services.UpdateRequestService;
+import edu.asu.sbs.services.RequestService;
 import edu.asu.sbs.services.UserService;
 import edu.asu.sbs.services.dto.UserDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletContext;
@@ -21,27 +25,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-
-//import edu.asu.sbs.services.AdminService;
 
 @Slf4j
+@PreAuthorize("hasAuthority('" + UserType.ADMIN_ROLE + "')")
 @RestController
 @RequestMapping("/api/v1/admin")
 public class AdminController{
 
     private final UserService userService;
+    private final RequestService requestService;
 
-    public AdminController(UserService userService) {
+    public AdminController(UserService userService, RequestService requestService) {
         this.userService = userService;
+        this.requestService = requestService;
     }
-
-    //public AdminController(UserService userService, AdminService adminService) {
-    //    this.userService = userService;
-    //}
 
     @GetMapping("/employee/details")
     @ResponseBody
@@ -58,86 +56,16 @@ public class AdminController{
         return new JSONObject(new Gson().toJson(user));
     }
 
-    @GetMapping("/employee/edit")
-    public JSONObject editEmployee() throws UnauthorizedAccessExcpetion, JSONException {
-
-        User user = userService.getCurrentUser();
-
-        if (user == null) {
-            log.info("GET request: Unauthorized request for admin user detail");
-            throw new UnauthorizedAccessExcpetion("401", " ");
-        }
-
-        log.info("GET request: Admin user detail");
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("user", user);
-        return jsonObject;
-    }
-
-    @PostMapping("/employee/edit")
-    @ResponseBody
-    public void editSubmit(User user) throws UnauthorizedAccessExcpetion {
-        User current = userService.getCurrentUser();
-
-        if (user == null) {
-            log.info("GET request: Unauthorized request for admin user detail");
-            throw new UnauthorizedAccessExcpetion("401", " ");
-        }
-
-        user.setUserType("TIER_1");
-        user.setId(current.getId());
-
-        // create request
-        userService.editUser(user);
-        log.info("POST request: Admin edit");
-    }
-
-    @GetMapping("/employee/add")
-    public JSONObject signupForm(@RequestParam(required = false) Boolean success) throws JSONException {
-        JSONObject jsonObject = new JSONObject();
-        if (success != null) {
-            jsonObject.put("user", "Success");
-        }
-        log.info("GET request: Admin new user request");
-        jsonObject.put("user", new User());
-        return jsonObject;
-    }
-
     @PostMapping("/employee/add")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void signupSubmit(UserDTO newUserRequest, String userType) throws Exceptions {
-        userService.registerUser(newUserRequest, userType);
+    public void signupSubmit(UserDTO newUserRequest, String password, String userType) throws Exceptions {
+        userService.registerUser(newUserRequest, password, userType);
         log.info("POST request: Admin new user request");
     }
 
     @GetMapping("/allEmployees")
-    public JSONObject getUsers() throws Exceptions, JSONException {
-        List<User> users = userService.getUsersByType("Tier_2");
-        if (users == null) {
-            throw new Exceptions("500", " No users found for given type");
-        }
-        log.info("GET request: All internal users");
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("users", users);
-        return jsonObject;
-    }
-
-    @GetMapping("/edit/{id}")
-    public JSONObject editUser(@PathVariable Long id) throws Exceptions, JSONException {
-        Optional<User> user = userService.getUserByIdAndActive(id);
-        if (user == null) {
-            throw new Exceptions("404", " ");
-        }
-        if (!user.get().getUserType().equals("EMPLOYEE_ROLE1")) {
-            log.warn("GET request: Admin unauthrorised request access");
-            throw new Exceptions("401", "Unauthorized Request !");
-        }
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("user", user);
-
-        log.info("GET request: All internal users");
-        return jsonObject;
+    public JSONArray getUsers() throws Exceptions, JSONException {
+        return new JSONArray(new Gson().toJson(userService.getAllEmployees()));
     }
 
     @PostMapping("/delete/{id}")
@@ -174,20 +102,30 @@ public class AdminController{
     }
 
     @GetMapping("/requests")
-    public JSONObject getAllUserRequest() throws JSONException {
-        JSONObject jsonObject = new JSONObject();
-
-        List<UpdateRequest> updateRequests = UpdateRequestService.getUpdateRequests("pending", "internal");
-        if (updateRequests == null) {
-            jsonObject.put("modificationRequests", new ArrayList<UpdateRequest>());
-        } else {
-            jsonObject.put("modificationRequests", updateRequests);
-        }
-        log.info("GET request: All user requests");
-        return jsonObject;
+    public JSONArray getAllUserRequest() throws JSONException {
+        return new JSONArray(new Gson().toJson(requestService.getAllRequests()));
     }
 
-    @GetMapping("/employee/requests/view/{id}")
+    @PutMapping("/requests/approve/{id}")
+    public void approveEdit(@PathVariable Long id) throws Exceptions {
+
+        Optional<Request> request = requestService.getRequest(id);
+        request.ifPresent(req -> {
+            switch (req.getRequestType()) {
+                case RequestType.TIER1_TO_TIER2:
+                    userService.updateUserType(req.getRequestBy(), UserType.EMPLOYEE_ROLE2);
+                    break;
+                case RequestType.TIER2_TO_TIER1:
+                    userService.updateUserType(req.getRequestBy(), UserType.EMPLOYEE_ROLE1);
+                    break;
+                case RequestType.UPDATE_PROFILE:
+                    break;
+            }
+        });
+    }
+
+    /*
+     @GetMapping("/requests/view/{id}")
     public JSONObject getUserRequest(@PathVariable() UUID id) throws Exceptions, JSONException {
         UpdateRequest updateRequest = UpdateRequestService.getUpdateRequest(id);
         JSONObject jsonObject = new JSONObject();
@@ -203,40 +141,7 @@ public class AdminController{
 
         return jsonObject;
     }
-
-    @PutMapping("/requests/{id}")
-    public void approveEdit(@PathVariable UUID id) throws Exceptions {
-        UpdateRequest request = UpdateRequestService.getUpdateRequest(id);
-        String status = request.getStatus();
-        if (status == null || !(request.getStatus().equals("approved") || request.getStatus().equals("rejected"))) {
-            throw new Exceptions("400", "Invalid Request Action !");
-        }
-
-        // checks validity of request
-        if (UpdateRequestService.getUpdateRequest(id) == null) {
-            throw new Exceptions("404", "Invalid Request !");
-        }
-        request.setUpdateRequestId(id);
-
-        // checks if admin is authorized for the request to approve
-        if (!UpdateRequestService.verifyUpdateRequestUserType(id, "internal")) {
-            log.warn("GET request: Admin unauthrorised request access");
-            throw new Exceptions("401", "Unauthorised Request !");
-        }
-
-        request.setUserType("internal");
-        request.setStatus(status);
-        if (status.equals("approved")) {
-            UpdateRequestService.approveUpdateRequest(request);
-        }
-        // rejects request
-        else {
-            UpdateRequestService.rejectUpdateRequest(request);
-        }
-        log.info("POST request: Admin approves modification request");
-    }
-
-    @GetMapping("/admin/user/request/delete/{id}")
+    @GetMapping("/request/delete/{id}")
     public JSONObject getDeleteRequest(@PathVariable() UUID id) throws Exceptions, JSONException {
         UpdateRequest updateRequest = UpdateRequestService.getUpdateRequest(id);
 
@@ -254,7 +159,7 @@ public class AdminController{
         return jsonObject;
     }
 
-    @PostMapping("/admin/user/request/delete/{requestId}")
+    @PostMapping("/request/delete/{requestId}")
     public void deleteRequest(@PathVariable UUID requestId) throws Exceptions {
         UpdateRequest request = UpdateRequestService.getUpdateRequest(requestId);
 
@@ -270,26 +175,7 @@ public class AdminController{
         UpdateRequestService.deleteUpdateRequest(request);
         log.info("POST request: Admin approves modification request");
     }
-
-    /*
-    @RequestMapping("/admin/syslogs")
-    public void adminControllerSystemLogs() {
-        //return "admin/systemlogs";
-    }
      */
-
-    /**
-     * Returns a list of all users
-     *
-     * @return
-     */
-    @GetMapping("/allActiveEmployees")
-    public JSONObject adminAccessActiveEmployees() throws JSONException {
-        List<User> userList = UpdateRequestService.ListAllActiveUsers();
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("users", userList);
-        return jsonObject;
-    }
 
     @GetMapping("/logDownload")
     public void doDownload(HttpServletRequest request,

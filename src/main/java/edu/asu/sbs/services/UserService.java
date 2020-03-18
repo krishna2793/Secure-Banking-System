@@ -1,5 +1,6 @@
 package edu.asu.sbs.services;
 
+import com.google.common.collect.Lists;
 import edu.asu.sbs.config.UserType;
 import edu.asu.sbs.errors.*;
 import edu.asu.sbs.models.Account;
@@ -225,6 +226,12 @@ public class UserService {
                 });
     }
 
+    public void updateUserType(User requestBy, String userType) {
+
+        requestBy.setUserType(userType);
+        userRepository.save(requestBy);
+    }
+
     @Getter
     @Setter
     public static class JWTToken {
@@ -266,39 +273,8 @@ public class UserService {
     }
 
 
-    public User createNewUserRequest(User newUserRequest) {
-        newUserRequest.setCreatedOn(Instant.now());
-        newUserRequest.setExpireOn(Instant.now().plusSeconds(86400));
-        newUserRequest.setActive(true);
-        newUserRequest = userRepository.save(newUserRequest);
-
-        log.info("Creating new internal user request");
-
-        /*
-        //setup up email message
-        message = new SimpleMailMessage();
-        message.setText(env.getProperty("internal.user.verification.body").replace(":id:",newUserRequest.getActivationKey().toString()));
-        message.setSubject(env.getProperty("internal.user.verification.subject"));
-        message.setTo(newUserRequest.getEmail());
-
-        // send email
-        if (emailService.sendEmail(message) == false) {
-            // Deactivate request if email fails
-            newUserRequest.setActive(false);
-            newUserRequestDao.update(newUserRequest);
-            logger.warn("Email message failed");
-
-            return null;
-        };
-         */
-        return newUserRequest;
-    }
-
-    public List<User> getUsersByType(String type) {
-        List<User> users = userRepository.findByUserType(type);
-        log.info("Getting users by type");
-
-        return users;
+    public List<User> getAllEmployees() {
+        return userRepository.findByUserTypeIn(Lists.newArrayList(UserType.EMPLOYEE_ROLE1, UserType.EMPLOYEE_ROLE2));
     }
 
     public Optional<User> getUserByIdAndActive(Long id) throws Exceptions {
@@ -313,7 +289,7 @@ public class UserService {
 
 
     public void deleteUser(Long id) {
-        Optional<User> current = userRepository.findByIdAndActive(id, true);
+        Optional<User> current = userRepository.findById(id);
         current.ifPresent(user -> {
             user.setActive(false);
             user.setExpireOn(Instant.now());
