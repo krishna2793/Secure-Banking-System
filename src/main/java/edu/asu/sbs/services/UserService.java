@@ -46,7 +46,7 @@ public class UserService {
     final TransactionRepository transactionRepository;
 
 
-    public UserService(UserRepository userRepository,AccountRepository accountRepository, TransactionRepository transactionRepository, AuthenticationManagerBuilder authenticationManagerBuilder, TokenProvider tokenProvider, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, AccountRepository accountRepository, TransactionRepository transactionRepository, AuthenticationManagerBuilder authenticationManagerBuilder, TokenProvider tokenProvider, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.tokenProvider = tokenProvider;
@@ -82,7 +82,7 @@ public class UserService {
         u.setUserType("t2");
         userRepository.save(u);
 
-        Account a= new Account();
+        Account a = new Account();
         a.setAccountBalance(1000.00);
         a.setAccountNumber("12345");
         a.setAccountType("savings");
@@ -90,7 +90,7 @@ public class UserService {
         a.setUser(userRepository.findOneWithUserTypeByUserName("admin").orElse(null));
         accountRepository.save(a);
 
-        a= new Account();
+        a = new Account();
         a.setAccountBalance(1000.00);
         a.setAccountNumber("12347");
         a.setAccountType("checking");
@@ -98,7 +98,7 @@ public class UserService {
         a.setUser(userRepository.findOneWithUserTypeByUserName("admin").orElse(null));
         accountRepository.save(a);
 
-        a= new Account();
+        a = new Account();
         a.setAccountBalance(1000.00);
         a.setAccountNumber("12346");
         a.setAccountType("checking");
@@ -133,7 +133,13 @@ public class UserService {
 
     @Transactional
     public void registerUser(UserDTO userDTO, String password) {
+        registerUser(userDTO, password, UserType.USER_ROLE);
+    }
+
+    @Transactional
+    public void registerUser(UserDTO userDTO, String password, String userType) {
         validateUserDTO(userDTO);
+        validateUserType(userType);
         User user = new User();
         user.setUserName(userDTO.getUserName().toLowerCase());
         user.setPasswordHash(passwordEncoder.encode(password));
@@ -144,7 +150,6 @@ public class UserService {
         user.setActivationKey(RandomUtil.generateActivationKey());
         user.setDateOfBirth(userDTO.getDateOfBirth());
         user.setSsn(userDTO.getSsn());
-        user.setUserType(UserType.USER_ROLE);
         user.setPhoneNumber(userDTO.getPhoneNumber());
         userRepository.save(user);
     }
@@ -164,6 +169,12 @@ public class UserService {
                         }
                     }
                 });
+    }
+
+    private void validateUserType(String userType) {
+        if (!(userType.equals(UserType.ADMIN_ROLE) || userType.equals(UserType.EMPLOYEE_ROLE1) || userType.equals(UserType.EMPLOYEE_ROLE2))) {
+            throw new UserTypeException();
+        }
     }
 
     private boolean removeNonActivatedUser(User existingUser) {
