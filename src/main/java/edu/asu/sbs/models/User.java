@@ -11,11 +11,12 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-//import java.sql.Date;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
+//import java.sql.Date;
 
 @Entity
 @Data
@@ -45,7 +46,7 @@ public class User implements Serializable {
 
     @NotNull
     @Column(nullable = false)
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "yyyy-mm-dd")
     private Date dateOfBirth;
 
     @NotNull
@@ -87,11 +88,24 @@ public class User implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy="user")
     private Set<Account> accounts = new HashSet<>();
 
+    @OneToOne(mappedBy="representative")
+    private Organization organization;
+
+    @OneToOne(mappedBy="requestBy")
+    private Request request;
+
+    @OneToOne(mappedBy="linkedUser")
+    private Session session;
+
     private Instant resetDate = null;
 
     @Size(max = 20)
     @Column(length = 20)
     @JsonIgnore
     private String activationKey;
+
+    private Instant createdOn;
+
+    private Instant expireOn;
 
 }

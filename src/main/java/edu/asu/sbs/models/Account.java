@@ -18,6 +18,7 @@ import java.util.Set;
 @Entity
 @Data
 public class Account implements Serializable {
+
     private static final long serialVersionUID = -1L;
 
     @Id
@@ -47,6 +48,10 @@ public class Account implements Serializable {
     @JoinColumn(nullable = false)
     @JsonUnwrapped
     private User user;
+
+    @OneToOne
+    @JoinColumn(nullable = false)
+    private TransactionAccountLog log;
 
     @OneToMany(mappedBy = "fromAccount")
     private Set<Transaction> debitTransactions = new HashSet<>();

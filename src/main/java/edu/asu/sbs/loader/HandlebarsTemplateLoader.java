@@ -1,12 +1,5 @@
 package edu.asu.sbs.loader;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PostConstruct;
-
-import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.jknack.handlebars.Context;
 import com.github.jknack.handlebars.Handlebars;
@@ -18,17 +11,21 @@ import com.github.jknack.handlebars.context.JavaBeanValueResolver;
 import com.github.jknack.handlebars.context.MapValueResolver;
 import com.github.jknack.handlebars.context.MethodValueResolver;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
-import com.github.jknack.handlebars.io.FileTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import com.github.jknack.handlebars.io.TemplateSource;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class will load the handlebar templates
+ *
  * @author Siva
  * @version 1.0
- *
  */
 @Component
 public class HandlebarsTemplateLoader {
@@ -55,29 +52,30 @@ public class HandlebarsTemplateLoader {
 
     /**
      * Get the compiled template
+     *
      * @param templateName - name of the template to compile
      * @return the compiled template
      * @throws IOException
      */
     public Template getTemplate(String templateName) throws IOException {
-        Template template = this.getHandlebars().compile(templateName);
-        return template;
+        return this.getHandlebars().compile(templateName);
     }
 
     /**
      * The Context for the template
+     *
      * @param model
      * @return
      */
     public Context getContext(JsonNode model) {
 
-        Context context = Context
+        return Context
                 .newBuilder(model)
-                .resolver(JsonNodeValueResolver.INSTANCE,JavaBeanValueResolver.INSTANCE,FieldValueResolver.INSTANCE,
+                .resolver(JsonNodeValueResolver.INSTANCE, JavaBeanValueResolver.INSTANCE, FieldValueResolver.INSTANCE,
                         MapValueResolver.INSTANCE,
                         MethodValueResolver.INSTANCE)
                 .build();
-        return context;
+
     }
 }
 

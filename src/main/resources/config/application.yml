@@ -12,7 +12,6 @@ spring:
         prepStmtCacheSize: 250
         prepStmtCacheSqlLimit: 2048
         useServerPrepStmts: true
-#  security:
 
   jpa:
     hibernate:
@@ -30,6 +29,25 @@ spring:
       hibernate.order_updates: true
       hibernate.query.fail_on_pagination_over_collection_fetch: true
       hibernate.query.in_clause_parameter_padding: true
+      #      hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+      hiberante.dialect: org.hibernate.dialect.MySQL8Dialect
+
+  mail:
+    default-encoding: UTF-8
+    host: smtp.gmail.com
+    username: asecurebank@gmail.com
+    password: ahksnmxgllecmfgx
+    port: 587
+    properties:
+      mail.smtp.starttls:
+        enable: true
+        auth: true
+        required: true
+
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+
 
 sbs:
   security:
@@ -38,13 +56,28 @@ sbs:
         base64-secret: NjNjZTE5MThmMmFmODU2Zjc4M2M3Zjc0M2FhZTZmYmMzZjlkMzlkYzQxMzQ5NTUzODkyNGIzYjBjZTNmNjRkNmVhYjllZGI3NzE5N2VlOTIzYzAyNzlkNWNiNTE3YzVkNjg0NWI0YmRhNWQ1MjUxZTZlZDhhYjFmMzIyZjAzMGI=
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
+  mail:
+    base-url: https://www.sbsbank.com
+    enabled: true
+    from: asecurebank@gmail.com
+
 
 server:
   port: 8080
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css, application/javascript, application/json
+    min-response-size: 1024
+
 #  ssl:
 #    key-store: classpath:config/tls/keystore.p12
 #    key-store-password: Sbs@Application56
 #    key-store-type: PKCS12
 #    key-alias: sbsapplication
 #    ciphers: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 ,TLS_DHE_RSA_WITH_AES_128_GCM_SHA256 ,TLS_DHE_RSA_WITH_AES_256_GCM_SHA384 ,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,TLS_DHE_RSA_WITH_AES_128_CBC_SHA256,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_256_CBC_SHA256,TLS_DHE_RSA_WITH_AES_256_CBC_SHA,TLS_RSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_RSA_WITH_AES_256_CBC_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA,TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA,TLS_RSA_WITH_CAMELLIA_256_CBC_SHA,TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA,TLS_RSA_WITH_CAMELLIA_128_CBC_SHA
-
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type: TRACE
