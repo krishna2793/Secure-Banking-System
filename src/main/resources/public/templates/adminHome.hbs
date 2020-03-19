@@ -1,0 +1,35 @@
+{{#partial "head"}}
+
+{{/partial}}
+{{#partial "body"}}
+    <div >
+        <table id="results" width="100%">
+            <thead>
+            <tr>
+                <th>Employee ID</th>
+                <th>Request Description</th>
+                <th>Time</th>
+                <th>Approve/Deny</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#each result }}
+            <tr>
+                <td align="center">{{ emplyoeeId }}</td>
+                <td align="center">{{ description }}</td>
+                <td align="center">{{ time }}</td>
+                <td align="center">
+                    <button class="inline"> <a href=""> Approve </a> </button>
+                    <button class="inline"> <a href=""> Deny </a> </button>
+                </td>
+            </tr>
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script type="text/javascript" src="/js/adminHandler.js"></script>
+{{/partial}}
+{{> adminBase}}

@@ -1,0 +1,51 @@
+{{#partial "head"}}
+
+{{/partial}}
+{{#partial "body"}}
+    <div>
+        <br>
+        <button class="btn btn-primary" onclick="location.href='/api/v1/admin/employee/add'">Add Employee</button>
+        <br>
+        <br>
+        <table id="results" width="100%">
+            <thead>
+            <tr>
+                <th align="center">Employee ID</th>
+                <th align="center">User Name</th>
+                <th align="center">First Name</th>
+                <th align="center">Last Name</th>
+                <th align="center">User Type</th>
+                <th align="center">Email</th>
+                <th align="center">Phone Number</th>
+                <th align="center">SSN</th>
+                <th align="center">Update/Delete</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#each result }}
+                <form method="POST">
+                    <tr>
+                        <td align="center">{{ id }}</td>
+                        <td align="center">{{ userName }}</td>
+                        <td align="center">{{ firstName }}</td>
+                        <td align="center">{{ lastName }}</td>
+                        <td align="center">{{ userType }}</td>
+                        <td align="center">{{ email }}</td>
+                        <td align="center">{{ phoneNumber }}</td>
+                        <td align="center">{{ ssn }}</td>
+                        <td align="center">
+                            <input id="update" class="btn btn-primary" type="button" name="update" onclick="location.href='/api/v1/admin/viewEmployee/{{ id }}'" value="Update"/>
+                            <input id="delete" class="btn btn-primary"  type="button" name="delete" onclick="location.href='/api/v1/admin/delete/{{ id }}'" value="Delete"/>
+                        </td>
+                    </tr>
+                </form>
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script type="text/javascript" src="/js/adminHandler.js"></script>
+{{/partial}}
+{{> adminBase}}
