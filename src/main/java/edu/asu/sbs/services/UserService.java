@@ -280,14 +280,14 @@ public class UserService {
         return userRepository.findByUserTypeIn(Lists.newArrayList(UserType.EMPLOYEE_ROLE1, UserType.EMPLOYEE_ROLE2));
     }
 
-    public Optional<User> getUserByIdAndActive(Long id) throws Exceptions {
+    public Optional<User> getUserByIdAndActive(Long id) {
+        log.info("Getting user by id and isActive=true");
         Optional<User> user = userRepository.findById(id);
-        if (user == null) {
-            return null;
-        }
-        log.info("Getting user by id");
 
-        return user;
+        if (user.get().isActive() == true)
+            return user;
+        else
+            return null;
     }
 
 
