@@ -7,7 +7,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.time.Instant;
 
 @Data
@@ -18,15 +17,17 @@ public class Request implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long requestId;
 
-    private Timestamp requestTime;
-
+    @NotNull
+    @Column(nullable = false)
     private String requestType;
 
+    @NotNull
+    @Column(nullable = false)
     private String description;
 
     @NotNull
     @Column(nullable = false)
-    private boolean isDeleted;
+    private boolean isDeleted = false;
 
     @CreatedDate
     private Instant createdDate;
@@ -37,15 +38,15 @@ public class Request implements Serializable {
     private Instant modifiedDate;
 
     @OneToOne
-    @JoinColumn(nullable = true)
+    @JoinColumn
     private User requestBy;
 
     @OneToOne
-    @JoinColumn(nullable = true)
+    @JoinColumn
     private User approvedBy;
 
     @OneToOne
-    @JoinColumn(nullable = true)
+    @JoinColumn
     private Transaction linkedTransaction;
 
 }

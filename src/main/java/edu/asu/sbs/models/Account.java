@@ -58,4 +58,11 @@ public class Account implements Serializable {
 
     @OneToMany(mappedBy = "toAccount")
     private Set<Transaction> creditTransactions = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "fromAccount")
+    private Set<Cheque> fromCheques = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "toAccount")
+    private Set<Cheque> toCheques = new HashSet<>();
+
 }

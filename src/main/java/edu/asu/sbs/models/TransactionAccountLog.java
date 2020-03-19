@@ -1,11 +1,12 @@
 package edu.asu.sbs.models;
 
+import lombok.Data;
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.Instant;
 
+@Data
 @Entity
 public class TransactionAccountLog implements Serializable {
     @Id
@@ -14,7 +15,7 @@ public class TransactionAccountLog implements Serializable {
 
     private String logDescription;
 
-    private Timestamp logTime;
+    private Instant logTime;
 
     @OneToOne(mappedBy = "log")
     private Transaction transaction;
