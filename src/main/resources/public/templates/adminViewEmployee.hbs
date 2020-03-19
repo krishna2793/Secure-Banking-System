@@ -1,25 +1,5 @@
-<!doctype html>
-<html>
-<head>
-    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/4.4.1-1/css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" href="/css/main.css">
-    <link rel="stylesheet" type="text/css" href="/webjars/datatables/1.10.20/css/dataTables.bootstrap.min.css">
-    {{#block "head"}}
-    {{!-- Custom <head> content per page could be added. --}}
-    {{/block}}
-</head>
-<body>
-<header>
-    <ul>
-        <li><a class="active" href="/api/v1/admin/home">Secure Banking System</a></li>
-        <li><a href="/api/v1/admin/home">View Employee Requests</a></li>
-        <li><a href="/api/v1/admin/logs">Access Logs</a></li>
-        <li><a href="/api/v1/admin/handleemployee">Access Employee Accounts</a></li>
-        <li><a href="/api/v1/admin/profile">Profile</a></li>
-    </ul>
-</header>
-
-<div class="container">
+{{#partial "body"}}
+    <div class="container">
         <!-- edit form column -->
         <form class="form-horizontal" method="POST" action="/api/v1/admin/updateUser">
             <div class="form-group">
@@ -27,7 +7,7 @@
                 <div class="col-lg-8">
                     <input class="form-control" type="text" id="id" name="id" value="{{ id }}" readonly>
                 </div>
-                </div>
+            </div>
             <div class="form-group">
                 <label class="col-lg-3 control-label">User Name:</label>
                 <div class="col-lg-8">
@@ -57,7 +37,7 @@
                 <div class="col-lg-8">
                     <input class="form-control" type="date" id="dateOfBirth" name="dateOfBirth" value="{{ dateOfBirth }}" readonly>
                 </div>
-                </div>
+            </div>
             <div class="form-group">
                 <label class="col-lg-3 control-label">Phone Number:</label>
                 <div class="col-lg-8">
@@ -80,14 +60,10 @@
                 </div>
             </div>
         </form>
-</div>
+    </div>
+{{/partial}}
+{{#partial "scripts"}}
+    <script type="text/javascript" src="/js/profileHandler.js"></script>
+{{/partial}}
 
-
-<script type="text/javascript" src="/webjars/jquery/3.4.1/jquery.min.js"></script>
-<script type="text/javascript" src="/webjars/bootstrap/4.4.1-1/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="/js/profileHandler.js"></script>
-{{#block "scripts"}}
-{{!-- Hero content goes here. --}}
-{{/block}}
-</body>
-</html>
+{{> adminBase}}
