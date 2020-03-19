@@ -54,7 +54,10 @@ public class Transaction implements Serializable {
     @JoinColumn(nullable = false)
     private TransactionAccountLog log;
 
-    @OneToOne(mappedBy="linkedTransaction")
+    @OneToOne(mappedBy = "linkedTransaction")
     private Request request;
+
+    @OneToOne(mappedBy = "transaction")
+    private Cheque cheque;
 
 }
