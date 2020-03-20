@@ -1,0 +1,69 @@
+{{#partial "body"}}
+    <div class="container">
+        <!-- edit form column -->
+        <form class="form-horizontal" method="POST" action="/api/v1/admin/updateUser">
+            <div class="form-group">
+                <label class="col-lg-3 control-label">ID:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="id" name="id" value="{{ id }}" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">User Name:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="userName" name="userName" value="{{ userName }}" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">First Name:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="firstName" name="firstName" value="{{ firstName }}" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">Last Name:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="lastName" name="lastName" value="{{ lastName }}" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">Email:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="email" name="email" value="{{ email }}" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">Date Of Birth:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="date" id="dateOfBirth" name="dateOfBirth" value="{{ dateOfBirth }}" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">Phone Number:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="phoneNumber" name="phoneNumber" value="{{ phoneNumber }}" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">SSN:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="ssn" name="ssn" value="{{ ssn }}" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-8">
+                    <input type="button" id="profileBtn" class="btn btn-primary" onclick="editProfile();editAll()" value="Edit Profile">
+                    <span></span>
+                    <input type="button" id="ssnBtn" class="btn btn-primary" onclick="editSSN()" value="Edit SSN">
+                    <span></span>
+                    <input type="submit" id="save" class="btn btn-primary" value="Save" disabled>
+                </div>
+            </div>
+        </form>
+    </div>
+{{/partial}}
+{{#partial "scripts"}}
+    <script type="text/javascript" src="/js/profileHandler.js"></script>
+{{/partial}}
+
+{{> adminBase}}

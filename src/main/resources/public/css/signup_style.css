@@ -45,6 +45,7 @@ body{
 .form input[type="submit"]:hover,.form input[type="submit"]:active{
 	background: #228B22;
 }
+/* The message box is shown when the user clicks on the password field */
 #message {
 	display:none;
 	background: #f1f1f1;
@@ -64,8 +65,19 @@ body{
 	color: green;
 }
 
+.valid:before {
+	position: relative;
+	left: -35px;
+	content: "✔";
+}
+
 /* Add a red text color and an "x" when the requirements are wrong */
 .invalid {
 	color: red;
 }
 
+.invalid:before {
+	position: relative;
+	left: -35px;
+	content: "✖";
+}

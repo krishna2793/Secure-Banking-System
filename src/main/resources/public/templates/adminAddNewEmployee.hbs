@@ -1,0 +1,80 @@
+{{#partial "body"}}
+    <div class="container">
+        <!-- edit form column -->
+        <form class="form-horizontal" method="POST" action="/api/v1/admin/employee/add">
+            <div class="form-group">
+                <label class="col-lg-3 control-label">User Name:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="userName" name="userName">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">First Name:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="firstName" name="firstName">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">Last Name:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="lastName" name="lastName">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">Email:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="email" name="email" pattern="\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">Date Of Birth:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="date" id="dateOfBirth" name="dateOfBirth">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">Phone Number:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="phoneNumber" name="phoneNumber" pattern="^\D?(\d{3})\D?\D?(\d{3})\D?(\d{4})$" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">Password:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="password" id="password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%\^\&*\)\(+=._-])[A-Za-z\d@$!%*?&]{8,}$">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">Confirm Password:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="password" id="confirmPassword" name="confirmPassword" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%\^\&*\)\(+=._-])[A-Za-z\d@$!%*?&]{8,}$">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">SSN:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="ssn" name="ssn" pattern="^(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}$">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">User Type:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" type="text" id="userType" name="userType">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-8">
+                    <input type="submit" class="btn btn-primary" value="Save">
+                    <span></span>
+                    <input type="reset" class="btn btn-primary"value="Reset">
+                </div>
+            </div>
+        </form>
+    </div>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script type="text/javascript" src="/js/passwordValidation.js"></script>
+{{/partial}}
+
+{{> adminBase}}
