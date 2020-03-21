@@ -235,6 +235,10 @@ public class UserService {
         userRepository.save(requestBy);
     }
 
+    public Object getAllUsers() {
+        return userRepository.findByUserTypeIn(Lists.newArrayList(UserType.USER_ROLE));
+    }
+
     @Getter
     @Setter
     public static class JWTToken {

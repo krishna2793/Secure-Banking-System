@@ -1,28 +1,20 @@
 package edu.asu.sbs.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jknack.handlebars.Template;
-import edu.asu.sbs.config.Constants;
-import edu.asu.sbs.errors.AccountResourceException;
 import edu.asu.sbs.errors.Exceptions;
-import edu.asu.sbs.errors.InvalidPasswordException;
 import edu.asu.sbs.errors.UnauthorizedAccessExcpetion;
 import edu.asu.sbs.loader.HandlebarsTemplateLoader;
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.services.UserService;
 import edu.asu.sbs.services.dto.UserDTO;
-import edu.asu.sbs.vm.LoginVM;
-import edu.asu.sbs.vm.ManageUserVM;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -31,22 +23,30 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 
-    @RestController
-    @RequestMapping("/api/v1/tier2")
-    public class Tier2Controller {
+@Slf4j
+@RestController
+@RequestMapping("/api/v1/tier2")
+public class Tier2Controller {
 
-        @Autowired
-        private HandlebarsTemplateLoader handlebarsTemplateLoader;
+    private final UserService userService;
+    ObjectMapper mapper = new ObjectMapper();
 
-        @RequestMapping(value = "/signup", method = RequestMethod.GET, produces = "text/html")
-        public String getHomeTemplate() throws IOException {
-            Template template = handlebarsTemplateLoader.getTemplate("adminHome");
-            return template.apply("");
-        }
+    @Autowired
+    private HandlebarsTemplateLoader handlebarsTemplateLoader;
 
-        @PostMapping("/user/add")
-        @ResponseStatus(HttpStatus.ACCEPTED)
-        public void signupSubmit(UserDTO newUserRequest, String password, String userType, HttpServletResponse response) throws Exceptions, IOException {
+    public Tier2Controller(UserService userService) {
+        this.userService = userService;
+    }
+
+    @RequestMapping(value = "/signup", method = RequestMethod.GET, produces = "text/html")
+    public String getHomeTemplate() throws IOException {
+        Template template = handlebarsTemplateLoader.getTemplate("adminHome");
+        return template.apply("");
+    }
+
+    @PostMapping("/user/add")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void signupSubmit(UserDTO newUserRequest, String password, String userType, HttpServletResponse response) throws Exceptions, IOException {
             userService.registerUser(newUserRequest, password, userType);
             log.info("POST request: tier2 new user request");
             response.sendRedirect("/allUsers");
@@ -63,7 +63,10 @@ import java.util.Optional;
                 log.info("GET request: Unauthorized request for tier2 employee user detail");
                 throw new UnauthorizedAccessExcpetion("401", "Unauthorized Access !");
             }
-
+            JsonNode result = mapper.valueToTree(user);
+            Template template = handlebarsTemplateLoader.getTemplate("profileAdmin");
+            log.info("GET request: Admin user detail");
+            return template.apply(handlebarsTemplateLoader.getContext(result));
         }
         @GetMapping("/allUsers")
         public String getUsers() throws Exceptions, JSONException, IOException {
