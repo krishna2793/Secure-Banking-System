@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
@@ -261,20 +262,25 @@ public class UserService {
     }
 
     @Transactional
-    public Optional<User> editUser(User userDTO) {
-        return userRepository.findById(userDTO.getId())
+    public Optional<User> editUser(Long id,
+                                   String phoneNumber,
+                                   String firstName,
+                                   String lastName,
+                                   String email,
+                                   String userName,
+                                   String userType,
+                                   String ssn
+                                   ) {
+        return userRepository.findById(id)
                 .map(user -> {
-                    user.setPhoneNumber(userDTO.getPhoneNumber());
-                    user.setFirstName(userDTO.getFirstName());
-                    user.setLastName(userDTO.getLastName());
-                    //user.setAddressLine1(userDTO.getAddressLine1());
-                    //user.setAddressLine2(userDTO.getAddressLine2());
-                    //user.setCity(userDTO.getCity());
-                    //user.setState(userDTO.getState());
-                    //user.setZip(userDTO.getZip());
-                    //user.setModifiedOn(LocalDateTime.now());
-                    user.setUserType(userDTO.getUserType());
-                    userRepository.save(userDTO);
+                    user.setPhoneNumber(phoneNumber);
+                    user.setFirstName(firstName);
+                    user.setLastName(lastName);
+                    user.setEmail(email);
+                    user.setSsn(ssn);
+                    user.setUserName(userName);
+                    user.setUserType(userType);
+                    userRepository.save(user);
                     return user;
                 });
     }

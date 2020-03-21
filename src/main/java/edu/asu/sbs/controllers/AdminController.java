@@ -50,7 +50,8 @@ public class AdminController{
         this.handlebarsTemplateLoader = handlebarsTemplateLoader;
     }
 
-    @GetMapping("/employee/details")
+    // Details of the admin.
+    @GetMapping("/details")
     @ResponseBody
     public String currentUserDetails() throws UnauthorizedAccessExcpetion, JSONException, IOException {
 
@@ -126,7 +127,7 @@ public class AdminController{
     }
 
     @GetMapping("/requests")
-    public String getAllUserRequest() throws JSONException, IOException {
+    public String getAllUserRequest() throws IOException {
         ArrayList<Request> allRequests = (ArrayList<Request>) requestService.getAllRequests();
         HashMap<String, ArrayList<Request>> resultMap= new HashMap<>();
         resultMap.put("result", allRequests);
@@ -136,7 +137,7 @@ public class AdminController{
     }
 
     @PutMapping("/requests/approve/{id}")
-    public void approveEdit(@PathVariable Long id) throws Exceptions {
+    public void approveEdit(@PathVariable Long id) {
 
         Optional<Request> request = requestService.getRequest(id);
         request.ifPresent(req -> {
