@@ -1,0 +1,31 @@
+<HTML>
+<Head>
+<title> Authorize transactions</title>
+
+</Head>
+<body>
+<div class="main">
+<h1> Authorize Transactions</h1>
+</div>
+<div>
+    <table id="auth">
+        <thead>
+        <tr>
+            <th align="center">User ID</th>
+            <th align="center">Tansaction Amount</th>
+        </tr>
+        </thead>
+{{#each auth}}
+        <form method="POST">
+            <tr>
+                <td align="center">{{ id }}</td>
+                <td align="center">{{ transaction }}</td>
+                    <input id="update" class="btn btn-primary" type="button" name="update" onclick="location.href='/api/v1/tier2/Authorize/{{ id }}'" value="Authorize"/>
+                    <input id="delete" class="btn btn-primary"  type="button" name="delete" onclick="location.href='/api/v1/admin/Decline/{{ id }}'" value="Decline"/>
+                </td>
+            </tr>
+    {{each}}
+    </table>
+</div>
+</body>
+</html>

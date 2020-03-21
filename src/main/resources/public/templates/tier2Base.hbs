@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/4.4.1-1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/webjars/datatables/1.10.20/css/dataTables.bootstrap.min.css">
+    <title>
+        Secure Banking System
+        {{#if title}}
+            - {{title}}
+        {{/if}}
+    </title>
+
+    {{#block "head"}}
+    {{!-- Custom <head> content per page could be added. --}}
+    {{/block}}
+</head>
+<body>
+<header>
+    <ul>
+        <li><a class="active" href="/api/v1/tier2">Secure Banking System</a></li>
+        <li><a href="/api/v1/tier2/requests">View Transaction Requests</a></li>
+        <li><a href="/api/v1/tier2/allUsers">Access User Accounts</a></li>
+        <li><a href="/api/v1/tier2/employee/details">Profile</a></li>
+    </ul>
+</header>
+{{#block "body"}}
+{{!-- Hero content goes here. --}}
+{{/block}}
+
+<script type="text/javascript" src="/webjars/jquery/3.4.1/jquery.min.js"></script>
+<script type="text/javascript" src="/webjars/bootstrap/4.4.1-1/js/bootstrap.min.js"></script>
+{{#block "scripts"}}
+{{!-- Hero content goes here. --}}
+{{/block}}
+</body>
+</html>
