@@ -76,7 +76,9 @@ public class TransactionService {
                 transaction.setTransactionType(transactionDTO.getTransactionType());
                 transaction.setTransactionAmount(transactionDTO.getTransactionAmount());
                 transaction.setLog(transactionAccountLog);
-                transaction.setToAccount(toAccount);
+                if (!transactionStatus.equals(TransactionStatus.PENDING)) {
+                    transaction.setToAccount(toAccount);
+                }
                 transaction.setFromAccount(fromAccount);
                 accountRepository.save(toAccount);
                 accountRepository.save(fromAccount);
@@ -107,6 +109,7 @@ public class TransactionService {
         Cheque cheque = new Cheque();
         cheque.setAmount(transactionDTO.getTransactionAmount());
         cheque.setTransaction(transaction);
-
     }
+
+
 }
