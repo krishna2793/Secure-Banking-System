@@ -45,7 +45,7 @@ public class Tier2Controller {
 
     @RequestMapping(value = "/signup", method = RequestMethod.GET, produces = "text/html")
     public String getHomeTemplate() throws IOException {
-        Template template = handlebarsTemplateLoader.getTemplate("adminHome");
+        Template template = handlebarsTemplateLoader.getTemplate("tier2UserAccess");
         return template.apply("");
     }
 

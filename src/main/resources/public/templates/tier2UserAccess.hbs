@@ -2,6 +2,7 @@
 
 {{/partial}}
 {{#partial "body"}}
+    <link rel="stylesheet" type="text/css" href="/css/t2UA.css">
     <div>
         <br>
         <button class="btn btn-primary" onclick="location.href='/api/v1/tier2/user/add'">Add User</button>
@@ -38,6 +39,7 @@
                         <td align="center">
                             <input id="update" class="btn btn-primary" type="button" name="update" onclick="location.href='/api/v1/tier2/viewUser/{{ id }}'" value="Update"/>
                             <input id="delete" class="btn btn-primary"  type="button" name="delete" onclick="location.href='/api/v1/tier2/viewUser/{{ id }}'" value="Delete"/>
+                            <input id="view" class="btn btn-primary" type="button" name="view" onclick="location.href='/api/v1/tier2/viewUser/{{ id }}'"value="View"/>
                         </td>
                     </tr>
                 </form>
