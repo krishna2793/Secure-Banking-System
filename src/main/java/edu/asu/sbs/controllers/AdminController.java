@@ -70,7 +70,7 @@ public class AdminController{
 
     @GetMapping("/employee/add")
     public String getLoginTemplate() throws IOException {
-        Template template = handlebarsTemplateLoader.getTemplate("adminAddNewEmployee");
+        Template template = handlebarsTemplateLoader.getTemplate("extUserTransferRequests");
         return template.apply("");
     }
 

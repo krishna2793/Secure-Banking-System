@@ -1,0 +1,35 @@
+
+{{#partial "body"}}
+    <div>
+        <br>
+        <button class="btn btn-primary" onclick="location.href='/api/v1/user/requestNewAccount'">Request New Account</button>
+        <br>
+        <br>
+        <table id="results" width="100%">
+            <thead>
+            <tr>
+                <th align="center">Account Number</th>
+                <th align="center">Account Type</th>
+                <th align="center">Account Balance</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#each result }}
+                <form method="POST">
+                    <tr>
+                        <td align="center">{{ accountNumber }}</td>
+                        <td align="center">{{ accountType }}</td>
+                        <td align="center">{{ accountBalance }}</td>
+                    </tr>
+                </form>
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
+{{/partial}}
+
+{{#block "scripts"}}
+{{!-- Hero content goes here. --}}
+{{/block}}
+
+{{> extUserBase}}

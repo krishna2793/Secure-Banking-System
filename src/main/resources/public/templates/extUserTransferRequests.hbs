@@ -10,10 +10,7 @@
                 <th>To Account</th>
                 <th>Description</th>
                 <th>Amount</th>
-                <th>Enter Amount to Pay</th>
-                <th>Select Payment Method (Credit/Debit)</th>
-                <th>Select Account to Pay</th>
-                <th>Action</th>
+                <th>Approve/Deny</th>
             </tr>
             </thead>
             <tbody>
@@ -23,20 +20,9 @@
                 <td align="center">{{ toAccountId }}</td>
                 <td align="center">{{ description }}</td>
                 <td align="center">{{ amount }}</td>
-                <td align="center">{{ enteredAmount }}</td>
                 <td align="center">
-                    <button class="inline"> <a href=""> Credit </a> </button>
-                    <button class="inline"> <a href=""> Debit </a> </button>
-                </td>
-                <td align="center">
-                    {{#each result }}
-                    <tr>
-                        <td align="center"><input type="radio" id="accountIdToPay" name={{ accountIdToPay }} value=""></td>
-                    </tr>
-                    {{/each}}
-                </td>
-                <td align="center">
-                    <button class="inline"> <a href=""> Make Payment </a> </button>
+                    <button class="inline"> <a href=""> Approve </a> </button>
+                    <button class="inline"> <a href=""> Deny </a> </button>
                 </td>
             </tr>
             {{/each}}
@@ -48,4 +34,4 @@
 {{#partial "scripts"}}
     <script type="text/javascript" src="/js/profileHandler.js"></script>
 {{/partial}}
-{{> profileExternalUser}}
+{{> extUserBase}}
