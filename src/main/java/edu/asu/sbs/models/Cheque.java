@@ -27,6 +27,7 @@ public class Cheque implements Serializable {
     @JsonUnwrapped
     private Transaction transaction;
 
+
     @ManyToOne
     @JoinColumn(nullable = false)
     private Account chequeFromAccount;
@@ -34,5 +35,6 @@ public class Cheque implements Serializable {
     @ManyToOne
     @JoinColumn(nullable = false)
     private Account chequeToAccount;
+    private boolean isDeleted;
 
 }

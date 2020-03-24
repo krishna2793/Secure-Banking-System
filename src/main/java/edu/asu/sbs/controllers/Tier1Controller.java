@@ -56,8 +56,8 @@ public class Tier1Controller {
 
     @PutMapping("/clearCheck")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void clearCheck() {
-
+    public void clearCheck(@RequestParam Long chequeId) {
+        transactionService.clearCheque(chequeId);
     }
 
     @PostMapping("/raiseRequest")

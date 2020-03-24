@@ -9,6 +9,7 @@ import edu.asu.sbs.models.Cheque;
 import edu.asu.sbs.models.Transaction;
 import edu.asu.sbs.models.TransactionAccountLog;
 import edu.asu.sbs.repositories.AccountRepository;
+import edu.asu.sbs.repositories.ChequeRepository;
 import edu.asu.sbs.repositories.TransactionAccountLogRepository;
 import edu.asu.sbs.repositories.TransactionRepository;
 import edu.asu.sbs.services.dto.TransactionDTO;
@@ -25,11 +26,13 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
     private final TransactionAccountLogRepository transactionAccountLogRepository;
+    private final ChequeRepository chequeRepository;
 
-    public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository, TransactionAccountLogRepository transactionAccountLogRepository) {
+    public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository, TransactionAccountLogRepository transactionAccountLogRepository, ChequeRepository chequeRepository) {
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
         this.transactionAccountLogRepository = transactionAccountLogRepository;
+        this.chequeRepository = chequeRepository;
     }
 
     public List<Transaction> getTransactions() {
@@ -76,7 +79,9 @@ public class TransactionService {
                 transaction.setTransactionType(transactionDTO.getTransactionType());
                 transaction.setTransactionAmount(transactionDTO.getTransactionAmount());
                 transaction.setLog(transactionAccountLog);
-                transaction.setToAccount(toAccount);
+                if (!transactionStatus.equals(TransactionStatus.PENDING)) {
+                    transaction.setToAccount(toAccount);
+                }
                 transaction.setFromAccount(fromAccount);
                 accountRepository.save(toAccount);
                 accountRepository.save(fromAccount);
@@ -107,6 +112,19 @@ public class TransactionService {
         Cheque cheque = new Cheque();
         cheque.setAmount(transactionDTO.getTransactionAmount());
         cheque.setTransaction(transaction);
+    }
+
+
+    public void clearCheque(Long chequeId) {
+        Optional<Cheque> optionalCheque = chequeRepository.findById(chequeId);
+        optionalCheque.ifPresent(cheque -> {
+            Transaction transaction = cheque.getTransaction();
+            if (transaction.getTransactionType().equals(TransactionStatus.PENDING)) {
+                Account toAccount = transaction.getToAccount();
+                Account fromAccount = transaction.getFromAccount();
+
+            }
+        });
 
     }
 }

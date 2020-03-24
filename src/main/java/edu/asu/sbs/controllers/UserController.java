@@ -58,18 +58,18 @@ public class UserController {
 
     @PostMapping("/signup_test")
     public void testing(@RequestBody HttpServletRequest payload) {
-        System.out.println(payload);
+        log.info(payload.toString());
     }
 
     @PostMapping(path = "/authenticate", consumes = "application/x-www-form-urlencoded")
-    public ResponseEntity<UserService.JWTToken> authenticate(LoginVM loginVM) throws JSONException {
+    public ResponseEntity<UserService.JWTToken> authenticate(LoginVM loginVM) {
         return userService.authenticate(loginVM);
     }
 
     @PostMapping(path = "/register")
     @ResponseStatus(HttpStatus.CREATED)
     public void registerUser(@RequestBody ManageUserVM manageUserVM) {
-        System.out.println(manageUserVM);
+        log.info(manageUserVM.toString());
         if (checkPasswordLength(manageUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
