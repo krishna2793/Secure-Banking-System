@@ -38,9 +38,8 @@ public class Tier2Controller {
     @Autowired
     private HandlebarsTemplateLoader handlebarsTemplateLoader;
 
-    public Tier2Controller(UserService userService, RequestService requestService) {
+    public Tier2Controller(UserService userService) {
         this.userService = userService;
-        this.requestService = requestService;
     }
 
     @RequestMapping(value = "/signup", method = RequestMethod.GET, produces = "text/html")
@@ -62,6 +61,27 @@ public class Tier2Controller {
     @ResponseBody
     public String currentUserDetails() throws UnauthorizedAccessExcpetion, IOException {
 
+            User user = userService.getCurrentUser();
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+            mapper.setDateFormat(df);
+            if (user == null) {
+                log.info("GET request: Unauthorized request for tier2 employee user detail");
+                throw new UnauthorizedAccessExcpetion("401", "Unauthorized Access !");
+            }
+            JsonNode result = mapper.valueToTree(user);
+            Template template = handlebarsTemplateLoader.getTemplate("profileTier2");
+            log.info("GET request: Tier2 Employee user detail");
+            return template.apply(handlebarsTemplateLoader.getContext(result));
+        }
+        @GetMapping("/allUsers")
+        public String getUsers() throws Exceptions, JSONException, IOException {
+            ArrayList<User> allUsers = (ArrayList<User>) userService.getAllUsers();
+            HashMap<String, ArrayList<User>> resultMap= new HashMap<>();
+            resultMap.put("result", allUsers);
+            JsonNode result = mapper.valueToTree(resultMap);
+            Template template = handlebarsTemplateLoader.getTemplate("tier2UserAccess");
+            return template.apply(handlebarsTemplateLoader.getContext(result));
+        }
         User user = userService.getCurrentUser();
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         mapper.setDateFormat(df);
@@ -113,6 +133,20 @@ public class Tier2Controller {
             throw new Exceptions("409", " ");
         }
 
+            JsonNode result = mapper.valueToTree(user.get());
+            Template template = handlebarsTemplateLoader.getTemplate("tier2ViewUser");
+            return template.apply(handlebarsTemplateLoader.getContext(result));
+        }
+
+    @GetMapping("/requests")
+    public String getAllUserRequest() throws JSONException, IOException {
+        ArrayList<Request> allRequests = (ArrayList<Request>) requestService.getAllRequests();
+        HashMap<String, ArrayList<Request>> resultMap= new HashMap<>();
+        resultMap.put("result", allRequests);
+        JsonNode result = mapper.valueToTree(resultMap);
+        Template template = handlebarsTemplateLoader.getTemplate("autharize");
+        return template.apply(handlebarsTemplateLoader.getContext(result));
+    }
         JsonNode result = mapper.valueToTree(user.get());
         Template template = handlebarsTemplateLoader.getTemplate("tier2ViewUser");
         return template.apply(handlebarsTemplateLoader.getContext(result));
