@@ -22,7 +22,7 @@ public class TransactionDTO {
 
     @Min(1)
     @NotNull
-    private Float transactionAmount;
+    private Double transactionAmount;
 
     @NotNull
     private Long fromAccount;

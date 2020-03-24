@@ -1,8 +1,11 @@
 package edu.asu.sbs.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import edu.asu.sbs.config.Constants;
+import edu.asu.sbs.globals.AccountType;
+import edu.asu.sbs.globals.AccountTypeAttributeConverter;
 import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -33,7 +36,9 @@ public class Account implements Serializable {
 
     @NotNull
     @Column(nullable = false, length = 50)
-    private String accountType;
+    @Enumerated(EnumType.STRING)
+    @Convert(converter = AccountTypeAttributeConverter.class)
+    private AccountType accountType;
 
     @NotNull
     @Column(nullable = false)
@@ -46,23 +51,27 @@ public class Account implements Serializable {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(nullable = false)
-    @JsonUnwrapped
+    @JsonIgnore
     private User user;
 
-    @OneToOne
-    @JoinColumn(nullable = false)
-    private TransactionAccountLog log;
+    @JsonIgnore
+    @OneToMany(mappedBy = "account")
+    private Set<TransactionAccountLog> accountLogs = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "fromAccount")
     private Set<Transaction> debitTransactions = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "toAccount")
     private Set<Transaction> creditTransactions = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "fromAccount")
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "chequeFromAccount")
     private Set<Cheque> fromCheques = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "toAccount")
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "chequeToAccount")
     private Set<Cheque> toCheques = new HashSet<>();
 
 }

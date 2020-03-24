@@ -37,7 +37,7 @@ public class Transaction implements Serializable {
     @NotNull
     @Column(nullable = false)
     @Min(1)
-    private Float transactionAmount;
+    private Double transactionAmount;
 
     @LastModifiedDate
     private Instant updatedTime;

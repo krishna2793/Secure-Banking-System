@@ -20,6 +20,7 @@ public class TransactionAccountLog implements Serializable {
     @OneToOne(mappedBy = "log")
     private Transaction transaction;
 
-    @OneToOne(mappedBy = "log")
+    @ManyToOne
+    @JoinColumn(nullable = true)
     private Account account;
 }

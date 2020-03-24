@@ -20,13 +20,21 @@ public class Cheque implements Serializable {
     @NotNull
     @Min(1)
     @Column(nullable = false)
-    private Float amount;
+    private Double amount;
 
     @OneToOne
     @JoinColumn(nullable = false)
     @JsonUnwrapped
     private Transaction transaction;
 
+
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Account chequeFromAccount;
+
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Account chequeToAccount;
     private boolean isDeleted;
 
 }

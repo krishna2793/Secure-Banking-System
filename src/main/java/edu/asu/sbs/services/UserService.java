@@ -3,6 +3,7 @@ package edu.asu.sbs.services;
 import com.google.common.collect.Lists;
 import edu.asu.sbs.config.UserType;
 import edu.asu.sbs.errors.*;
+import edu.asu.sbs.globals.AccountType;
 import edu.asu.sbs.models.Account;
 import edu.asu.sbs.models.Transaction;
 import edu.asu.sbs.models.User;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -85,7 +87,7 @@ public class UserService {
         Account a = new Account();
         a.setAccountBalance(1000.00);
         a.setAccountNumber("12345");
-        a.setAccountType("savings");
+        a.setAccountType(AccountType.SAVINGS);
         a.setActive(true);
         a.setUser(userRepository.findOneWithUserTypeByUserName("admin").orElse(null));
         accountRepository.save(a);
@@ -93,7 +95,7 @@ public class UserService {
         a = new Account();
         a.setAccountBalance(1000.00);
         a.setAccountNumber("12347");
-        a.setAccountType("checking");
+        a.setAccountType(AccountType.CHECKING);
         a.setActive(true);
         a.setUser(userRepository.findOneWithUserTypeByUserName("admin").orElse(null));
         accountRepository.save(a);
@@ -101,7 +103,7 @@ public class UserService {
         a = new Account();
         a.setAccountBalance(1000.00);
         a.setAccountNumber("12346");
-        a.setAccountType("checking");
+        a.setAccountType(AccountType.CHECKING);
         a.setActive(true);
         a.setUser(userRepository.findOneWithUserTypeByUserName("user").orElse(null));
         accountRepository.save(a);
@@ -110,7 +112,7 @@ public class UserService {
         t.setCreatedTime(Instant.now());
         t.setDescription("Dummy transfer");
         t.setStatus("SUCCESS");
-        t.setTransactionAmount(100.0f);
+        t.setTransactionAmount(100.0);
         t.setUpdatedTime(Instant.now());
         t.setTransactionType("Internal");
         t.setFromAccount(accountRepository.findOneByAccountNumberEquals("12346").orElse(null));
@@ -246,9 +248,14 @@ public class UserService {
 
     public User getCurrentUser() {
         log.info("Getting current logged in user");
-        String userName = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<User> user = userRepository.findOneByUserName(userName);
-        if (userRepository.findOneByUserName(userName).isPresent()) {
+        String currentUserName = "";
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            currentUserName = authentication.getName();
+        }
+        System.out.println("Loggendin user: "+currentUserName);
+        Optional<User> user = userRepository.findOneByUserName(currentUserName);
+        if (userRepository.findOneByUserName(currentUserName).isPresent()) {
             return user.get();
         } else {
             return null;
