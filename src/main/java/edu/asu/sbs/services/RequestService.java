@@ -19,7 +19,7 @@ public class RequestService {
 
     public List<Request> getAllRequests() {
         List<Request> requestList = Lists.newArrayList();
-        requestRepository.findAll().forEach(requestList::add);
+        requestList.addAll(requestRepository.findAll());
         return requestList;
     }
 

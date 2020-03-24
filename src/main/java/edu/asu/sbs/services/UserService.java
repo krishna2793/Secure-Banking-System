@@ -253,7 +253,7 @@ public class UserService {
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
             currentUserName = authentication.getName();
         }
-        System.out.println("Loggendin user: "+currentUserName);
+        System.out.println("Loggendin user: " + currentUserName);
         Optional<User> user = userRepository.findOneByUserName(currentUserName);
         if (userRepository.findOneByUserName(currentUserName).isPresent()) {
             return user.get();
