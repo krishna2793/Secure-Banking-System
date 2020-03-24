@@ -162,6 +162,7 @@ public class TransactionService {
         }
     }
 
+    @Transactional
     public void approveCriticalTransaction(Long requestId) {
         Optional<Request> optionalRequest = requestRepository.findOneByRequestId(requestId);
         optionalRequest.ifPresent(request -> {

@@ -6,17 +6,13 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-//import java.sql.Date;
 
 @Entity
 @Data
@@ -52,6 +48,9 @@ public class User implements Serializable {
     @NotNull
     @Column(nullable = false)
     private boolean isActive = false;
+
+    @Min(100000)
+    private int otp;
 
     @NotNull
     @Pattern(regexp = Constants.SSN_REGEX)

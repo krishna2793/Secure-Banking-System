@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -39,10 +40,6 @@ public class UserController {
         this.mailService = mailService;
     }
 
-//    @InitBinder
-//    public void initBinder(WebDataBinder binder) {
-//        binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"), true));
-//    }
 
     @GetMapping(value = "/signup", produces = "text/html")
     public String getHomeTemplate() throws IOException {
@@ -109,6 +106,12 @@ public class UserController {
         if (!user.isPresent()) {
             throw new AccountResourceException("No user was found for this reset key");
         }
+    }
+
+    @GetMapping("/logout")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        return userService.logout(request, response);
     }
 
     @GetMapping("/test")

@@ -27,9 +27,12 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.Calendar;
@@ -44,17 +47,19 @@ public class UserService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
     private final PasswordEncoder passwordEncoder;
-    final AccountRepository accountRepository;
-    final TransactionRepository transactionRepository;
+    private final AccountRepository accountRepository;
+    private final TransactionRepository transactionRepository;
+    private final OTPService otpService;
 
 
-    public UserService(UserRepository userRepository, AccountRepository accountRepository, TransactionRepository transactionRepository, AuthenticationManagerBuilder authenticationManagerBuilder, TokenProvider tokenProvider, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, AccountRepository accountRepository, TransactionRepository transactionRepository, AuthenticationManagerBuilder authenticationManagerBuilder, TokenProvider tokenProvider, PasswordEncoder passwordEncoder, OTPService otpService) {
         this.userRepository = userRepository;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.tokenProvider = tokenProvider;
         this.passwordEncoder = passwordEncoder;
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
+        this.otpService = otpService;
     }
 
     @Transactional
@@ -253,13 +258,8 @@ public class UserService {
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
             currentUserName = authentication.getName();
         }
-        System.out.println("Loggendin user: " + currentUserName);
-        Optional<User> user = userRepository.findOneByUserName(currentUserName);
-        if (userRepository.findOneByUserName(currentUserName).isPresent()) {
-            return user.get();
-        } else {
-            return null;
-        }
+        log.debug("Logged in User: '{}'", currentUserName);
+        return userRepository.findOneByUserName(currentUserName).orElse(null);
     }
 
     @Transactional
@@ -286,17 +286,13 @@ public class UserService {
         return userRepository.findByUserTypeIn(Lists.newArrayList(UserType.EMPLOYEE_ROLE1, UserType.EMPLOYEE_ROLE2));
     }
 
-    public Optional<User> getUserByIdAndActive(Long id) {
+    public User getUserByIdAndActive(Long id) {
         log.info("Getting user by id and isActive=true");
-        Optional<User> user = userRepository.findById(id);
-
-        if (user.get().isActive() == true)
-            return user;
-        else
-            return null;
+        Optional<User> optionalUser = userRepository.findOneByIdAndActive(id, true);
+        return optionalUser.orElse(null);
     }
 
-
+    @Transactional
     public void deleteUser(Long id) {
         Optional<User> current = userRepository.findById(id);
         current.ifPresent(user -> {
@@ -304,6 +300,18 @@ public class UserService {
             user.setExpireOn(Instant.now());
             userRepository.save(user);
         });
+    }
+
+
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        User user = getCurrentUser();
+        otpService.clearOTP(user.getEmail());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            otpService.clearOTP(user.getEmail());
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+        return "redirect:/login?logout";
     }
 
 }
