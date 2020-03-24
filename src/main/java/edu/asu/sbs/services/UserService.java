@@ -29,7 +29,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Calendar;
 import java.util.List;
@@ -108,11 +107,11 @@ public class UserService {
         accountRepository.save(a);
 
         Transaction t = new Transaction();
-        t.setCreatedTime(new Timestamp(System.currentTimeMillis()));
+        t.setCreatedTime(Instant.now());
         t.setDescription("Dummy transfer");
         t.setStatus("SUCCESS");
-        t.setTransactionAmount(100.00);
-        t.setUpdatedTime(new Timestamp(System.currentTimeMillis()));
+        t.setTransactionAmount(100.0f);
+        t.setUpdatedTime(Instant.now());
         t.setTransactionType("Internal");
         t.setFromAccount(accountRepository.findOneByAccountNumberEquals("12346").orElse(null));
         t.setToAccount(accountRepository.findOneByAccountNumberEquals("12347").orElse(null));
