@@ -8,6 +8,7 @@ import edu.asu.sbs.config.Constants;
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.repositories.UserRepository;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -60,5 +61,20 @@ public class OTPService {
             user.setOtp(generateOTP(user.getEmail()));
             return user;
         });
+    }
+
+    public boolean validateOtp(int otp) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userName = auth.getName();
+        Optional<User> optionalUser = userRepository.findOneByUserName(userName);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            String email = user.getEmail();
+            if (otp > 100000 && getOTP(email) == otp) {
+                clearOTP(email);
+                return true;
+            }
+        }
+        return false;
     }
 }

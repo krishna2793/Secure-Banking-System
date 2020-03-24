@@ -6,10 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -24,11 +21,17 @@ public class OTPController {
         this.mailService = mailService;
     }
 
-
     @GetMapping("/generateOTP")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void generateOTP() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         otpService.generateOTP(auth).ifPresent(mailService::sendOTPMail);
     }
+
+    @GetMapping("/validateOtp")
+    @ResponseBody
+    public String validateOtp(@RequestParam("otp") int otp) {
+        return otpService.validateOtp(otp) ? "SUCCESS" : "Invalid OTP";
+    }
+
 }
