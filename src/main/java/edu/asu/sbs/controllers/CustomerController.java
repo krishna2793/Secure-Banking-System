@@ -1,7 +1,12 @@
 package edu.asu.sbs.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.jknack.handlebars.Template;
 import edu.asu.sbs.config.UserType;
+import edu.asu.sbs.errors.UnauthorizedAccessExcpetion;
 import edu.asu.sbs.globals.CreditDebitType;
+import edu.asu.sbs.loader.HandlebarsTemplateLoader;
 import edu.asu.sbs.models.Account;
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.services.AccountService;
@@ -11,10 +16,12 @@ import edu.asu.sbs.services.dto.CreditDebitDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 @Slf4j
@@ -23,11 +30,32 @@ import java.util.List;
 @RequestMapping("/api/v1/customer")
 public class CustomerController {
 
-    @Autowired
     private AccountService accountService;
-
-    @Autowired
     private UserService userService;
+    private final HandlebarsTemplateLoader handlebarsTemplateLoader;
+    ObjectMapper mapper = new ObjectMapper();
+    public CustomerController(AccountService accountService, UserService userService, HandlebarsTemplateLoader handlebarsTemplateLoader) {
+        this.handlebarsTemplateLoader = handlebarsTemplateLoader;
+        this.accountService = accountService;
+        this.userService = userService;
+    }
+
+    @GetMapping("/profile")
+    @ResponseBody
+    public String getProfile() throws UnauthorizedAccessExcpetion, IOException {
+        User user = userService.getCurrentUser();
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        mapper.setDateFormat(df);
+        if (user == null) {
+            log.info("GET request: Unauthorized request for admin user detail");
+            throw new UnauthorizedAccessExcpetion("401", "Unauthorized Access !");
+        }
+
+        JsonNode result = mapper.valueToTree(user);
+        Template template = handlebarsTemplateLoader.getTemplate("profileUser");
+        log.info("GET request: Admin user detail");
+        return template.apply(handlebarsTemplateLoader.getContext(result));
+    }
 
     @GetMapping("/summary")
     @ResponseBody

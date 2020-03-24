@@ -51,6 +51,7 @@ public class User implements Serializable {
 
     @NotNull
     @Column(nullable = false)
+    @JsonIgnore
     private boolean isActive = false;
 
     @NotNull
@@ -61,6 +62,7 @@ public class User implements Serializable {
 
     @NotNull
     @Column(nullable = false, length = 50)
+    @JsonIgnore
     private String userType;
 
     @NotNull
@@ -85,18 +87,24 @@ public class User implements Serializable {
     @JsonIgnore
     private String resetKey;
 
+
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy="user")
     private Set<Account> accounts = new HashSet<>();
 
+    @JsonIgnore
     @OneToOne(mappedBy="representative")
     private Organization organization;
 
+    @JsonIgnore
     @OneToOne(mappedBy="requestBy")
     private Request request;
 
+    @JsonIgnore
     @OneToOne(mappedBy="linkedUser")
     private Session session;
 
+    @JsonIgnore
     private Instant resetDate = null;
 
     @Size(max = 20)
@@ -104,8 +112,10 @@ public class User implements Serializable {
     @JsonIgnore
     private String activationKey;
 
+    @JsonIgnore
     private Instant createdOn;
 
+    @JsonIgnore
     private Instant expireOn;
 
 }
