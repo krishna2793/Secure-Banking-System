@@ -27,4 +27,6 @@ public class Cheque implements Serializable {
     @JsonUnwrapped
     private Transaction transaction;
 
+    private boolean isDeleted;
+
 }
