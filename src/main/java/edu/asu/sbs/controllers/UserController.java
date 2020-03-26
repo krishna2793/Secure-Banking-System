@@ -81,10 +81,9 @@ public class UserController {
         return template.apply("");
     }
 
-    }
 
     @GetMapping("/activate")
-    public void activate(@RequestParam(value = "key") String key) {
+    public void activate(@RequestParam(value = "key") String key, HttpServletResponse response) throws IOException {
         Optional<User> user = userService.activateRegistration(key);
         if (!user.isPresent()) {
             throw new AccountResourceException("No user was found for this activation key");
@@ -132,14 +131,6 @@ public class UserController {
         return userService.logout(request, response);
     }
 
-    @GetMapping("/test")
-    @ResponseBody
-    public JSONObject test() throws JSONException {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("ASUH", "ASDJH");
-        jsonObject.put("Array", new JSONArray().put(1));
-        return jsonObject;
-    }
 
     private static boolean checkPasswordLength(String password) {
         log.info(String.valueOf(StringUtils.isEmpty(password) ||
