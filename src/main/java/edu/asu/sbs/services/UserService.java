@@ -58,7 +58,7 @@ public class UserService {
     }
 
     @Transactional
-    public void createUpdateUser(User user) {
+    public void createUpdateUser() {
 
         User u = new User();
         u.setUserName("admin");
@@ -67,7 +67,7 @@ public class UserService {
         u.setPhoneNumber("9994621912");
         u.setSsn("123-45-6789");
         u.setDateOfBirth(new Date(Calendar.getInstance().getTime().getTime()));
-        u.setEmail("93@asu,edu");
+        u.setEmail("93@asu.edu");
         u.setPasswordHash(passwordEncoder.encode("admin"));
         u.setUserType("t2");
         userRepository.save(u);
