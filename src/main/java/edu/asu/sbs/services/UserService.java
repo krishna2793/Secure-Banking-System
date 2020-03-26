@@ -288,7 +288,7 @@ public class UserService {
 
     public User getUserByIdAndActive(Long id) {
         log.info("Getting user by id and isActive=true");
-        Optional<User> optionalUser = userRepository.findOneByIdAndActive(id, true);
+        Optional<User> optionalUser = userRepository.findByIdAndIsActive(id, true);
         return optionalUser.orElse(null);
     }
 

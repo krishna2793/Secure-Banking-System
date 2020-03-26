@@ -12,7 +12,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     Optional<User> findOneWithUserTypeByUserName(String userName);
 
-    Optional<User> findOneByUserNameAndActive(String userName, boolean isActive);
+    Optional<User> findOneByUserNameAndIsActive(String userName, boolean isActive);
 
     Optional<User> findOneByUserName(String userName);
 
@@ -40,5 +40,5 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     boolean findByPhoneNumber(String ph);
 
-    Optional<User> findOneByIdAndActive(Long id, boolean isActive);
+    Optional<User> findByIdAndIsActive(Long id, boolean isActive);
 }
