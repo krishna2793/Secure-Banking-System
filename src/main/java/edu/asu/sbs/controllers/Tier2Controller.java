@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jknack.handlebars.Template;
 import edu.asu.sbs.config.RequestType;
-import edu.asu.sbs.config.UserType;
 import edu.asu.sbs.errors.Exceptions;
 import edu.asu.sbs.errors.UnauthorizedAccessExcpetion;
 import edu.asu.sbs.loader.HandlebarsTemplateLoader;
@@ -15,6 +14,7 @@ import edu.asu.sbs.services.UserService;
 import edu.asu.sbs.services.dto.UserDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,20 +31,21 @@ import java.util.Optional;
 @RequestMapping("/api/v1/tier2")
 public class Tier2Controller {
 
-    private final UserService userService;
+    private UserService userService = null;
     private final RequestService requestService;
     ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     private HandlebarsTemplateLoader handlebarsTemplateLoader;
 
-    public Tier2Controller(UserService userService) {
+    public Tier2Controller(UserService userService, RequestService requestService) throws UnauthorizedAccessExcpetion, IOException {
         this.userService = userService;
+        this.requestService = requestService;
     }
 
-    @RequestMapping(value = "/signup", method = RequestMethod.GET, produces = "text/html")
-    public String getHomeTemplate() throws IOException {
-        Template template = handlebarsTemplateLoader.getTemplate("tier2UserAccess");
+    @GetMapping("/employee/add")
+    public String getLoginTemplate() throws IOException {
+        Template template = handlebarsTemplateLoader.getTemplate("adminAddNewEmployee");
         return template.apply("");
     }
 
@@ -72,28 +73,8 @@ public class Tier2Controller {
             Template template = handlebarsTemplateLoader.getTemplate("profileTier2");
             log.info("GET request: Tier2 Employee user detail");
             return template.apply(handlebarsTemplateLoader.getContext(result));
-        }
-        @GetMapping("/allUsers")
-        public String getUsers() throws Exceptions, JSONException, IOException {
-            ArrayList<User> allUsers = (ArrayList<User>) userService.getAllUsers();
-            HashMap<String, ArrayList<User>> resultMap= new HashMap<>();
-            resultMap.put("result", allUsers);
-            JsonNode result = mapper.valueToTree(resultMap);
-            Template template = handlebarsTemplateLoader.getTemplate("tier2UserAccess");
-            return template.apply(handlebarsTemplateLoader.getContext(result));
-        }
-        User user = userService.getCurrentUser();
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        mapper.setDateFormat(df);
-        if (user == null) {
-            log.info("GET request: Unauthorized request for tier2 employee user detail");
-            throw new UnauthorizedAccessExcpetion("401", "Unauthorized Access !");
-        }
-        JsonNode result = mapper.valueToTree(user);
-        Template template = handlebarsTemplateLoader.getTemplate("profileAdmin");
-        log.info("GET request: Admin user detail");
-        return template.apply(handlebarsTemplateLoader.getContext(result));
     }
+
     @GetMapping("/allUsers")
     public String getUsers() throws IOException {
         ArrayList<User> allUsers = (ArrayList<User>) userService.getAllUsers();
@@ -145,10 +126,6 @@ public class Tier2Controller {
         resultMap.put("result", allRequests);
         JsonNode result = mapper.valueToTree(resultMap);
         Template template = handlebarsTemplateLoader.getTemplate("autharize");
-        return template.apply(handlebarsTemplateLoader.getContext(result));
-    }
-        JsonNode result = mapper.valueToTree(user.get());
-        Template template = handlebarsTemplateLoader.getTemplate("tier2ViewUser");
         return template.apply(handlebarsTemplateLoader.getContext(result));
     }
 

@@ -2,16 +2,13 @@
     <ul>
         <li><a class="active" href="/api/v1/tier2/home">Secure Banking System</a></li>
         <li><a href="/api/v1/tier2/autharize">View Transaction Requests</a></li>
-        <li><a href="/api/v1/tier2/logs">Access Logs</a></li>
         <li><a href="/api/v1/tier2/handleusers">Access User Accounts</a></li>
-        <li><a href="/api/v1/tier2/profile">Profile</a></li>
+        <li><a href="/api/v1/tier2/details">Profile</a></li>
     </ul>
 {{/partial}}
 
 {{#partial "profileUser"}}
-    <input type="button" id="profileBtn" class="btn btn-primary" onclick="editProfile();editAll()" value="Edit Profile">
-    <span></span>
-    <input type="button" id="ssnBtn" class="btn btn-primary" onclick="editSSN()" value="Edit SSN">
+    <input type="button" id="profileBtn" class="btn btn-primary" onclick="editProfile()" value="Edit Profile">
 {{/partial}}
 
 {{> profile}}

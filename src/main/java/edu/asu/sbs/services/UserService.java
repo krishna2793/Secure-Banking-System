@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -252,9 +253,14 @@ public class UserService {
 
     public User getCurrentUser() {
         log.info("Getting current logged in user");
-        String userName = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<User> user = userRepository.findOneByUserName(userName);
-        if (userRepository.findOneByUserName(userName).isPresent()) {
+        String currentUserName = "";
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            currentUserName = authentication.getName();
+        }
+        System.out.println("Loggendin user: "+currentUserName);
+        Optional<User> user = userRepository.findOneByUserName(currentUserName);
+        if (userRepository.findOneByUserName(currentUserName).isPresent()) {
             return user.get();
         } else {
             return null;
