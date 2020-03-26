@@ -44,22 +44,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-//    @Override
-//    protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
-////        auth.userDetailsService(userDetailsService);
-//        auth.inMemoryAuthentication()
-//        .withUser("user1").password(passwordEncoder().encode("user1Pass")).roles("USER")
-//        .and()
-//        .withUser("user2").password(passwordEncoder().encode("user2Pass")).roles("USER")
-//        .and()
-//        .withUser("admin").password(passwordEncoder().encode("adminPass")).roles(UserType.ADMIN_ROLE);
-//    }
-//
-//    @Bean
-//    public AuthenticationSuccessHandler myAuthenticationSuccessHandler(){
-//        return new CustomSuccessHandler();
-//    }
-
     @Override
     public void configure(WebSecurity webSecurity) {
         webSecurity.ignoring()
@@ -84,7 +68,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                     .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
                 .and()
-                    .featurePolicy("geolocation 'none'; midi 'none'; sync-xhr 'none'; microphone 'none'; camera 'none'; magnetometer 'none'; gyroscope 'none'; speaker 'none'; fullscreen 'self'; payment 'none'")
+                .featurePolicy("geolocation 'none'; midi 'none'; sync-xhr 'none'; microphone 'none'; camera 'none'; magnetometer 'none'; gyroscope 'none'; speaker 'none'; fullscreen 'self'; payment 'none'")
                 .and()
                     .frameOptions()
                     .deny()
@@ -94,6 +78,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                     .authorizeRequests()
                     .antMatchers("/api/v1/user/reset-password/init", "/api/v1/user/reset-password/finish", "/api/v1/user/signup", "/api/v1/user/test", "/api/v1/user/login", "/api/v1/user/authenticate", "/api/v1/user/activate", "/api/v1/user/register", "/api/account/reset-password/init", "/api/account/password-reset/finish", "/swagger-ui.html", "/css/main.css","/webjars/bootstrap/4.4.1-1/css/bootstrap.min.css","/webjars/bootstrap/4.4.1-1/js/bootstrap.min.js","/webjars/jquery/3.4.1/jquery.min.js", "/js/passwordValidation.js").permitAll()
+                    .antMatchers("/ap1/v1/admin/**").hasAuthority(UserType.ADMIN_ROLE)
                 .antMatchers().permitAll()
                 .anyRequest().authenticated()
                 .and()

@@ -20,6 +20,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -37,6 +39,7 @@ public class UserController {
         this.handlebarsTemplateLoader = handlebarsTemplateLoader;
         this.mailService = mailService;
     }
+
 
     @GetMapping(value = "/signup", produces = "text/html")
     public String getHomeTemplate() throws IOException {
@@ -78,14 +81,10 @@ public class UserController {
         return template.apply("");
     }
 
-    @GetMapping(value = "/activate", produces = "text/html")
-    public String getActivateTemplate() throws IOException {
-        Template template = handlebarsTemplateLoader.getTemplate("activate");
-        return template.apply("");
     }
 
-    @PostMapping("/activate")
-    public void activate(String key, HttpServletResponse response) throws IOException {
+    @GetMapping("/activate")
+    public void activate(@RequestParam(value = "key") String key) {
         Optional<User> user = userService.activateRegistration(key);
         if (!user.isPresent()) {
             throw new AccountResourceException("No user was found for this activation key");
@@ -127,10 +126,19 @@ public class UserController {
         response.sendRedirect("/api/v1/user/login");
     }
 
+    @GetMapping("/logout")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        return userService.logout(request, response);
+    }
+
     @GetMapping("/test")
     @ResponseBody
-    public void test() throws JSONException {
-        userService.createUpdateUser();
+    public JSONObject test() throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("ASUH", "ASDJH");
+        jsonObject.put("Array", new JSONArray().put(1));
+        return jsonObject;
     }
 
     private static boolean checkPasswordLength(String password) {

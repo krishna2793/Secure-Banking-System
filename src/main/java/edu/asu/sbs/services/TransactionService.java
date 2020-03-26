@@ -1,17 +1,12 @@
 package edu.asu.sbs.services;
 
 import com.google.common.collect.Lists;
+import edu.asu.sbs.config.RequestType;
 import edu.asu.sbs.config.TransactionStatus;
 import edu.asu.sbs.config.TransactionType;
 import edu.asu.sbs.errors.GenericRuntimeException;
-import edu.asu.sbs.models.Account;
-import edu.asu.sbs.models.Cheque;
-import edu.asu.sbs.models.Transaction;
-import edu.asu.sbs.models.TransactionAccountLog;
-import edu.asu.sbs.repositories.AccountRepository;
-import edu.asu.sbs.repositories.ChequeRepository;
-import edu.asu.sbs.repositories.TransactionAccountLogRepository;
-import edu.asu.sbs.repositories.TransactionRepository;
+import edu.asu.sbs.models.*;
+import edu.asu.sbs.repositories.*;
 import edu.asu.sbs.services.dto.TransactionDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,12 +22,16 @@ public class TransactionService {
     private final AccountRepository accountRepository;
     private final TransactionAccountLogRepository transactionAccountLogRepository;
     private final ChequeRepository chequeRepository;
+    private final RequestRepository requestRepository;
+    private final UserService userService;
 
-    public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository, TransactionAccountLogRepository transactionAccountLogRepository, ChequeRepository chequeRepository) {
+    public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository, TransactionAccountLogRepository transactionAccountLogRepository, ChequeRepository chequeRepository, RequestRepository requestRepository, UserService userService) {
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
         this.transactionAccountLogRepository = transactionAccountLogRepository;
         this.chequeRepository = chequeRepository;
+        this.requestRepository = requestRepository;
+        this.userService = userService;
     }
 
     public List<Transaction> getTransactions() {
@@ -75,7 +74,11 @@ public class TransactionService {
                 transaction.setDescription(transactionDTO.getDescription());
                 transaction.setFromAccount(fromAccount);
                 transaction.setToAccount(toAccount);
-                transaction.setStatus(TransactionStatus.APPROVED);
+                if (transactionDTO.getTransactionAmount() > 1000) {
+                    transaction.setStatus(TransactionStatus.PENDING);
+                } else {
+                    transaction.setStatus(transactionStatus);
+                }
                 transaction.setTransactionType(transactionDTO.getTransactionType());
                 transaction.setTransactionAmount(transactionDTO.getTransactionAmount());
                 transaction.setLog(transactionAccountLog);
@@ -85,7 +88,20 @@ public class TransactionService {
                 transaction.setFromAccount(fromAccount);
                 accountRepository.save(toAccount);
                 accountRepository.save(fromAccount);
-                return transactionRepository.save(transaction);
+                transaction = transactionRepository.save(transaction);
+                if (transactionDTO.getTransactionAmount() < 1000) {
+                    Request request = new Request();
+                    request.setCreatedDate(Instant.now());
+                    request.setLinkedTransaction(transaction);
+                    request.setDeleted(false);
+                    request.setModifiedDate(Instant.now());
+                    request.setDescription("Transaction more than 1000$");
+                    request.setStatus(TransactionStatus.PENDING);
+                    request.setRequestType(RequestType.APPROVE_CRITICAL_TRANSACTION);
+                    request.setRequestBy(userService.getCurrentUser());
+                    requestRepository.save(request);
+                }
+                return transaction;
             }
         }
 
@@ -114,17 +130,50 @@ public class TransactionService {
         cheque.setTransaction(transaction);
     }
 
-
-    public void clearCheque(Long chequeId) {
+    @Transactional
+    public String clearCheque(Long chequeId) {
         Optional<Cheque> optionalCheque = chequeRepository.findById(chequeId);
-        optionalCheque.ifPresent(cheque -> {
+        if (optionalCheque.isPresent()) {
+            Cheque cheque = optionalCheque.get();
             Transaction transaction = cheque.getTransaction();
-            if (transaction.getTransactionType().equals(TransactionStatus.PENDING)) {
+            if (transaction.getTransactionType().equals(TransactionStatus.PENDING) && !cheque.isDeleted()) {
+                if (transaction.getTransactionAmount() > 1000) {
+                    Request request = transaction.getRequest();
+                    if (!request.getStatus().equals(TransactionStatus.APPROVED)) {
+                        return "Transaction to be Approved by TIER2";
+                    }
+                }
                 Account toAccount = transaction.getToAccount();
-                Account fromAccount = transaction.getFromAccount();
+                if (toAccount.isActive()) {
+                    toAccount.setAccountBalance(toAccount.getAccountBalance() + transaction.getTransactionAmount());
+                    transaction.setStatus(TransactionStatus.APPROVED);
+                    TransactionAccountLog transactionAccountLog = transaction.getLog();
+                    transactionAccountLog.setLogDescription("CHEQUE CLEARED");
+                    cheque.setDeleted(true);
+                    transactionRepository.save(transaction);
+                    chequeRepository.save(cheque);
+                    transactionAccountLogRepository.save(transactionAccountLog);
+                }
+            }
+            return "Cheque Cleared";
 
+        } else {
+            return "Cheque Not Found";
+        }
+    }
+
+    @Transactional
+    public void approveCriticalTransaction(Long requestId) {
+        Optional<Request> optionalRequest = requestRepository.findOneByRequestId(requestId);
+        optionalRequest.ifPresent(request -> {
+            Transaction transaction = request.getLinkedTransaction();
+            if (request.getStatus().equals(TransactionStatus.PENDING) && transaction.getTransactionAmount() > 1000) {
+                request.setDescription("Critical Request Approved");
+                request.setModifiedDate(Instant.now());
+                request.setApprovedBy(userService.getCurrentUser());
+                request.setStatus(TransactionStatus.APPROVED);
+                requestRepository.save(request);
             }
         });
-
     }
 }

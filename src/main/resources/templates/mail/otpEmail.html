@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{email.otp.title}">OTP for Transaction</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <link rel="shortcut icon" th:href="@{|${baseUrl}/favicon.ico|}"/>
+</head>
+<body>
+<p th:text="#{email.activation.greeting(${user.getEmail()})}">
+    Dear
+</p>
+<p th:text="#{email.activation.text1}">
+    Your Secure Bank account has been created, please click on the URL below to activate it:
+</p>
+<p th:text="#{email.otp.body(${user.getOtp()})}">
+
+</p>
+<p>
+    <span th:text="#{email.activation.text2}">Regards, </span>
+    <br/>
+    <em th:text="#{email.signature}">Secure Bank.</em>
+</p>
+</body>
+</html>
