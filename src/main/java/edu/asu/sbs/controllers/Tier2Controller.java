@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jknack.handlebars.Template;
 import edu.asu.sbs.config.RequestType;
+import edu.asu.sbs.config.UserType;
 import edu.asu.sbs.errors.Exceptions;
 import edu.asu.sbs.errors.UnauthorizedAccessExcpetion;
 import edu.asu.sbs.loader.HandlebarsTemplateLoader;
@@ -43,9 +44,9 @@ public class Tier2Controller {
         this.requestService = requestService;
     }
 
-    @GetMapping("/employee/add")
+    @GetMapping("/user/add")
     public String getLoginTemplate() throws IOException {
-        Template template = handlebarsTemplateLoader.getTemplate("adminAddNewEmployee");
+        Template template = handlebarsTemplateLoader.getTemplate("tier2AddNewUser");
         return template.apply("");
     }
 
@@ -57,7 +58,6 @@ public class Tier2Controller {
         response.sendRedirect("/allUsers");
     }
 
-    // Details of the tier2 employee.
     @GetMapping("/details")
     @ResponseBody
     public String currentUserDetails() throws UnauthorizedAccessExcpetion, IOException {
@@ -85,21 +85,20 @@ public class Tier2Controller {
         return template.apply(handlebarsTemplateLoader.getContext(result));
     }
 
-
     @GetMapping("/delete/{id}")
     public void deleteUser(@PathVariable Long id, HttpServletResponse response) throws Exceptions, IOException {
         Optional<User> current = userService.getUserByIdAndActive(id);
         if (current == null) {
             throw new Exceptions("404", " ");
         }
-        if (!(current.get().getUserType().equals("USER"))) {
+        if (!(current.get().getUserType().equals(UserType.USER_ROLE))) {
             log.warn("GET request: tier2 employee unauthorised request access");
             throw new Exceptions("401", "Unauthorized request !!");
         }
 
         userService.deleteUser(id);
-        log.info("POST request: User New modification request");
-        response.sendRedirect("../allUsers");
+        log.info("POST request: Delete User request");
+        response.sendRedirect("/api/v1/tier2/allUsers");
     }
 
     @GetMapping("/viewUser/{id}")
@@ -109,7 +108,7 @@ public class Tier2Controller {
         if (user == null) {
             throw new Exceptions("404", " ");
         }
-        if (!(user.get().getUserType().equals("USER") )) {
+        if (!(user.get().getUserType().equals(UserType.USER_ROLE) )) {
             log.warn("GET request: Unauthorized request for external user");
             throw new Exceptions("409", " ");
         }
@@ -119,13 +118,13 @@ public class Tier2Controller {
             return template.apply(handlebarsTemplateLoader.getContext(result));
         }
 
-    @GetMapping("/requests")
+    @GetMapping("/transactions")
     public String getAllUserRequest() throws JSONException, IOException {
         ArrayList<Request> allRequests = (ArrayList<Request>) requestService.getAllRequests();
         HashMap<String, ArrayList<Request>> resultMap= new HashMap<>();
         resultMap.put("result", allRequests);
         JsonNode result = mapper.valueToTree(resultMap);
-        Template template = handlebarsTemplateLoader.getTemplate("autharize");
+        Template template = handlebarsTemplateLoader.getTemplate("tier2Transactions");
         return template.apply(handlebarsTemplateLoader.getContext(result));
     }
 
