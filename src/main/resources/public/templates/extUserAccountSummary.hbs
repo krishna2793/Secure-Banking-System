@@ -11,6 +11,7 @@
                 <th align="center">Account Number</th>
                 <th align="center">Account Type</th>
                 <th align="center">Account Balance</th>
+                <th align="center">Delete Account</th>
             </tr>
             </thead>
             <tbody>
@@ -20,6 +21,7 @@
                         <td align="center">{{ accountNumber }}</td>
                         <td align="center">{{ accountType }}</td>
                         <td align="center">{{ accountBalance }}</td>
+                        <input id="delete" class="btn btn-primary"  type="button" name="delete" onclick="location.href='/api/v1/customer/delete/{{ id }}'" value="Delete"/>
                     </tr>
                 </form>
             {{/each}}
