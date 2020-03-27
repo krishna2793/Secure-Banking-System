@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jknack.handlebars.Template;
 import edu.asu.sbs.config.RequestType;
+import edu.asu.sbs.config.StatusType;
 import edu.asu.sbs.errors.Exceptions;
 import edu.asu.sbs.errors.UnauthorizedAccessExcpetion;
 import edu.asu.sbs.loader.HandlebarsTemplateLoader;
@@ -14,7 +15,6 @@ import edu.asu.sbs.services.UserService;
 import edu.asu.sbs.services.dto.UserDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -120,9 +120,9 @@ public class Tier2Controller {
         }
 
     @GetMapping("/requests")
-    public String getAllUserRequest() throws JSONException, IOException {
-        ArrayList<Request> allRequests = (ArrayList<Request>) requestService.getAllRequests();
-        HashMap<String, ArrayList<Request>> resultMap= new HashMap<>();
+    public String getAllUserRequest() throws IOException {
+        ArrayList<Request> allRequests = requestService.getAllTier2Requests();
+        HashMap<String, ArrayList<Request>> resultMap = new HashMap<>();
         resultMap.put("result", allRequests);
         JsonNode result = mapper.valueToTree(resultMap);
         Template template = handlebarsTemplateLoader.getTemplate("autharize");
@@ -155,10 +155,25 @@ public class Tier2Controller {
     public void approveEdit(@PathVariable Long id) {
 
         Optional<Request> request = requestService.getRequest(id);
+        User user = userService.getCurrentUser();
         request.ifPresent(req -> {
             switch (req.getRequestType()) {
                 case RequestType.ABOVE_LIMIT_TRANS:
-                    // Add logic here for above $1000 requests
+                    requestService.modifyRequest(request, user, RequestType.ABOVE_LIMIT_TRANS, StatusType.APPROVED);
+                    break;
+            }
+        });
+    }
+
+    @PutMapping("/tier2Requests/decline/{id}")
+    public void declineEdit(@PathVariable Long id) {
+
+        Optional<Request> request = requestService.getRequest(id);
+        User user = userService.getCurrentUser();
+        request.ifPresent(req -> {
+            switch (req.getRequestType()) {
+                case RequestType.ABOVE_LIMIT_TRANS:
+                    requestService.modifyRequest(request, user, RequestType.ABOVE_LIMIT_TRANS, StatusType.DECLINED);
                     break;
             }
         });

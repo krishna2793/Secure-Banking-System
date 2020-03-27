@@ -128,8 +128,8 @@ public class AdminController{
 
     @GetMapping("/requests")
     public String getAllUserRequest() throws IOException {
-        ArrayList<Request> allRequests = (ArrayList<Request>) requestService.getAllRequests();
-        HashMap<String, ArrayList<Request>> resultMap= new HashMap<>();
+        ArrayList<Request> allRequests = (ArrayList<Request>) requestService.getAllAdminRequests();
+        HashMap<String, ArrayList<Request>> resultMap = new HashMap<>();
         resultMap.put("result", allRequests);
         JsonNode result = mapper.valueToTree(resultMap);
         Template template = handlebarsTemplateLoader.getTemplate("adminHome");
@@ -153,59 +153,6 @@ public class AdminController{
             }
         });
     }
-
-    /*
-     @GetMapping("/requests/view/{id}")
-    public JSONObject getUserRequest(@PathVariable() UUID id) throws Exceptions, JSONException {
-        UpdateRequest updateRequest = UpdateRequestService.getUpdateRequest(id);
-        JSONObject jsonObject = new JSONObject();
-        if (updateRequest == null) {
-            throw new Exceptions("404", "Invalid Request !");
-        }
-        if (!updateRequest.getUserType().equals("internal")) {
-            log.warn("GET request: Admin unauthrorised request access");
-            throw new Exceptions("401", "Unauthorised Request !");
-        }
-        jsonObject.put("modificationRequests", updateRequest);
-        log.info("GET request: User modification request by ID");
-
-        return jsonObject;
-    }
-    @GetMapping("/request/delete/{id}")
-    public JSONObject getDeleteRequest(@PathVariable() UUID id) throws Exceptions, JSONException {
-        UpdateRequest updateRequest = UpdateRequestService.getUpdateRequest(id);
-
-        if (updateRequest == null) {
-            throw new Exceptions("404","Invalid Request !");
-        }
-        if (!updateRequest.getUserType().equals("internal")) {
-            log.warn("GET request: Admin unauthrorised request access");
-            throw new Exceptions("401","Unauthorised Request !");
-        }
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("modificationRequests", updateRequest);
-        log.info("GET request: User modification request by ID");
-
-        return jsonObject;
-    }
-
-    @PostMapping("/request/delete/{requestId}")
-    public void deleteRequest(@PathVariable UUID requestId) throws Exceptions {
-        UpdateRequest request = UpdateRequestService.getUpdateRequest(requestId);
-
-        // checks validity of request
-        if (request == null) {
-            throw new Exceptions("404", "Invalid Request !");
-        }
-
-        if (!UpdateRequestService.verifyUpdateRequestUserType(requestId, "internal")) {
-            log.warn("GET request: Admin unauthrorised request access");
-            throw new Exceptions("401", "Unauthorised Request !");
-        }
-        UpdateRequestService.deleteUpdateRequest(request);
-        log.info("POST request: Admin approves modification request");
-    }
-     */
 
     @GetMapping("/logDownload")
     public void doDownload(HttpServletRequest request,

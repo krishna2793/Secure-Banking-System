@@ -32,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
@@ -238,7 +237,7 @@ public class UserService {
     }
 
     public Object getAllUsers() {
-        return userRepository.findByUserTypeIn(Lists.newArrayList(UserType.USER_ROLE));
+        return userRepository.findByUserTypeInAndIsActive(Lists.newArrayList(UserType.USER_ROLE), true);
     }
 
     @Getter
@@ -293,10 +292,10 @@ public class UserService {
 
 
     public List<User> getAllEmployees() {
-        return userRepository.findByUserTypeIn(Lists.newArrayList(UserType.EMPLOYEE_ROLE1, UserType.EMPLOYEE_ROLE2));
+        return userRepository.findByUserTypeInAndIsActive(Lists.newArrayList(UserType.EMPLOYEE_ROLE1, UserType.EMPLOYEE_ROLE2), true);
     }
 
-    public Optional<User> getUserByIdAndActive(Long id) throws Exceptions {
+    public Optional<User> getUserByIdAndActive(Long id) {
         Optional<User> user = userRepository.findById(id);
         if (user == null) {
             return null;
