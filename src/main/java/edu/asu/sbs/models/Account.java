@@ -1,8 +1,6 @@
 package edu.asu.sbs.models;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import edu.asu.sbs.config.Constants;
 import edu.asu.sbs.globals.AccountType;
 import edu.asu.sbs.globals.AccountTypeAttributeConverter;
@@ -22,7 +20,6 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-//@EqualsAndHashCode(exclude = {"accountLogs", "debitTransactions", "creditTransactions", "fromCheques", "toCheques"})
 public class Account implements Serializable {
 
     private static final long serialVersionUID = -1L;
@@ -52,28 +49,22 @@ public class Account implements Serializable {
     private boolean isActive;
 
     @ManyToOne
-    @JsonBackReference
     @JoinColumn(nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "account")
     private Set<TransactionAccountLog> accountLogs = new HashSet<>();
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "fromAccount")
     private Set<Transaction> debitTransactions = new HashSet<>();
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "toAccount")
     private Set<Transaction> creditTransactions = new HashSet<>();
 
-    @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "chequeFromAccount")
     private Set<Cheque> fromCheques = new HashSet<>();
 
-    @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "chequeToAccount")
     private Set<Cheque> toCheques = new HashSet<>();
 

@@ -1,7 +1,5 @@
 package edu.asu.sbs.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,11 +19,9 @@ public class TransactionAccountLog implements Serializable {
 
     private Instant logTime;
 
-    @JsonManagedReference
     @OneToOne(mappedBy = "log")
     private Transaction transaction;
 
-    @JsonBackReference
     @ManyToOne
     @JoinColumn
     private Account account;

@@ -1,6 +1,5 @@
 package edu.asu.sbs.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,7 +23,6 @@ public class Session implements Serializable {
 
     private Integer otp;
 
-    @JsonBackReference
     @OneToOne
     @JoinColumn(nullable = false)
     private User linkedUser;

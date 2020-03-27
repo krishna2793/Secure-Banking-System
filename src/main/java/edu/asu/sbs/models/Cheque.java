@@ -1,6 +1,5 @@
 package edu.asu.sbs.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,17 +23,14 @@ public class Cheque implements Serializable {
     @Column(nullable = false)
     private Double amount;
 
-    @JsonBackReference
     @OneToOne
     @JoinColumn(nullable = false)
     private Transaction transaction;
 
-    @JsonBackReference
     @ManyToOne
     @JoinColumn(nullable = false)
     private Account chequeFromAccount;
 
-    @JsonBackReference
     @ManyToOne
     @JoinColumn(nullable = false)
     private Account chequeToAccount;

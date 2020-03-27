@@ -1,7 +1,5 @@
 package edu.asu.sbs.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
@@ -46,26 +44,21 @@ public class Transaction implements Serializable {
     @LastModifiedDate
     private Instant updatedTime;
 
-    @JsonBackReference
     @ManyToOne
     @JoinColumn(nullable = false)
     private Account fromAccount;
 
-    @JsonBackReference
     @ManyToOne
     @JoinColumn(nullable = false)
     private Account toAccount;
 
-    @JsonBackReference
     @OneToOne
     @JoinColumn(nullable = false)
     private TransactionAccountLog log;
 
-    @JsonManagedReference
     @OneToOne(mappedBy = "linkedTransaction")
     private Request request;
 
-    @JsonManagedReference
     @OneToOne(mappedBy = "transaction")
     private Cheque cheque;
 

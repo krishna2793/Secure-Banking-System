@@ -1,7 +1,6 @@
 package edu.asu.sbs.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import edu.asu.sbs.config.Constants;
 import lombok.Getter;
 import lombok.Setter;
@@ -98,19 +97,15 @@ public class User implements Serializable {
 
     private Instant expireOn;
 
-    @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Set<Account> accounts = new HashSet<>();
 
-    @JsonManagedReference
     @OneToOne(mappedBy = "representative")
     private Organization organization;
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "requestBy", cascade = CascadeType.ALL)
     private Set<Request> requests = new HashSet<>();
 
-    @JsonManagedReference
     @OneToOne(mappedBy = "linkedUser")
     private Session session;
 
