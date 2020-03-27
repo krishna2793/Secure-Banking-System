@@ -249,6 +249,10 @@ public class UserService {
         userRepository.save(requestBy);
     }
 
+    public Object getAllUsers() {
+        return userRepository.findByUserTypeInAndIsActive(Lists.newArrayList(UserType.USER_ROLE), true);
+    }
+
     @Getter
     @Setter
     public static class JWTToken {
@@ -271,7 +275,7 @@ public class UserService {
     }
 
     @Transactional
-    public Optional<User> editUser(User userDTO) {
+    public Optional<User> editUser(UserDTO userDTO) {
         return userRepository.findById(userDTO.getId())
                 .map(user -> {
                     user.setPhoneNumber(userDTO.getPhoneNumber());
@@ -283,15 +287,14 @@ public class UserService {
                     //user.setState(userDTO.getState());
                     //user.setZip(userDTO.getZip());
                     //user.setModifiedOn(LocalDateTime.now());
-                    user.setUserType(userDTO.getUserType());
-                    userRepository.save(userDTO);
+                    userRepository.save(user);
                     return user;
                 });
     }
 
 
     public List<User> getAllEmployees() {
-        return userRepository.findByUserTypeIn(Lists.newArrayList(UserType.EMPLOYEE_ROLE1, UserType.EMPLOYEE_ROLE2));
+        return userRepository.findByUserTypeInAndIsActive(Lists.newArrayList(UserType.EMPLOYEE_ROLE1, UserType.EMPLOYEE_ROLE2), true);
     }
 
     public User getUserByIdAndActive(Long id) {

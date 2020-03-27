@@ -11,9 +11,14 @@
 {{/partial}}
 
 {{#partial "profileUser"}}
-    <input type="button" id="profileBtn" class="btn btn-primary" onclick="editProfile();editAll()" value="Edit Profile">
-    <span></span>
-    <input type="button" id="ssnBtn" class="btn btn-primary" onclick="editSSN()" value="Edit SSN">
+    <div class="form-group">
+        <div class="col-md-8">
+            <input type="button" id="profileBtn" class="btn btn-primary" onclick="editProfile();editAll()" value="Edit Profile">
+            <span></span>
+            <input type="button" id="ssnBtn" class="btn btn-primary" onclick="editSSN()" value="Edit SSN">
+            <span></span>
+            <input type="submit" id="save" class="btn btn-primary" value="Save" disabled>
+        </div>
+    </div>
 {{/partial}}
-
 {{> profile}}
