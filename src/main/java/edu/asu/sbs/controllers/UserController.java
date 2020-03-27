@@ -13,13 +13,11 @@ import edu.asu.sbs.vm.KeyAndPasswordVM;
 import edu.asu.sbs.vm.LoginVM;
 import edu.asu.sbs.vm.ManageUserVM;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -129,6 +127,12 @@ public class UserController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         return userService.logout(request, response);
+    }
+
+    @GetMapping("/test")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void test() {
+        userService.createUpdateUser();
     }
 
 

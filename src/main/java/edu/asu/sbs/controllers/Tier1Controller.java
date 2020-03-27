@@ -91,7 +91,7 @@ public class Tier1Controller {
 
     @PostMapping("/transactions")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void createTransaction(@RequestBody TransactionDTO transactionDTO) {
+    public void createTransaction(TransactionDTO transactionDTO) {
         transactionService.createTransaction(transactionDTO, TransactionStatus.APPROVED);
     }
 

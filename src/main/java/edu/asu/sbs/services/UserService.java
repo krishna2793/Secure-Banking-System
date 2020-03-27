@@ -6,8 +6,10 @@ import edu.asu.sbs.errors.*;
 import edu.asu.sbs.globals.AccountType;
 import edu.asu.sbs.models.Account;
 import edu.asu.sbs.models.Transaction;
+import edu.asu.sbs.models.TransactionAccountLog;
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.repositories.AccountRepository;
+import edu.asu.sbs.repositories.TransactionAccountLogRepository;
 import edu.asu.sbs.repositories.TransactionRepository;
 import edu.asu.sbs.repositories.UserRepository;
 import edu.asu.sbs.security.jwt.JWTFilter;
@@ -49,16 +51,18 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
+    private final TransactionAccountLogRepository transactionAccountLogRepository;
     private final OTPService otpService;
 
 
-    public UserService(UserRepository userRepository, AccountRepository accountRepository, TransactionRepository transactionRepository, AuthenticationManagerBuilder authenticationManagerBuilder, TokenProvider tokenProvider, PasswordEncoder passwordEncoder, OTPService otpService) {
+    public UserService(UserRepository userRepository, AccountRepository accountRepository, TransactionRepository transactionRepository, AuthenticationManagerBuilder authenticationManagerBuilder, TokenProvider tokenProvider, PasswordEncoder passwordEncoder, TransactionAccountLogRepository transactionAccountLogRepository, OTPService otpService) {
         this.userRepository = userRepository;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.tokenProvider = tokenProvider;
         this.passwordEncoder = passwordEncoder;
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
+        this.transactionAccountLogRepository = transactionAccountLogRepository;
         this.otpService = otpService;
     }
 
@@ -122,6 +126,10 @@ public class UserService {
         t.setTransactionType("Internal");
         t.setFromAccount(accountRepository.findOneByAccountNumberEquals("12346").orElse(null));
         t.setToAccount(accountRepository.findOneByAccountNumberEquals("12347").orElse(null));
+        TransactionAccountLog transactionAccountLog = new TransactionAccountLog();
+        transactionAccountLog.setLogDescription(t.getDescription());
+        TransactionAccountLog tlog = transactionAccountLogRepository.save(transactionAccountLog);
+        t.setLog(tlog);
         transactionRepository.save(t);
 
     }

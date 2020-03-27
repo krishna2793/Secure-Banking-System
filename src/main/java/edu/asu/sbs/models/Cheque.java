@@ -1,14 +1,16 @@
 package edu.asu.sbs.models;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
-@Data
+@Getter
+@Setter
 @Entity
 public class Cheque implements Serializable {
     private static final long serialVersionUID = -1L;
@@ -22,19 +24,21 @@ public class Cheque implements Serializable {
     @Column(nullable = false)
     private Double amount;
 
+    @JsonBackReference
     @OneToOne
     @JoinColumn(nullable = false)
-    @JsonUnwrapped
     private Transaction transaction;
 
-
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(nullable = false)
     private Account chequeFromAccount;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(nullable = false)
     private Account chequeToAccount;
+
     private boolean isDeleted;
 
 }

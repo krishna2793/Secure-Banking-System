@@ -1,28 +1,23 @@
 package edu.asu.sbs.config;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import edu.asu.sbs.config.UserType;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
-import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Collection;
 
 
 @Component
 @Configuration
-public class CustomSuccessHandler  implements AuthenticationSuccessHandler {
+public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
@@ -32,36 +27,41 @@ public class CustomSuccessHandler  implements AuthenticationSuccessHandler {
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         authorities.forEach(authority -> {
-            if(authority.getAuthority().equals(UserType.USER_ROLE)) {
-                try {
-                    redirectStrategy.sendRedirect(arg0, arg1, "/api/v1/user/home");
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            } else if(authority.getAuthority().equals(UserType.ADMIN_ROLE)) {
-                try {
-                    redirectStrategy.sendRedirect(arg0, arg1, "/api/v1/admin/requests");
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            } else if(authority.getAuthority().equals(UserType.EMPLOYEE_ROLE1)) {
-                try {
-                    redirectStrategy.sendRedirect(arg0, arg1, "/api/v1/tier1/accounts");
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            } else if(authority.getAuthority().equals(UserType.EMPLOYEE_ROLE2)) {
-                try {
-                    redirectStrategy.sendRedirect(arg0, arg1, "/api/v1/tier2/requests");
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            } else {
-                throw new IllegalStateException();
+            switch (authority.getAuthority()) {
+                case UserType.USER_ROLE:
+                    try {
+                        redirectStrategy.sendRedirect(arg0, arg1, "/api/v1/user/home");
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    break;
+                case UserType.ADMIN_ROLE:
+                    try {
+                        redirectStrategy.sendRedirect(arg0, arg1, "/api/v1/admin/requests");
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    break;
+                case UserType.EMPLOYEE_ROLE1:
+                    try {
+                        redirectStrategy.sendRedirect(arg0, arg1, "/api/v1/tier1/accounts");
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    break;
+                case UserType.EMPLOYEE_ROLE2:
+                    try {
+                        redirectStrategy.sendRedirect(arg0, arg1, "/api/v1/tier2/requests");
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    break;
+                default:
+                    throw new IllegalStateException();
             }
         });
     }
