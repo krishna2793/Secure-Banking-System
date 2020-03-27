@@ -1,0 +1,32 @@
+{{#partial "head"}}
+
+{{/partial}}
+{{#partial "body"}}
+    <div>
+        <table id="results" width="100%">
+            <thead>
+            <tr>
+                <th align="center">Account Number:</th>
+                <th align="center">Account Type:</th>
+                <th align="center">Balance</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#each result }}
+                <form method="POST">
+                    <tr>
+                        <td align="center">{{ accountNumber }}</td>
+                        <td align="center">{{ accountType }}</td>
+                        <td align="center">{{ accountBalance }}</td>
+                    </tr>
+                </form>
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script type="text/javascript" src="/js/adminHandler.js"></script>
+{{/partial}}
+{{> tier1Base}}

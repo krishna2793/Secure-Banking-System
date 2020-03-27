@@ -14,17 +14,17 @@ hikari:
     prepStmtCacheSqlLimit: 2048
     useServerPrepStmts: true
 
-jpa:
-  hibernate:
-    ddl-auto: update
-    use-new-id-generator-mappings: false
-  show-sql: true
-  properties:
-    hibernate.id.new_generator_mappings: true
-    hibernate.connection.provider_disables_autocommit: true
-    hibernate.cache.use_second_level_cache: false
-    hibernate.cache.use_query_cache: false
-    hibernate.generate_statistics: false
+  jpa:
+    hibernate:
+      ddl-auto: update
+      use-new-id-generator-mappings: false
+    show-sql: true
+    properties:
+      hibernate.id.new_generator_mappings: true
+      hibernate.connection.provider_disables_autocommit: true
+      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: false
       hibernate.jdbc.batch_size: 25
       hibernate.order_inserts: true
       hibernate.order_updates: true
@@ -58,7 +58,7 @@ sbs:
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
   mail:
-    base-url: https://www.sbsbank.com
+    base-url: https://www.sbsbank.xyz
     enabled: true
     from: asecurebank@gmail.com
 

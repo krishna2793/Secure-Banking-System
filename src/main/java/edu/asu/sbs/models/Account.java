@@ -1,9 +1,13 @@
 package edu.asu.sbs.models;
 
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import edu.asu.sbs.config.Constants;
-import lombok.Data;
+import edu.asu.sbs.globals.AccountType;
+import edu.asu.sbs.globals.AccountTypeAttributeConverter;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -16,7 +20,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
+//@EqualsAndHashCode(exclude = {"accountLogs", "debitTransactions", "creditTransactions", "fromCheques", "toCheques"})
 public class Account implements Serializable {
 
     private static final long serialVersionUID = -1L;
@@ -33,7 +39,9 @@ public class Account implements Serializable {
 
     @NotNull
     @Column(nullable = false, length = 50)
-    private String accountType;
+    @Enumerated(EnumType.STRING)
+    @Convert(converter = AccountTypeAttributeConverter.class)
+    private AccountType accountType;
 
     @NotNull
     @Column(nullable = false)
@@ -44,18 +52,29 @@ public class Account implements Serializable {
     private boolean isActive;
 
     @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonBackReference
     @JoinColumn(nullable = false)
-    @JsonUnwrapped
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
-    @OneToOne
-    @JoinColumn(nullable = false)
-    private TransactionAccountLog log;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "account")
+    private Set<TransactionAccountLog> accountLogs = new HashSet<>();
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "fromAccount")
     private Set<Transaction> debitTransactions = new HashSet<>();
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "toAccount")
     private Set<Transaction> creditTransactions = new HashSet<>();
+
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "chequeFromAccount")
+    private Set<Cheque> fromCheques = new HashSet<>();
+
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "chequeToAccount")
+    private Set<Cheque> toCheques = new HashSet<>();
+
 }

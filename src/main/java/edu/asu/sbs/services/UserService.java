@@ -3,10 +3,13 @@ package edu.asu.sbs.services;
 import com.google.common.collect.Lists;
 import edu.asu.sbs.config.UserType;
 import edu.asu.sbs.errors.*;
+import edu.asu.sbs.globals.AccountType;
 import edu.asu.sbs.models.Account;
 import edu.asu.sbs.models.Transaction;
+import edu.asu.sbs.models.TransactionAccountLog;
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.repositories.AccountRepository;
+import edu.asu.sbs.repositories.TransactionAccountLogRepository;
 import edu.asu.sbs.repositories.TransactionRepository;
 import edu.asu.sbs.repositories.UserRepository;
 import edu.asu.sbs.security.jwt.JWTFilter;
@@ -26,11 +29,13 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Calendar;
 import java.util.List;
@@ -44,21 +49,25 @@ public class UserService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
     private final PasswordEncoder passwordEncoder;
-    final AccountRepository accountRepository;
-    final TransactionRepository transactionRepository;
+    private final AccountRepository accountRepository;
+    private final TransactionRepository transactionRepository;
+    private final TransactionAccountLogRepository transactionAccountLogRepository;
+    private final OTPService otpService;
 
 
-    public UserService(UserRepository userRepository, AccountRepository accountRepository, TransactionRepository transactionRepository, AuthenticationManagerBuilder authenticationManagerBuilder, TokenProvider tokenProvider, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, AccountRepository accountRepository, TransactionRepository transactionRepository, AuthenticationManagerBuilder authenticationManagerBuilder, TokenProvider tokenProvider, PasswordEncoder passwordEncoder, TransactionAccountLogRepository transactionAccountLogRepository, OTPService otpService) {
         this.userRepository = userRepository;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.tokenProvider = tokenProvider;
         this.passwordEncoder = passwordEncoder;
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
+        this.transactionAccountLogRepository = transactionAccountLogRepository;
+        this.otpService = otpService;
     }
 
     @Transactional
-    public void createUpdateUser(User user) {
+    public void createUpdateUser() {
 
         User u = new User();
         u.setUserName("admin");
@@ -67,7 +76,7 @@ public class UserService {
         u.setPhoneNumber("9994621912");
         u.setSsn("123-45-6789");
         u.setDateOfBirth(new Date(Calendar.getInstance().getTime().getTime()));
-        u.setEmail("93@asu,edu");
+        u.setEmail("93@asu.edu");
         u.setPasswordHash(passwordEncoder.encode("admin"));
         u.setUserType("t2");
         userRepository.save(u);
@@ -87,7 +96,7 @@ public class UserService {
         Account a = new Account();
         a.setAccountBalance(1000.00);
         a.setAccountNumber("12345");
-        a.setAccountType("savings");
+        a.setAccountType(AccountType.SAVINGS);
         a.setActive(true);
         a.setUser(userRepository.findOneWithUserTypeByUserName("admin").orElse(null));
         accountRepository.save(a);
@@ -95,7 +104,7 @@ public class UserService {
         a = new Account();
         a.setAccountBalance(1000.00);
         a.setAccountNumber("12347");
-        a.setAccountType("checking");
+        a.setAccountType(AccountType.CHECKING);
         a.setActive(true);
         a.setUser(userRepository.findOneWithUserTypeByUserName("admin").orElse(null));
         accountRepository.save(a);
@@ -103,20 +112,24 @@ public class UserService {
         a = new Account();
         a.setAccountBalance(1000.00);
         a.setAccountNumber("12346");
-        a.setAccountType("checking");
+        a.setAccountType(AccountType.CHECKING);
         a.setActive(true);
         a.setUser(userRepository.findOneWithUserTypeByUserName("user").orElse(null));
         accountRepository.save(a);
 
         Transaction t = new Transaction();
-        t.setCreatedTime(new Timestamp(System.currentTimeMillis()));
+        t.setCreatedTime(Instant.now());
         t.setDescription("Dummy transfer");
         t.setStatus("SUCCESS");
-        t.setTransactionAmount(100.00);
-        t.setUpdatedTime(new Timestamp(System.currentTimeMillis()));
+        t.setTransactionAmount(100.0);
+        t.setUpdatedTime(Instant.now());
         t.setTransactionType("Internal");
         t.setFromAccount(accountRepository.findOneByAccountNumberEquals("12346").orElse(null));
         t.setToAccount(accountRepository.findOneByAccountNumberEquals("12347").orElse(null));
+        TransactionAccountLog transactionAccountLog = new TransactionAccountLog();
+        transactionAccountLog.setLogDescription(t.getDescription());
+        TransactionAccountLog tlog = transactionAccountLogRepository.save(transactionAccountLog);
+        t.setLog(tlog);
         transactionRepository.save(t);
 
     }
@@ -257,35 +270,25 @@ public class UserService {
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
             currentUserName = authentication.getName();
         }
-        System.out.println("Loggendin user: "+currentUserName);
-        Optional<User> user = userRepository.findOneByUserName(currentUserName);
-        if (userRepository.findOneByUserName(currentUserName).isPresent()) {
-            return user.get();
-        } else {
-            return null;
-        }
+        log.debug("Logged in User: '{}'", currentUserName);
+        return userRepository.findOneByUserName(currentUserName).orElse(null);
     }
 
     @Transactional
-    public Optional<User> editUser(Long id,
-                                   String phoneNumber,
-                                   String firstName,
-                                   String lastName,
-                                   String email,
-                                   String userName,
-                                   String userType,
-                                   String ssn
-                                   ) {
-        return userRepository.findById(id)
+    public Optional<User> editUser(User userDTO) {
+        return userRepository.findById(userDTO.getId())
                 .map(user -> {
-                    user.setPhoneNumber(phoneNumber);
-                    user.setFirstName(firstName);
-                    user.setLastName(lastName);
-                    user.setEmail(email);
-                    user.setSsn(ssn);
-                    user.setUserName(userName);
-                    user.setUserType(userType);
-                    userRepository.save(user);
+                    user.setPhoneNumber(userDTO.getPhoneNumber());
+                    user.setFirstName(userDTO.getFirstName());
+                    user.setLastName(userDTO.getLastName());
+                    //user.setAddressLine1(userDTO.getAddressLine1());
+                    //user.setAddressLine2(userDTO.getAddressLine2());
+                    //user.setCity(userDTO.getCity());
+                    //user.setState(userDTO.getState());
+                    //user.setZip(userDTO.getZip());
+                    //user.setModifiedOn(LocalDateTime.now());
+                    user.setUserType(userDTO.getUserType());
+                    userRepository.save(userDTO);
                     return user;
                 });
     }
@@ -303,9 +306,13 @@ public class UserService {
         log.info("Getting user by id");
 
         return user;
+    public User getUserByIdAndActive(Long id) {
+        log.info("Getting user by id and isActive=true");
+        Optional<User> optionalUser = userRepository.findByIdAndIsActive(id, true);
+        return optionalUser.orElse(null);
     }
 
-
+    @Transactional
     public void deleteUser(Long id) {
         Optional<User> current = userRepository.findById(id);
         current.ifPresent(user -> {
@@ -313,6 +320,18 @@ public class UserService {
             user.setExpireOn(Instant.now());
             userRepository.save(user);
         });
+    }
+
+
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        User user = getCurrentUser();
+        otpService.clearOTP(user.getEmail());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            otpService.clearOTP(user.getEmail());
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+        return "redirect:/login?logout";
     }
 
 }

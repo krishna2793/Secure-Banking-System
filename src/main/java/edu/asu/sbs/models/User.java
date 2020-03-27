@@ -1,8 +1,10 @@
 package edu.asu.sbs.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import edu.asu.sbs.config.Constants;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -15,7 +17,8 @@ import java.util.Set;
 
 
 @Entity
-@Data
+@Getter
+@Setter
 public class User implements Serializable {
     private static final long serialVersionUID = -1L;
 
@@ -84,18 +87,6 @@ public class User implements Serializable {
     @JsonIgnore
     private String resetKey;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy="user")
-    private Set<Account> accounts = new HashSet<>();
-
-    @OneToOne(mappedBy="representative")
-    private Organization organization;
-
-    @OneToOne(mappedBy="requestBy")
-    private Request request;
-
-    @OneToOne(mappedBy="linkedUser")
-    private Session session;
-
     private Instant resetDate = null;
 
     @Size(max = 20)
@@ -106,5 +97,21 @@ public class User implements Serializable {
     private Instant createdOn;
 
     private Instant expireOn;
+
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private Set<Account> accounts = new HashSet<>();
+
+    @JsonManagedReference
+    @OneToOne(mappedBy = "representative")
+    private Organization organization;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "requestBy", cascade = CascadeType.ALL)
+    private Set<Request> requests = new HashSet<>();
+
+    @JsonManagedReference
+    @OneToOne(mappedBy = "linkedUser")
+    private Session session;
 
 }

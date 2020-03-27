@@ -1,0 +1,19 @@
+{{#partial "bodyHeader"}}
+    <ul>
+        <li><a class="active" href="/api/v1/tier1/transactions">Secure Banking System</a></li>
+        <li><a href="/api/v1/tier1/transactions">Transaction Requests</a></li>
+        <li><a href="/api/v1/tier1/accounts">Access User Accounts</a></li>
+        <li><a href="/api/v1/tier1/profile">Profile</a></li>
+        <button class='btn btn-success pull-right' onclick="location.href='/logout'">
+            Log out
+        </button>
+    </ul>
+{{/partial}}
+
+{{#partial "profileUser"}}
+    <input type="button" id="profileBtn" class="btn btn-primary" onclick="editProfile();editAll()" value="Edit Profile">
+    <span></span>
+    <input type="button" id="ssnBtn" class="btn btn-primary" onclick="editSSN()" value="Edit SSN">
+{{/partial}}
+
+{{> profile}}

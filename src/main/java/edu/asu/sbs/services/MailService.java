@@ -87,4 +87,10 @@ public class MailService {
         sendEmailFromTemplate(user, "mail/passwordResetEmail", "email.reset.title");
     }
 
+    @Async
+    public void sendOTPMail(User user) {
+        log.debug("Sending otp email to '{}'", user.getEmail());
+        sendEmailFromTemplate(user, "mail/otpEmail", "email.otp.title");
+    }
+
 }

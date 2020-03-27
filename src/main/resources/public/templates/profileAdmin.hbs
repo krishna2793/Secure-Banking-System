@@ -1,10 +1,12 @@
 {{#partial "bodyHeader"}}
     <ul>
-        <li><a class="active" href="/api/v1/admin/home">Secure Banking System</a></li>
-        <li><a href="/api/v1/admin/home">View Employee Requests</a></li>
-        <li><a href="/api/v1/admin/logs">Access Logs</a></li>
-        <li><a href="/api/v1/admin/handleemployee">Access Employee Accounts</a></li>
-        <li><a href="/api/v1/admin/profile">Profile</a></li>
+        <li><a class="active" href="/api/v1/admin/requests">Secure Banking System</a></li>
+        <li><a href="/api/v1/admin/requests">View Employee Requests</a></li>
+        <li><a href="/api/v1/admin/allEmployees">Access Employee Accounts</a></li>
+        <li><a href="/api/v1/admin/employee/details">Profile</a></li>
+        <button class='btn btn-success pull-right' onclick="location.href='/logout'">
+            Log out
+        </button>
     </ul>
 {{/partial}}
 

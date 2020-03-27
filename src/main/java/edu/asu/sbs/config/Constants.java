@@ -9,6 +9,7 @@ public final class Constants {
     public static final int PASSWORD_MIN_LENGTH = 4;
     public static final int PASSWORD_MAX_LENGTH = 100;
     public static final String ACCOUNT_NUMBER_REGEX = "^\\w{1,17}$";
+    public static final int EXPIRE_MINS = 10;
 
     private Constants() {
 

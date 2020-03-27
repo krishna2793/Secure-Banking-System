@@ -1,32 +1,37 @@
 package edu.asu.sbs.models;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.time.Instant;
 
-@Data
+@Getter
+@Setter
 @Entity
 public class Request implements Serializable {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long requestId;
 
-    private Timestamp requestTime;
-
+    @NotNull
+    @Column(nullable = false)
     private String requestType;
 
+    @NotNull
+    @Column(nullable = false)
     private String description;
 
     @NotNull
     @Column(nullable = false)
-    private boolean isDeleted;
+    private boolean isDeleted = false;
 
     @CreatedDate
     private Instant createdDate;
@@ -36,16 +41,19 @@ public class Request implements Serializable {
     @LastModifiedDate
     private Instant modifiedDate;
 
-    @OneToOne
-    @JoinColumn(nullable = true)
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn
     private User requestBy;
 
+    @JsonBackReference
     @OneToOne
-    @JoinColumn(nullable = true)
+    @JoinColumn
     private User approvedBy;
 
+    @JsonBackReference
     @OneToOne
-    @JoinColumn(nullable = true)
+    @JoinColumn
     private Transaction linkedTransaction;
 
 }

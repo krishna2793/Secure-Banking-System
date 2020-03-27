@@ -1,11 +1,16 @@
 package edu.asu.sbs.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.Instant;
 
+@Getter
+@Setter
 @Entity
 public class TransactionAccountLog implements Serializable {
     @Id
@@ -14,11 +19,14 @@ public class TransactionAccountLog implements Serializable {
 
     private String logDescription;
 
-    private Timestamp logTime;
+    private Instant logTime;
 
+    @JsonManagedReference
     @OneToOne(mappedBy = "log")
     private Transaction transaction;
 
-    @OneToOne(mappedBy = "log")
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn
     private Account account;
 }
