@@ -73,7 +73,6 @@ public class TransactionService {
                 transaction.setUpdatedTime(Instant.now());
                 transaction.setDescription(transactionDTO.getDescription());
                 transaction.setFromAccount(fromAccount);
-                transaction.setToAccount(toAccount);
                 if (transactionDTO.getTransactionAmount() > 1000) {
                     transaction.setStatus(TransactionStatus.PENDING);
                 } else {
