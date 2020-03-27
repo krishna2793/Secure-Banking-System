@@ -12,11 +12,12 @@ import edu.asu.sbs.loader.HandlebarsTemplateLoader;
 import edu.asu.sbs.models.Request;
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.services.RequestService;
+import edu.asu.sbs.services.TransactionService;
 import edu.asu.sbs.services.UserService;
 import edu.asu.sbs.services.dto.UserDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -28,32 +29,25 @@ import java.util.HashMap;
 import java.util.Optional;
 
 @Slf4j
-import edu.asu.sbs.config.UserType;
-import edu.asu.sbs.models.Request;
-import edu.asu.sbs.services.RequestService;
-import edu.asu.sbs.services.TransactionService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-@Slf4j
 @PreAuthorize("hasAnyAuthority('" + UserType.EMPLOYEE_ROLE2 + "')")
 @RestController
 @RequestMapping("/api/v1/tier2")
 public class Tier2Controller {
 
-    private UserService userService = null;
+    private final UserService userService;
     private final RequestService requestService;
     ObjectMapper mapper = new ObjectMapper();
 
-    @Autowired
-    private HandlebarsTemplateLoader handlebarsTemplateLoader;
+    //@Autowired
+    private final HandlebarsTemplateLoader handlebarsTemplateLoader;
 
-    public Tier2Controller(UserService userService, RequestService requestService) throws UnauthorizedAccessExcpetion, IOException {
+    private final TransactionService transactionService;
+
+    public Tier2Controller(UserService userService, TransactionService transactionService, RequestService requestService, HandlebarsTemplateLoader handlebarsTemplateLoader) {
         this.userService = userService;
+        this.transactionService = transactionService;
         this.requestService = requestService;
+        this.handlebarsTemplateLoader = handlebarsTemplateLoader;
     }
 
     @GetMapping("/user/add")
@@ -99,11 +93,11 @@ public class Tier2Controller {
 
     @GetMapping("/delete/{id}")
     public void deleteUser(@PathVariable Long id, HttpServletResponse response) throws Exceptions, IOException {
-        Optional<User> current = userService.getUserByIdAndActive(id);
+        User current = userService.getUserByIdAndActive(id);
         if (current == null) {
             throw new Exceptions("404", " ");
         }
-        if (!(current.get().getUserType().equals(UserType.USER_ROLE))) {
+        if (!(current.getUserType().equals(UserType.USER_ROLE))) {
             log.warn("GET request: tier2 employee unauthorised request access");
             throw new Exceptions("401", "Unauthorized request !!");
         }
@@ -115,18 +109,18 @@ public class Tier2Controller {
 
     @GetMapping("/viewUser/{id}")
     public String getUserDetail(@PathVariable Long id) throws Exceptions, IOException {
-        Optional<User> user = userService.getUserByIdAndActive(id);
+        User user = userService.getUserByIdAndActive(id);
 
         if (user == null) {
             throw new Exceptions("404", " ");
         }
-        if (!(user.get().getUserType().equals(UserType.USER_ROLE))) {
+        if (!(user.getUserType().equals(UserType.USER_ROLE))) {
             log.warn("GET request: Unauthorized request for external user");
             throw new Exceptions("409", " ");
         }
 
-            JsonNode result = mapper.valueToTree(user.get());
-            Template template = handlebarsTemplateLoader.getTemplate("tier2ViewUser");
+        JsonNode result = mapper.valueToTree(user);
+        Template template = handlebarsTemplateLoader.getTemplate("tier2ViewUser");
             return template.apply(handlebarsTemplateLoader.getContext(result));
         }
 
@@ -141,18 +135,10 @@ public class Tier2Controller {
     }
 
     @GetMapping("/editUser/{id}")
-    public String modifyUserDetail(@PathVariable Long id,
-                                   String phoneNumber,
-                                   String firstName,
-                                   String lastName,
-                                   String email,
-                                   String userName,
-                                   String userType,
-                                   String ssn
-                                   ) throws Exceptions, IOException {
+    public String modifyUserDetail(UserDTO userDTO
+    ) throws Exceptions, IOException {
 
-        Optional<User> user = userService.editUser(id, phoneNumber, firstName,
-                                            lastName, email, userName, userType, ssn);
+        Optional<User> user = userService.editUser(userDTO);
 
         if (user == null) {
             throw new Exceptions("404", " ");
@@ -169,8 +155,8 @@ public class Tier2Controller {
         User user = userService.getCurrentUser();
         request.ifPresent(req -> {
             switch (req.getRequestType()) {
-                case RequestType.ABOVE_LIMIT_TRANS:
-                    requestService.modifyRequest(request, user, RequestType.ABOVE_LIMIT_TRANS, StatusType.APPROVED);
+                case RequestType.APPROVE_CRITICAL_TRANSACTION:
+                    requestService.modifyRequest(request, user, RequestType.APPROVE_CRITICAL_TRANSACTION, StatusType.APPROVED);
                     break;
             }
         });
@@ -183,25 +169,20 @@ public class Tier2Controller {
         User user = userService.getCurrentUser();
         request.ifPresent(req -> {
             switch (req.getRequestType()) {
-                case RequestType.ABOVE_LIMIT_TRANS:
-                    requestService.modifyRequest(request, user, RequestType.ABOVE_LIMIT_TRANS, StatusType.DECLINED);
+                case RequestType.APPROVE_CRITICAL_TRANSACTION:
+                    requestService.modifyRequest(request, user, RequestType.APPROVE_CRITICAL_TRANSACTION, StatusType.DECLINED);
                     break;
             }
         });
     }
-    private final TransactionService transactionService;
-    private final RequestService requestService;
 
-    public Tier2Controller(TransactionService transactionService, RequestService requestService) {
-        this.transactionService = transactionService;
-        this.requestService = requestService;
-    }
-
+    /*
     @GetMapping("/viewRequests")
     @ResponseBody
     public List<Request> viewRequests() {
         return requestService.getAllRequests();
     }
+     */
 
     @PutMapping("/approveCriticalTransaction")
     public void approveCriticalTransaction(@RequestParam Long requestId) {

@@ -275,7 +275,7 @@ public class UserService {
     }
 
     @Transactional
-    public Optional<User> editUser(User userDTO) {
+    public Optional<User> editUser(UserDTO userDTO) {
         return userRepository.findById(userDTO.getId())
                 .map(user -> {
                     user.setPhoneNumber(userDTO.getPhoneNumber());
@@ -287,8 +287,7 @@ public class UserService {
                     //user.setState(userDTO.getState());
                     //user.setZip(userDTO.getZip());
                     //user.setModifiedOn(LocalDateTime.now());
-                    user.setUserType(userDTO.getUserType());
-                    userRepository.save(userDTO);
+                    userRepository.save(user);
                     return user;
                 });
     }
@@ -298,14 +297,6 @@ public class UserService {
         return userRepository.findByUserTypeInAndIsActive(Lists.newArrayList(UserType.EMPLOYEE_ROLE1, UserType.EMPLOYEE_ROLE2), true);
     }
 
-    public Optional<User> getUserByIdAndActive(Long id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user == null) {
-            return null;
-        }
-        log.info("Getting user by id");
-
-        return user;
     public User getUserByIdAndActive(Long id) {
         log.info("Getting user by id and isActive=true");
         Optional<User> optionalUser = userRepository.findByIdAndIsActive(id, true);

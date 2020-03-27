@@ -32,7 +32,7 @@ public class RequestService {
     }
 
     public ArrayList<Request> getAllTier2Requests() {
-        return (ArrayList<Request>) requestRepository.findByRequestTypeInAndDeletedTrue(RequestType.ABOVE_LIMIT_TRANS);
+        return (ArrayList<Request>) requestRepository.findByRequestTypeInAndDeletedTrue(RequestType.APPROVE_CRITICAL_TRANSACTION);
     }
 
     public void modifyRequest(Optional<Request> request, User user, String requestType, String action) {
