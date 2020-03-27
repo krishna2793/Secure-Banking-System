@@ -2,7 +2,6 @@
 
 {{/partial}}
 {{#partial "body"}}
-    <link rel="stylesheet" type="text/css" href="/css/t2UA.css">
     <div>
         <br>
         <button class="btn btn-primary" onclick="location.href='/api/v1/tier2/user/add'">Add User</button>
@@ -24,7 +23,7 @@
             </tr>
             </thead>
             <tbody>
-            {{#each userResults }}
+            {{#each result }}
                 <form method="POST">
                     <tr>
                         <td align="center">{{ id }}</td>
@@ -38,8 +37,7 @@
                         <td align="center">{{ ssn }}</td>
                         <td align="center">
                             <input id="update" class="btn btn-primary" type="button" name="update" onclick="location.href='/api/v1/tier2/viewUser/{{ id }}'" value="Update"/>
-                            <input id="delete" class="btn btn-primary"  type="button" name="delete" onclick="location.href='/api/v1/tier2/viewUser/{{ id }}'" value="Delete"/>
-                            <input id="view" class="btn btn-primary" type="button" name="view" onclick="location.href='/api/v1/tier2/viewUser/{{ id }}'"value="View"/>
+                            <input id="delete" class="btn btn-primary"  type="button" name="delete" onclick="location.href='/api/v1/tier2/delete/{{ id }}'" value="Delete"/>
                         </td>
                     </tr>
                 </form>
@@ -50,6 +48,6 @@
 {{/partial}}
 
 {{#partial "scripts"}}
-    <script type="text/javascript" src="/js/tier2Handler.js"></script>
+
 {{/partial}}
 {{>tier2Base}}
