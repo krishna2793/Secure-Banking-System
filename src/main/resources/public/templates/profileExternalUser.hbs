@@ -1,0 +1,14 @@
+{{#partial "bodyHeader"}}
+    <ul>
+        <li><a class="active" href="">Account Summary</a></li>
+        <li><a href="">Transfer Requests</a></li>
+        <li><a href="">Request New Account</a></li>
+        <li><a href="">Review Transfer Requests</a></li>
+    </ul>
+{{/partial}}
+
+{{#partial "profileExternalUser"}}
+    <input type="button" id="profileBtn" class="btn btn-primary" onclick="editProfile()" value="Edit Profile">
+{{/partial}}
+
+{{> profile}}

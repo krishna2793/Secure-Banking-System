@@ -1,0 +1,34 @@
+
+{{#partial "body"}}
+    <div>
+    <form class="form-horizontal" role="form">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">Initial Amount: </label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text" id="intialAmount" name="initialAmount">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-lg-8">
+                <label for="accountType">Select list:</label>
+                <select class="form-control" id="accountType" name="accountType">
+                    <option>CURRENT</option>
+                    <option>SAVINGS</option>
+                    <option>CHECKING</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-8">
+                <input type="submit" id="save" class="btn btn-primary" value="request">
+            </div>
+        </div>
+    </form>
+    </div>
+{{/partial}}
+
+{{#block "scripts"}}
+{{!-- Hero content goes here. --}}
+{{/block}}
+
+{{> extUserBase}}
