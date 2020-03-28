@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jknack.handlebars.Template;
 import edu.asu.sbs.config.TransactionStatus;
+import edu.asu.sbs.config.TransactionType;
 import edu.asu.sbs.config.UserType;
 import edu.asu.sbs.errors.UnauthorizedAccessExcpetion;
 import edu.asu.sbs.loader.HandlebarsTemplateLoader;
@@ -58,13 +59,14 @@ public class Tier1Controller {
         JsonNode result = mapper.valueToTree(user);
         Template template = handlebarsTemplateLoader.getTemplate("profileTier1");
         log.info("GET request: Admin user detail");
-        return template.apply(handlebarsTemplateLoader.getContext(result));    }
+        return template.apply(handlebarsTemplateLoader.getContext(result));
+    }
 
     @GetMapping("/accounts")
     @ResponseBody
     public String getAccounts() throws IOException {
         List accounts = accountService.getAccounts();
-        HashMap<String, List> resultMap= new HashMap<>();
+        HashMap<String, List> resultMap = new HashMap<>();
         resultMap.put("result", accounts);
         JsonNode result = mapper.valueToTree(resultMap);
         Template template = handlebarsTemplateLoader.getTemplate("tier1UserAccounts");
@@ -75,7 +77,7 @@ public class Tier1Controller {
     @ResponseBody
     public String viewTransactions() throws IOException {
         List transactions = transactionService.getTransactions();
-        HashMap<String, List> resultMap= new HashMap<>();
+        HashMap<String, List> resultMap = new HashMap<>();
         resultMap.put("result", transactions);
         JsonNode result = mapper.valueToTree(resultMap);
         Template template = handlebarsTemplateLoader.getTemplate("tier1TransactionRequests");
@@ -92,7 +94,11 @@ public class Tier1Controller {
     @PostMapping("/transactions")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void createTransaction(TransactionDTO transactionDTO) {
-        transactionService.createTransaction(transactionDTO, TransactionStatus.APPROVED);
+        if (transactionDTO.getTransactionType().equals(TransactionType.CHEQUE)) {
+            transactionService.issueCheque(transactionDTO);
+        } else {
+            transactionService.createTransaction(transactionDTO, TransactionStatus.APPROVED);
+        }
     }
 
     @PostMapping("/issueCheck")

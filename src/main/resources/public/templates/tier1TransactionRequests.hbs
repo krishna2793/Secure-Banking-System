@@ -4,10 +4,11 @@
 {{#partial "body"}}
     <div>
         <br>
-        <button class="btn btn-primary" onclick="location.href='/api/v1/tier1/createTransaction'">Create Transaction</button>
+        <button class="btn btn-primary" onclick="location.href='/api/v1/tier1/createTransaction'">Create Transaction
+        </button>
         <br>
         <br>
-        <table id="results" width="100%">
+        <table id="results" class="results">
             <thead>
             <tr>
                 <th align="center">Transaction ID</th>
@@ -30,12 +31,16 @@
                         <td align="center">{{ fromAccount }}</td>
                         <td align="center">{{ toAccount }}</td>
                         <td align="center">{{ transactionAmount }}</td>
-                        {% if transactionAmount > 1500%}
-                        <td align="center">
-                            <input id="update" class="btn btn-primary" type="button" name="approve" onclick="location.href='/api/v1/tier1/approveTransaction/{{ transactionId }}'" value="Approve"/>
-                            <input id="delete" class="btn btn-primary"  type="button" name="deny" onclick="location.href='/api/v1/tier1/denyTransaction/{{ transactionId }}'" value="Deny"/>
-                        </td>
-                        {% endif %}
+                        {{#if transactionAmount '>' 1000}}
+                            <td align="center">
+                                <input id="update" class="btn btn-primary" type="button" name="approve"
+                                       onclick="location.href='/api/v1/tier1/approveTransaction/{{ transactionId }}'"
+                                       value="Approve"/>
+                                <input id="delete" class="btn btn-primary" type="button" name="deny"
+                                       onclick="location.href='/api/v1/tier1/denyTransaction/{{ transactionId }}'"
+                                       value="Deny"/>
+                            </td>
+                        {{/if}}
                     </tr>
                 </form>
             {{/each}}

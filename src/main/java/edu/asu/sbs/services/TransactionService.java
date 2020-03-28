@@ -51,14 +51,18 @@ public class TransactionService {
                 switch (transactionDTO.getTransactionType()) {
                     case TransactionType.DEBIT:
                         if (fromAccount.getAccountBalance() > transactionDTO.getTransactionAmount()) {
-                            toAccount.setAccountBalance(toAccount.getAccountBalance() + transactionDTO.getTransactionAmount());
                             fromAccount.setAccountBalance(fromAccount.getAccountBalance() - transactionDTO.getTransactionAmount());
+                            if (transactionDTO.getTransactionAmount() <= 1000 && !transactionStatus.equals(TransactionStatus.PENDING)) {
+                                toAccount.setAccountBalance(toAccount.getAccountBalance() + transactionDTO.getTransactionAmount());
+                            }
                         }
                         break;
                     case TransactionType.CREDIT:
                         if (toAccount.getAccountBalance() > transactionDTO.getTransactionAmount()) {
-                            fromAccount.setAccountBalance(fromAccount.getAccountBalance() + transactionDTO.getTransactionAmount());
                             toAccount.setAccountBalance(toAccount.getAccountBalance() - transactionDTO.getTransactionAmount());
+                            if (transactionDTO.getTransactionAmount() <= 1000 && !transactionStatus.equals(TransactionStatus.PENDING)) {
+                                fromAccount.setAccountBalance(fromAccount.getAccountBalance() + transactionDTO.getTransactionAmount());
+                            }
                         }
                         break;
                     default:
@@ -81,14 +85,12 @@ public class TransactionService {
                 transaction.setTransactionType(transactionDTO.getTransactionType());
                 transaction.setTransactionAmount(transactionDTO.getTransactionAmount());
                 transaction.setLog(transactionAccountLog);
-                if (!transactionStatus.equals(TransactionStatus.PENDING)) {
-                    transaction.setToAccount(toAccount);
-                }
+                transaction.setToAccount(toAccount);
                 transaction.setFromAccount(fromAccount);
                 accountRepository.save(toAccount);
                 accountRepository.save(fromAccount);
                 transaction = transactionRepository.save(transaction);
-                if (transactionDTO.getTransactionAmount() < 1000) {
+                if (transactionDTO.getTransactionAmount() > 1000) {
                     Request request = new Request();
                     request.setCreatedDate(Instant.now());
                     request.setLinkedTransaction(transaction);
@@ -123,6 +125,7 @@ public class TransactionService {
 
     @Transactional
     public void issueCheque(TransactionDTO transactionDTO) {
+        transactionDTO.setTransactionType(TransactionType.DEBIT);
         Transaction transaction = createTransaction(transactionDTO, TransactionStatus.PENDING);
         Cheque cheque = new Cheque();
         cheque.setAmount(transactionDTO.getTransactionAmount());

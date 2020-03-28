@@ -1,6 +1,8 @@
 package edu.asu.sbs.services;
 
 import com.google.common.collect.Lists;
+import edu.asu.sbs.config.TransactionStatus;
+import edu.asu.sbs.config.TransactionType;
 import edu.asu.sbs.config.UserType;
 import edu.asu.sbs.errors.*;
 import edu.asu.sbs.globals.AccountType;
@@ -70,27 +72,68 @@ public class UserService {
     public void createUpdateUser() {
 
         User u = new User();
-        u.setUserName("admin");
+        u.setUserName("tier2");
         u.setFirstName("R");
         u.setLastName("R");
         u.setPhoneNumber("9994621912");
         u.setSsn("123-45-6789");
         u.setDateOfBirth(new Date(Calendar.getInstance().getTime().getTime()));
         u.setEmail("93@asu.edu");
-        u.setPasswordHash(passwordEncoder.encode("admin"));
-        u.setUserType("t2");
+        u.setPasswordHash(passwordEncoder.encode("tier2"));
+        u.setUserType(UserType.EMPLOYEE_ROLE2);
+        u.setActive(true);
         userRepository.save(u);
 
         u = new User();
-        u.setUserName("user");
+        u.setUserName("admin");
+        u.setActive(true);
+        u.setFirstName("K");
+        u.setLastName("K");
+        u.setPhoneNumber("7708316841");
+        u.setSsn("123-45-5674");
+        u.setDateOfBirth(new Date(Calendar.getInstance().getTime().getTime()));
+        u.setEmail("76761@asu.edu");
+        u.setPasswordHash(passwordEncoder.encode("admin"));
+        u.setUserType(UserType.ADMIN_ROLE);
+        userRepository.save(u);
+
+        u = new User();
+        u.setUserName("tier1");
+        u.setActive(true);
         u.setFirstName("K");
         u.setLastName("K");
         u.setPhoneNumber("7708316840");
         u.setSsn("123-45-5675");
         u.setDateOfBirth(new Date(Calendar.getInstance().getTime().getTime()));
         u.setEmail("7676@asu.edu");
-        u.setPasswordHash(passwordEncoder.encode("user"));
-        u.setUserType("t2");
+        u.setPasswordHash(passwordEncoder.encode("tier1"));
+        u.setUserType(UserType.EMPLOYEE_ROLE1);
+        userRepository.save(u);
+
+        u = new User();
+        u.setUserName("user1");
+        u.setActive(true);
+        u.setFirstName("K");
+        u.setLastName("K");
+        u.setPhoneNumber("6708316840");
+        u.setSsn("123-45-5775");
+        u.setDateOfBirth(new Date(Calendar.getInstance().getTime().getTime()));
+        u.setEmail("776@asu.edu");
+        u.setPasswordHash(passwordEncoder.encode("user1"));
+        u.setUserType(UserType.USER_ROLE);
+        userRepository.save(u);
+
+        u = new User();
+        u.setUserName("user2");
+        u.setActive(true);
+        u.setFirstName("K");
+        u.setLastName("K");
+        u.setPhoneNumber("6508316840");
+        u.setSsn("123-45-5785");
+        u.setDateOfBirth(new Date(Calendar.getInstance().getTime().getTime()));
+        u.setEmail("7746@asu.edu");
+        u.setPasswordHash(passwordEncoder.encode("user2"));
+        u.setUserType(UserType.USER_ROLE);
         userRepository.save(u);
 
         Account a = new Account();
@@ -98,7 +141,7 @@ public class UserService {
         a.setAccountNumber("12345");
         a.setAccountType(AccountType.SAVINGS);
         a.setActive(true);
-        a.setUser(userRepository.findOneWithUserTypeByUserName("admin").orElse(null));
+        a.setUser(userRepository.findOneWithUserTypeByUserName("user2").orElse(null));
         accountRepository.save(a);
 
         a = new Account();
@@ -106,7 +149,7 @@ public class UserService {
         a.setAccountNumber("12347");
         a.setAccountType(AccountType.CHECKING);
         a.setActive(true);
-        a.setUser(userRepository.findOneWithUserTypeByUserName("admin").orElse(null));
+        a.setUser(userRepository.findOneWithUserTypeByUserName("user2").orElse(null));
         accountRepository.save(a);
 
         a = new Account();
@@ -114,16 +157,16 @@ public class UserService {
         a.setAccountNumber("12346");
         a.setAccountType(AccountType.CHECKING);
         a.setActive(true);
-        a.setUser(userRepository.findOneWithUserTypeByUserName("user").orElse(null));
+        a.setUser(userRepository.findOneWithUserTypeByUserName("user1").orElse(null));
         accountRepository.save(a);
 
         Transaction t = new Transaction();
         t.setCreatedTime(Instant.now());
         t.setDescription("Dummy transfer");
-        t.setStatus("SUCCESS");
+        t.setStatus(TransactionStatus.APPROVED);
         t.setTransactionAmount(100.0);
         t.setUpdatedTime(Instant.now());
-        t.setTransactionType("Internal");
+        t.setTransactionType(TransactionType.DEBIT);
         t.setFromAccount(accountRepository.findOneByAccountNumberEquals("12346").orElse(null));
         t.setToAccount(accountRepository.findOneByAccountNumberEquals("12347").orElse(null));
         TransactionAccountLog transactionAccountLog = new TransactionAccountLog();
