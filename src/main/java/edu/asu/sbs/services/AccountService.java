@@ -96,4 +96,11 @@ public class AccountService {
         Account account = getAccountById(accountId);
         account.setAccountType(accountType);
     }
+
+    public void closeUserAccount(Long accountId) {
+        if (accountId != null) {
+            Account account = getAccountById(accountId);
+            account.setActive(false);
+        }
+    }
 }

@@ -129,7 +129,7 @@ public class AdminController {
     }
 
     @PutMapping("/requests/approve/{id}")
-    public void approveEdit(@PathVariable Long id) {
+    public void approveEdit(@PathVariable Long id) throws IllegalStateException {
 
         Optional<Request> request = requestService.getRequest(id);
         request.ifPresent(req -> {
@@ -140,8 +140,8 @@ public class AdminController {
                 case RequestType.TIER2_TO_TIER1:
                     userService.updateUserType(req.getRequestBy(), UserType.EMPLOYEE_ROLE1);
                     break;
-                case RequestType.UPDATE_PROFILE:
-                    break;
+                default:
+                    throw new IllegalStateException("Unexpected RequestType: " + req.getRequestType());
             }
         });
     }

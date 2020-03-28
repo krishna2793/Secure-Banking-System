@@ -224,17 +224,12 @@ public class Tier2Controller {
         }
     }
 
-    /*
-    @GetMapping("/viewRequests")
-    @ResponseBody
-    public List<Request> viewRequests() {
-        return requestService.getAllRequests();
+    @PostMapping("/closeAccount/{id}")
+    public void closeAccount(@RequestParam Long accountId) throws IllegalStateException {
+        if (accountId != null) {
+            accountService.closeUserAccount(accountId);
+        } else {
+            throw new IllegalStateException("Incorrect Id: " + accountId);
+        }
     }
-     */
-
-    @PutMapping("/approveCriticalTransaction")
-    public void approveCriticalTransaction(@RequestParam Long requestId) {
-        transactionService.approveCriticalTransaction(requestId);
-    }
-
 }
