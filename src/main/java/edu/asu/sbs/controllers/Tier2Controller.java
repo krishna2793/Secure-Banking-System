@@ -224,12 +224,13 @@ public class Tier2Controller {
         }
     }
 
-    @PostMapping("/closeAccount/{id}")
-    public void closeAccount(@RequestParam Long accountId) throws IllegalStateException {
-        if (accountId != null) {
-            accountService.closeUserAccount(accountId);
+    @PostMapping("/closeAccount")
+    public void closeAccount(Long id, HttpServletResponse response) throws IllegalStateException, IOException {
+        if (id != null) {
+            accountService.closeUserAccount(id);
         } else {
-            throw new IllegalStateException("Incorrect Id: " + accountId);
+            throw new IllegalStateException("Incorrect Id: " + id);
         }
+        response.sendRedirect("transactions");
     }
 }

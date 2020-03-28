@@ -21,5 +21,5 @@ public interface AccountRepository extends CrudRepository<Account, Long> {
     @Query("select bankAccount from Account bankAccount where bankAccount.user = :user")
     List<Account> findByUserAndLock(@Param("user") User user);
 
-    Account getAccountById(Long accountId);
+    Account getAccountById(Long id);
 }

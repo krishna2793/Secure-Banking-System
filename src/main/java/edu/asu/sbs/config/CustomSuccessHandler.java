@@ -30,7 +30,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
             switch (authority.getAuthority()) {
                 case UserType.USER_ROLE:
                     try {
-                        redirectStrategy.sendRedirect(arg0, arg1, "/api/v1/user/home");
+                        redirectStrategy.sendRedirect(arg0, arg1, "/api/v1/customer/home");
                     } catch (Exception e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();

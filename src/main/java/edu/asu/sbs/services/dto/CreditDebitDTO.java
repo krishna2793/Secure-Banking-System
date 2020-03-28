@@ -14,5 +14,5 @@ public class CreditDebitDTO {
     @NotNull
     private String description;
     @NotNull
-    private String accountNumber;
+    private Long id;
 }

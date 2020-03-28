@@ -59,8 +59,8 @@ public class AccountService {
     public void makeSelfTransaction(User currentUser, CreditDebitDTO creditDebitRequest) throws Exception {
         List<Account> currentUserAccounts = accountRepository.findByUserAndLock(currentUser);
         for (Account currentUserAccount : currentUserAccounts) {
-            if (currentUserAccount.getAccountNumber().equalsIgnoreCase(creditDebitRequest.getAccountNumber())) {
-                System.out.println("Accounts :\n" + currentUserAccount.getAccountNumber());
+            if (currentUserAccount.getId().equals(creditDebitRequest.getId())) {
+                System.out.println("Accounts :\n" + currentUserAccount.getId());
                 if (creditDebitRequest.getCreditDebitType() == CreditDebitType.CREDIT) {
                     credit(currentUserAccount, creditDebitRequest.getAmount());
                 } else if (creditDebitRequest.getCreditDebitType() == CreditDebitType.DEBIT) {
@@ -88,8 +88,8 @@ public class AccountService {
         }
     }
 
-    public Account getAccountById(Long accountId) {
-        return (accountRepository.getAccountById(accountId));
+    public Account getAccountById(Long id) {
+        return (accountRepository.getAccountById(id));
     }
 
     public void updateAccountType(Long accountId, AccountType accountType) {
@@ -97,9 +97,9 @@ public class AccountService {
         account.setAccountType(accountType);
     }
 
-    public void closeUserAccount(Long accountId) {
-        if (accountId != null) {
-            Account account = getAccountById(accountId);
+    public void closeUserAccount(Long id) {
+        if (id != null) {
+            Account account = getAccountById(id);
             account.setActive(false);
         }
     }

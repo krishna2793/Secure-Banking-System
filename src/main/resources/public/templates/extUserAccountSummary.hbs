@@ -2,7 +2,7 @@
 {{#partial "body"}}
     <div>
         <br>
-        <button class="btn btn-primary" onclick="location.href='/api/v1/user/requestNewAccount'">Request New Account</button>
+        <button class="btn btn-primary" onclick="location.href='/api/v1/customer/requestNewAccount'">Request New Account</button>
         <br>
         <br>
         <table id="results" width="100%">
@@ -18,10 +18,10 @@
             {{#each result }}
                 <form method="POST">
                     <tr>
-                        <td align="center">{{ accountNumber }}</td>
+                        <td align="center">{{ id }}</td>
                         <td align="center">{{ accountType }}</td>
                         <td align="center">{{ accountBalance }}</td>
-                        <input id="delete" class="btn btn-primary"  type="button" name="delete" onclick="location.href='/api/v1/customer/delete/{{ id }}'" value="Delete"/>
+                        <td><input id="delete" class="btn btn-danger"  type="button" name="delete" onclick="location.href='/api/v1/customer/delete/{{ id }}'" value="Delete"/></td>
                     </tr>
                 </form>
             {{/each}}
@@ -31,7 +31,7 @@
 {{/partial}}
 
 {{#block "scripts"}}
-{{!-- Hero content goes here. --}}
+    <script type="text/javascript" src="/js/dataTableHandler.js"></script>
 {{/block}}
 
 {{> extUserBase}}
