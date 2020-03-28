@@ -368,4 +368,8 @@ public class UserService {
         return "redirect:/login?logout";
     }
 
+    public User getUserByUserName(String userName){
+        return userRepository.findOneByUserName(userName).get();
+    }
+
 }

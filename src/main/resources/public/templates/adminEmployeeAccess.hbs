@@ -5,10 +5,9 @@
     <div>
         <br>
         <button class="btn btn-primary" onclick="location.href='/api/v1/admin/employee/add'">Add Employee</button>
-        <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names.." title="Type in a name">
         <br>
         <br>
-        <table id="results" width="100%">
+        <table id="results" class="display cell-border hover" width="100%">
             <thead>
             <tr>
                 <th align="center">Employee ID</th>
@@ -36,7 +35,7 @@
                         <td align="center">{{ ssn }}</td>
                         <td align="center">
                             <input id="update" class="btn btn-primary" type="button" name="update" onclick="location.href='/api/v1/admin/viewEmployee/{{ id }}'" value="Update"/>
-                            <input id="delete" class="btn btn-primary"  type="button" name="delete" onclick="location.href='/api/v1/admin/delete/{{ id }}'" value="Delete"/>
+                            <input id="delete" class="btn btn-danger"  type="button" name="delete" onclick="location.href='/api/v1/admin/delete/{{ id }}'" value="Delete"/>
                         </td>
                     </tr>
                 </form>
@@ -44,30 +43,9 @@
             </tbody>
         </table>
     </div>
-    <script>
-        function myFunction() {
-            var input, filter, table, tr, td, i, txtValue;
-            input = document.getElementById("myInput");
-            filter = input.value.toUpperCase();
-            table = document.getElementById("myTable");
-            tr = table.getElementsByTagName("tr");
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[0];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }
-            }
-        }
-    </script>
-
 {{/partial}}
 
 {{#partial "scripts"}}
-    <script type="text/javascript" src="/js/adminHandler.js"></script>
+    <script type="text/javascript" src="/js/dataTableHandler.js"></script>
 {{/partial}}
 {{> adminBase}}

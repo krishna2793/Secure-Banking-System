@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -69,6 +70,7 @@ public class Tier1Controller {
         HashMap<String, List> resultMap = new HashMap<>();
         resultMap.put("result", accounts);
         JsonNode result = mapper.valueToTree(resultMap);
+        System.out.println(result);
         Template template = handlebarsTemplateLoader.getTemplate("tier1UserAccounts");
         return template.apply(handlebarsTemplateLoader.getContext(result));
     }
@@ -80,6 +82,7 @@ public class Tier1Controller {
         HashMap<String, List> resultMap = new HashMap<>();
         resultMap.put("result", transactions);
         JsonNode result = mapper.valueToTree(resultMap);
+        System.out.println(result);
         Template template = handlebarsTemplateLoader.getTemplate("tier1TransactionRequests");
         return template.apply(handlebarsTemplateLoader.getContext(result));
     }
@@ -93,12 +96,13 @@ public class Tier1Controller {
 
     @PostMapping("/transactions")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void createTransaction(TransactionDTO transactionDTO) {
+    public void createTransaction(TransactionDTO transactionDTO, HttpServletResponse response) throws IOException {
         if (transactionDTO.getTransactionType().equals(TransactionType.CHEQUE)) {
             transactionService.issueCheque(transactionDTO);
         } else {
             transactionService.createTransaction(transactionDTO, TransactionStatus.APPROVED);
         }
+        response.sendRedirect("transactions");
     }
 
     @PostMapping("/issueCheck")

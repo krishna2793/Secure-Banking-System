@@ -38,12 +38,14 @@
                     <td align="center">{{ amount }}</td>
                     <td align="center">{{ type }}</td>
                     <td align="center">
-                        <form method="post">
+                        <form method="post" action="/api/v1/tier2/approveTransaction" class="inline">
+                            <input type="text" name="id" value="{{requestId}}" style="display: none">
                             <input id="update" class="btn btn-primary" type="submit" name="approve"
-                                   formaction="/api/v1/tier2/approveTransaction/{{ requestId }}"
                                    value="Approve"/>
-                            <input id="delete" class="btn btn-primary" type="submit" name="deny"
-                                   formaction="/api/v1/tier2/denyTransaction/{{ requestId }}"
+                        </form>
+                        <form method="post" action="/api/v1/tier2/denyTransaction" class="inline">
+                            <input type="text" name="id" value="{{requestId}}" style="display: none">
+                            <input id="delete" class="btn btn-danger" type="submit" name="deny"
                                    value="Deny"/>
                         </form>
                     </td>
@@ -55,5 +57,6 @@
 {{/partial}}
 
 {{#partial "scripts"}}
+    <script type="text/javascript" src="/js/dataTableHandler.js"></script>
 {{/partial}}
 {{> tier2Base}}

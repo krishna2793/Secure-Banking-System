@@ -70,7 +70,7 @@ public class Tier2Controller {
     public void signupSubmit(UserDTO newUserRequest, String password, String userType, HttpServletResponse response) throws IOException {
         userService.registerUser(newUserRequest, password, userType);
         log.info("POST request: tier2 new user request");
-        response.sendRedirect("/allUsers");
+        response.sendRedirect("/api/v1/tier2/allUsers");
     }
 
     @GetMapping("/details")
@@ -97,6 +97,17 @@ public class Tier2Controller {
         resultMap.put("result", allUsers);
         JsonNode result = mapper.valueToTree(resultMap);
         Template template = handlebarsTemplateLoader.getTemplate("tier2UserAccess");
+        return template.apply(handlebarsTemplateLoader.getContext(result));
+    }
+
+    @GetMapping("/{userName}/accounts")
+    public String getUsersAccounts(@PathVariable String userName) throws IOException {
+        List allAccounts = accountService.getAccountsForUser(userService.getUserByUserName(userName));
+        HashMap<String, List> resultMap = new HashMap<>();
+        resultMap.put("result", allAccounts);
+        JsonNode result = mapper.valueToTree(resultMap);
+        System.out.println(result);
+        Template template = handlebarsTemplateLoader.getTemplate("tier2UserAccounts");
         return template.apply(handlebarsTemplateLoader.getContext(result));
     }
 
@@ -160,8 +171,8 @@ public class Tier2Controller {
         }
     }
 
-    @PostMapping("/approveTransaction/{id}")
-    public void approveEdit(@PathVariable Long id) {
+    @PostMapping("/approveTransaction")
+    public void approveEdit(Long id, HttpServletResponse response) throws IOException {
 
         Optional<Request> request = requestService.getRequest(id);
         User user = userService.getCurrentUser();
@@ -170,10 +181,11 @@ public class Tier2Controller {
                 requestService.modifyRequest(req, user, RequestType.APPROVE_CRITICAL_TRANSACTION, StatusType.APPROVED);
             }
         });
+        response.sendRedirect("transactions");
     }
 
-    @PostMapping("/denyTransaction/{id}")
-    public void denyTransaction(@PathVariable Long id) {
+    @PostMapping("/denyTransaction")
+    public void denyTransaction(Long id, HttpServletResponse response) throws IOException {
 
         Optional<Request> request = requestService.getRequest(id);
         User user = userService.getCurrentUser();
@@ -182,10 +194,20 @@ public class Tier2Controller {
                 requestService.modifyRequest(req, user, RequestType.APPROVE_CRITICAL_TRANSACTION, StatusType.DECLINED);
             }
         });
+        response.sendRedirect("transactions");
     }
 
-    @PutMapping("/modifyAccount")
-    public void modifyUserAccount(@PathVariable Long accountId, AccountType type) throws IllegalStateException {
+    @GetMapping("/modifyAccount/{id}")
+    public String getModifyAccountTemplate(@PathVariable Long id) throws IOException {
+        HashMap<String, Long> resultMap = Maps.newHashMap();
+        resultMap.put("id", id);
+        JsonNode result = mapper.valueToTree(resultMap);
+        Template template = handlebarsTemplateLoader.getTemplate("tier2ModifyAccount");
+        return template.apply(handlebarsTemplateLoader.getContext(result));
+    }
+
+    @PostMapping("/modifyAccount")
+    public void modifyUserAccount(Long accountId, AccountType type) throws IllegalStateException {
 
         switch (type) {
             case CHECKING:
