@@ -5,14 +5,14 @@ spring:
     username: root
     password:
 
-hikari:
-  poolName: Hikari
-  auto-commit: false
-  data-source-properties:
-    cachePrepStmts: true
-    prepStmtCacheSize: 250
-    prepStmtCacheSqlLimit: 2048
-    useServerPrepStmts: true
+    hikari:
+      poolName: Hikari
+      auto-commit: false
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
 
   jpa:
     hibernate:
