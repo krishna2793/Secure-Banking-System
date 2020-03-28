@@ -96,7 +96,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/reset-password/init")
-    public String requestPasswordReset(@RequestBody String email) throws IOException {
+    public String requestPasswordReset(String email) throws IOException {
         Optional<User> user = userService.requestPasswordReset(email);
         if (user.isPresent()) {
             mailService.sendPasswordResetMail(user.get());
@@ -110,7 +110,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/reset-password/finish")
-    public void finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword, HttpServletResponse response) throws IOException {
+    public void finishPasswordReset(KeyAndPasswordVM keyAndPassword, HttpServletResponse response) throws IOException {
         if (checkPasswordLength(keyAndPassword.getNewPassword())) {
             throw new InvalidPasswordException();
         }

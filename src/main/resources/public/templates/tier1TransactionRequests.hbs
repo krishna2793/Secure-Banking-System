@@ -30,10 +30,12 @@
                         <td align="center">{{ fromAccount }}</td>
                         <td align="center">{{ toAccount }}</td>
                         <td align="center">{{ transactionAmount }}</td>
+                        {% if transactionAmount > 1500%}
                         <td align="center">
                             <input id="update" class="btn btn-primary" type="button" name="approve" onclick="location.href='/api/v1/tier1/approveTransaction/{{ transactionId }}'" value="Approve"/>
                             <input id="delete" class="btn btn-primary"  type="button" name="deny" onclick="location.href='/api/v1/tier1/denyTransaction/{{ transactionId }}'" value="Deny"/>
                         </td>
+                        {% endif %}
                     </tr>
                 </form>
             {{/each}}
