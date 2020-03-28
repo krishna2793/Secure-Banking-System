@@ -1,4 +1,5 @@
 
 $(document).ready(function () {
-    $('.results').DataTable().addClass('bs-select');
+   let res = $('.results').DataTable();
+   res.addClass('bs-select');
 });
