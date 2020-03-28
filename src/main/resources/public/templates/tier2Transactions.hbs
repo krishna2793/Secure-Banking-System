@@ -6,6 +6,8 @@
         <table id="results" width="100%">
             <thead>
             <tr>
+                <th align="center">Modified Date</th>
+                <th align="center">Created Date</th>
                 <th align="center">Transaction ID</th>
                 <th align="center">Status</th>
                 <th align="center">Description</th>
@@ -17,18 +19,30 @@
             </tr>
             </thead>
             <tbody>
+
             {{#each result }}
+
+                {{#log}}
+                    {{this}}
+                {{/log}}
                 <form method="POST">
                     <tr>
+                        <td align="center">{{ modifiedDate }}</td>
+                        <td align="center">{{ createdDate }}</td>
                         <td align="center">{{ transactionId }}</td>
                         <td align="center">{{ status }}</td>
                         <td align="center">{{ description }}</td>
                         <td align="center">{{ fromAccount }}</td>
                         <td align="center">{{ toAccount }}</td>
                         <td align="center">{{ transactionAmount }}</td>
+                        <td align="center">{{ type }}</td>
                         <td align="center">
-                            <input id="update" class="btn btn-primary" type="button" name="approve" onclick="location.href='/api/v1/tier1/approveTransaction/{{ transactionId }}'" value="Approve"/>
-                            <input id="delete" class="btn btn-primary"  type="button" name="deny" onclick="location.href='/api/v1/tier1/denyTransaction/{{ transactionId }}'" value="Deny"/>
+                            <input id="update" class="btn btn-primary" type="button" name="approve"
+                                   onclick="location.href='/api/v1/tier1/approveTransaction/{{ transactionId }}'"
+                                   value="Approve"/>
+                            <input id="delete" class="btn btn-primary" type="button" name="deny"
+                                   onclick="location.href='/api/v1/tier1/denyTransaction/{{ transactionId }}'"
+                                   value="Deny"/>
                         </td>
                     </tr>
                 </form>

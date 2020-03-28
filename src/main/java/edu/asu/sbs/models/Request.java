@@ -3,6 +3,7 @@ package edu.asu.sbs.models;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -14,6 +15,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
+@ToString
 public class Request implements Serializable {
 
 

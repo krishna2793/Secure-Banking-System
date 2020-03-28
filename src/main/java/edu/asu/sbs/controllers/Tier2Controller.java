@@ -2,7 +2,10 @@ package edu.asu.sbs.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.jknack.handlebars.Template;
+import com.google.common.collect.Maps;
 import edu.asu.sbs.config.RequestType;
 import edu.asu.sbs.config.StatusType;
 import edu.asu.sbs.config.UserType;
@@ -14,6 +17,7 @@ import edu.asu.sbs.models.User;
 import edu.asu.sbs.services.RequestService;
 import edu.asu.sbs.services.TransactionService;
 import edu.asu.sbs.services.UserService;
+import edu.asu.sbs.services.dto.Tier2RequestsDTO;
 import edu.asu.sbs.services.dto.UserDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,6 +30,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -68,23 +73,23 @@ public class Tier2Controller {
     @ResponseBody
     public String currentUserDetails() throws UnauthorizedAccessExcpetion, IOException {
 
-            User user = userService.getCurrentUser();
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            mapper.setDateFormat(df);
-            if (user == null) {
-                log.info("GET request: Unauthorized request for tier2 employee user detail");
-                throw new UnauthorizedAccessExcpetion("401", "Unauthorized Access !");
-            }
-            JsonNode result = mapper.valueToTree(user);
-            Template template = handlebarsTemplateLoader.getTemplate("profileTier2");
-            log.info("GET request: Tier2 Employee user detail");
-            return template.apply(handlebarsTemplateLoader.getContext(result));
+        User user = userService.getCurrentUser();
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        mapper.setDateFormat(df);
+        if (user == null) {
+            log.info("GET request: Unauthorized request for tier2 employee user detail");
+            throw new UnauthorizedAccessExcpetion("401", "Unauthorized Access !");
+        }
+        JsonNode result = mapper.valueToTree(user);
+        Template template = handlebarsTemplateLoader.getTemplate("profileTier2");
+        log.info("GET request: Tier2 Employee user detail");
+        return template.apply(handlebarsTemplateLoader.getContext(result));
     }
 
     @GetMapping("/allUsers")
     public String getUsers() throws IOException {
         ArrayList<User> allUsers = (ArrayList<User>) userService.getAllUsers();
-        HashMap<String, ArrayList<User>> resultMap= new HashMap<>();
+        HashMap<String, ArrayList<User>> resultMap = new HashMap<>();
         resultMap.put("result", allUsers);
         JsonNode result = mapper.valueToTree(resultMap);
         Template template = handlebarsTemplateLoader.getTemplate("tier2UserAccess");
@@ -121,14 +126,17 @@ public class Tier2Controller {
 
         JsonNode result = mapper.valueToTree(user);
         Template template = handlebarsTemplateLoader.getTemplate("tier2ViewUser");
-            return template.apply(handlebarsTemplateLoader.getContext(result));
-        }
+        return template.apply(handlebarsTemplateLoader.getContext(result));
+    }
 
     @GetMapping("/transactions")
     public String getAllUserRequest() throws IOException {
-        ArrayList<Request> allRequests = requestService.getAllTier2Requests();
-        HashMap<String, ArrayList<Request>> resultMap = new HashMap<>();
+        List<Tier2RequestsDTO> allRequests = requestService.getAllTier2Requests();
+        HashMap<String, List<Tier2RequestsDTO>> resultMap = Maps.newHashMap();
         resultMap.put("result", allRequests);
+        JavaTimeModule module = new JavaTimeModule();
+        mapper.registerModule(module);
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         JsonNode result = mapper.valueToTree(resultMap);
         Template template = handlebarsTemplateLoader.getTemplate("tier2Transactions");
         return template.apply(handlebarsTemplateLoader.getContext(result));
