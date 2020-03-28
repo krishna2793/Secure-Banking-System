@@ -8,6 +8,7 @@
             <tr>
                 <th align="center">Modified Date</th>
                 <th align="center">Created Date</th>
+                <th align="center">Request ID</th>
                 <th align="center">Transaction ID</th>
                 <th align="center">Status</th>
                 <th align="center">Description</th>
@@ -25,27 +26,28 @@
                 {{#log}}
                     {{this}}
                 {{/log}}
-                <form method="POST">
-                    <tr>
-                        <td align="center">{{ modifiedDate }}</td>
-                        <td align="center">{{ createdDate }}</td>
-                        <td align="center">{{ transactionId }}</td>
-                        <td align="center">{{ status }}</td>
-                        <td align="center">{{ description }}</td>
-                        <td align="center">{{ fromAccount }}</td>
-                        <td align="center">{{ toAccount }}</td>
-                        <td align="center">{{ transactionAmount }}</td>
-                        <td align="center">{{ type }}</td>
-                        <td align="center">
-                            <input id="update" class="btn btn-primary" type="button" name="approve"
-                                   onclick="location.href='/api/v1/tier1/approveTransaction/{{ transactionId }}'"
+                <tr>
+                    <td align="center">{{ modifiedDate }}</td>
+                    <td align="center">{{ createdDate }}</td>
+                    <td align="center">{{ requestId }}</td>
+                    <td align="center">{{ transactionId }}</td>
+                    <td align="center">{{ status }}</td>
+                    <td align="center">{{ description }}</td>
+                    <td align="center">{{ fromAccount }}</td>
+                    <td align="center">{{ toAccount }}</td>
+                    <td align="center">{{ amount }}</td>
+                    <td align="center">{{ type }}</td>
+                    <td align="center">
+                        <form method="post">
+                            <input id="update" class="btn btn-primary" type="submit" name="approve"
+                                   formaction="/api/v1/tier2/approveTransaction/{{ requestId }}"
                                    value="Approve"/>
-                            <input id="delete" class="btn btn-primary" type="button" name="deny"
-                                   onclick="location.href='/api/v1/tier1/denyTransaction/{{ transactionId }}'"
+                            <input id="delete" class="btn btn-primary" type="submit" name="deny"
+                                   formaction="/api/v1/tier2/denyTransaction/{{ requestId }}"
                                    value="Deny"/>
-                        </td>
-                    </tr>
-                </form>
+                        </form>
+                    </td>
+                </tr>
             {{/each}}
             </tbody>
         </table>

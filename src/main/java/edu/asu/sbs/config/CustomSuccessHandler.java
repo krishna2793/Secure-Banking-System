@@ -54,7 +54,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
                     break;
                 case UserType.EMPLOYEE_ROLE2:
                     try {
-                        redirectStrategy.sendRedirect(arg0, arg1, "/api/v1/tier2/requests");
+                        redirectStrategy.sendRedirect(arg0, arg1, "/api/v1/tier2/transactions");
                     } catch (Exception e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();

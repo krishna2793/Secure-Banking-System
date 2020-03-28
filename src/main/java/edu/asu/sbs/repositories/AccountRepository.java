@@ -13,10 +13,13 @@ import java.util.Optional;
 
 public interface AccountRepository extends CrudRepository<Account, Long> {
     Optional<Account> findOneByAccountNumberEquals(String s);
+
     @Query("select bankAccount from Account bankAccount where bankAccount.user = :user")
     List<Account> findByUser(@Param("user") User user);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select bankAccount from Account bankAccount where bankAccount.user = :user")
     List<Account> findByUserAndLock(@Param("user") User user);
+
+    Account getAccountById(Long accountId);
 }

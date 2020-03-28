@@ -2,11 +2,19 @@ package edu.asu.sbs.services;
 
 import com.google.common.collect.Lists;
 import edu.asu.sbs.config.RequestType;
+import edu.asu.sbs.config.StatusType;
+import edu.asu.sbs.config.TransactionType;
+import edu.asu.sbs.errors.GenericRuntimeException;
 import edu.asu.sbs.models.Request;
+import edu.asu.sbs.models.Transaction;
+import edu.asu.sbs.models.TransactionAccountLog;
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.repositories.RequestRepository;
+import edu.asu.sbs.repositories.TransactionAccountLogRepository;
+import edu.asu.sbs.repositories.TransactionRepository;
 import edu.asu.sbs.services.dto.Tier2RequestsDTO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -16,9 +24,13 @@ import java.util.Optional;
 public class RequestService {
 
     private final RequestRepository requestRepository;
+    private final TransactionRepository transactionRepository;
+    private final TransactionAccountLogRepository transactionAccountLogRepository;
 
-    public RequestService(RequestRepository requestRepository) {
+    public RequestService(RequestRepository requestRepository, TransactionRepository transactionRepository, TransactionAccountLogRepository transactionAccountLogRepository) {
         this.requestRepository = requestRepository;
+        this.transactionRepository = transactionRepository;
+        this.transactionAccountLogRepository = transactionAccountLogRepository;
     }
 
     public List<Request> getAllAdminRequests() {
@@ -36,6 +48,7 @@ public class RequestService {
         List<Request> requestList = requestRepository.findByRequestTypeInAndIsDeleted(Lists.newArrayList(RequestType.APPROVE_CRITICAL_TRANSACTION), false);
         for (Request request : requestList) {
             Tier2RequestsDTO tier2RequestsDTO = new Tier2RequestsDTO();
+            tier2RequestsDTO.setRequestId(request.getRequestId());
             tier2RequestsDTO.setTransactionId(request.getLinkedTransaction().getTransactionId());
             tier2RequestsDTO.setStatus(request.getStatus());
             tier2RequestsDTO.setDescription(request.getDescription());
@@ -50,14 +63,39 @@ public class RequestService {
         return tier2RequestsDTOList;
     }
 
-    public void modifyRequest(Optional<Request> request, User user, String requestType, String action) {
+    @Transactional
+    public void modifyRequest(Request request, User user, String requestType, String action) {
+        request.setRequestType(requestType);
+        request.setApprovedBy(user);
+        request.setStatus(action);
+        request.setModifiedDate(Instant.now());
+        Transaction transaction = request.getLinkedTransaction();
+        TransactionAccountLog transactionAccountLog = transaction.getLog();
 
-        request.ifPresent(req -> {
-            req.setRequestType(requestType);
-            req.setApprovedBy(user);
-            req.setStatus(action);
-            req.setModifiedDate(Instant.now());
-            requestRepository.save(req);
-        });
+        switch (action) {
+            case StatusType.APPROVED:
+                if (transaction.getTransactionType().equals(TransactionType.DEBIT)) {
+                    transaction.getToAccount().setAccountBalance(transaction.getToAccount().getAccountBalance() + transaction.getTransactionAmount());
+                } else {
+                    transaction.getFromAccount().setAccountBalance(transaction.getFromAccount().getAccountBalance() + transaction.getTransactionAmount());
+                }
+                transaction.setStatus(StatusType.APPROVED);
+                break;
+            case StatusType.DECLINED:
+                if (transaction.getTransactionType().equals(TransactionType.DEBIT)) {
+                    transaction.getFromAccount().setAccountBalance(transaction.getFromAccount().getAccountBalance() + transaction.getTransactionAmount());
+                } else {
+                    transaction.getToAccount().setAccountBalance(transaction.getToAccount().getAccountBalance() + transaction.getTransactionAmount());
+                }
+                transaction.setStatus(StatusType.DECLINED);
+                break;
+            default:
+                throw new GenericRuntimeException("Invalid Action");
+        }
+        transactionAccountLog.setLogTime(Instant.now());
+        transactionAccountLog.setLogDescription(transactionAccountLog.getLogDescription() + "\n Transaction Approved on " + Instant.now());
+        transactionAccountLogRepository.save(transactionAccountLog);
+        transactionRepository.save(transaction);
+        requestRepository.save(request);
     }
 }

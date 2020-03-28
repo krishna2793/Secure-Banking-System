@@ -50,7 +50,7 @@ public class TransactionService {
                 Account toAccount = optionalToAccount.get();
                 switch (transactionDTO.getTransactionType()) {
                     case TransactionType.DEBIT:
-                        if (fromAccount.getAccountBalance() > transactionDTO.getTransactionAmount()) {
+                        if (fromAccount.getAccountBalance() >= transactionDTO.getTransactionAmount()) {
                             fromAccount.setAccountBalance(fromAccount.getAccountBalance() - transactionDTO.getTransactionAmount());
                             if (transactionDTO.getTransactionAmount() <= 1000 && !transactionStatus.equals(TransactionStatus.PENDING)) {
                                 toAccount.setAccountBalance(toAccount.getAccountBalance() + transactionDTO.getTransactionAmount());
@@ -58,7 +58,7 @@ public class TransactionService {
                         }
                         break;
                     case TransactionType.CREDIT:
-                        if (toAccount.getAccountBalance() > transactionDTO.getTransactionAmount()) {
+                        if (toAccount.getAccountBalance() >= transactionDTO.getTransactionAmount()) {
                             toAccount.setAccountBalance(toAccount.getAccountBalance() - transactionDTO.getTransactionAmount());
                             if (transactionDTO.getTransactionAmount() <= 1000 && !transactionStatus.equals(TransactionStatus.PENDING)) {
                                 fromAccount.setAccountBalance(fromAccount.getAccountBalance() + transactionDTO.getTransactionAmount());
@@ -74,7 +74,7 @@ public class TransactionService {
                 transactionAccountLog = transactionAccountLogRepository.save(transactionAccountLog);
                 Transaction transaction = new Transaction();
                 transaction.setCreatedTime(Instant.now());
-                transaction.setUpdatedTime(Instant.now());
+                transaction.setModifiedTime(Instant.now());
                 transaction.setDescription(transactionDTO.getDescription());
                 transaction.setFromAccount(fromAccount);
                 if (transactionDTO.getTransactionAmount() > 1000) {

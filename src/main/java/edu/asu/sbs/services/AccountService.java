@@ -12,7 +12,6 @@ import edu.asu.sbs.services.dto.CreditDebitDTO;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Service
@@ -41,16 +40,17 @@ public class AccountService {
         newAccount.setUser(customer);
         accountRepository.save(newAccount);
     }
+
     public void credit(Account account, Double amount) throws Exception {
         try {
             Double currentBalance = account.getAccountBalance();
-            account.setAccountBalance(currentBalance+amount);
+            account.setAccountBalance(currentBalance + amount);
             accountRepository.save(account);
-        }
-        catch (Exception e) {
-            throw new Exception("Failed to credit from account "+account.getAccountNumber(),e);
+        } catch (Exception e) {
+            throw new Exception("Failed to credit from account " + account.getAccountNumber(), e);
         }
     }
+
     public List<Account> getAccountsForUser(User user) {
         return accountRepository.findByUser(user);
     }
@@ -58,9 +58,9 @@ public class AccountService {
     @Transactional
     public void makeSelfTransaction(User currentUser, CreditDebitDTO creditDebitRequest) throws Exception {
         List<Account> currentUserAccounts = accountRepository.findByUserAndLock(currentUser);
-        for(Account currentUserAccount:currentUserAccounts) {
-            if (currentUserAccount.getAccountNumber().equalsIgnoreCase(creditDebitRequest.getAccountNumber())){
-                System.out.println("Accounts :\n"+ currentUserAccount.getAccountNumber());
+        for (Account currentUserAccount : currentUserAccounts) {
+            if (currentUserAccount.getAccountNumber().equalsIgnoreCase(creditDebitRequest.getAccountNumber())) {
+                System.out.println("Accounts :\n" + currentUserAccount.getAccountNumber());
                 if (creditDebitRequest.getCreditDebitType() == CreditDebitType.CREDIT) {
                     credit(currentUserAccount, creditDebitRequest.getAmount());
                 } else if (creditDebitRequest.getCreditDebitType() == CreditDebitType.DEBIT) {
@@ -72,20 +72,28 @@ public class AccountService {
         throw new Exception("Invalid Account");
     }
 
-    private void debit(Account account, Double amount) throws Exception{
-        try{
+    private void debit(Account account, Double amount) throws Exception {
+        try {
             Double currentBalance = account.getAccountBalance();
             if (currentBalance < amount)
                 throw new Exception("Insufficient Funds");
-            if (account.isActive()){
-                account.setAccountBalance(currentBalance-amount);
+            if (account.isActive()) {
+                account.setAccountBalance(currentBalance - amount);
                 accountRepository.save(account);
             } else {
                 throw new Exception("Inactive account");
             }
+        } catch (Exception e) {
+            throw new Exception("Failed to debit from account " + account.getAccountNumber(), e);
         }
-        catch (Exception e){
-            throw new Exception("Failed to debit from account "+account.getAccountNumber(), e);
-        }
+    }
+
+    public Account getAccountById(Long accountId) {
+        return (accountRepository.getAccountById(accountId));
+    }
+
+    public void updateAccountType(Long accountId, AccountType accountType) {
+        Account account = getAccountById(accountId);
+        account.setAccountType(accountType);
     }
 }

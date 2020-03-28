@@ -44,7 +44,7 @@ public class Transaction implements Serializable {
     private Double transactionAmount;
 
     @LastModifiedDate
-    private Instant updatedTime;
+    private Instant modifiedTime;
 
     @JsonBackReference
     @ManyToOne

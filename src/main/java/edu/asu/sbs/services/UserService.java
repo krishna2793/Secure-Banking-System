@@ -165,7 +165,7 @@ public class UserService {
         t.setDescription("Dummy transfer");
         t.setStatus(TransactionStatus.APPROVED);
         t.setTransactionAmount(100.0);
-        t.setUpdatedTime(Instant.now());
+        t.setModifiedTime(Instant.now());
         t.setTransactionType(TransactionType.DEBIT);
         t.setFromAccount(accountRepository.findOneByAccountNumberEquals("12346").orElse(null));
         t.setToAccount(accountRepository.findOneByAccountNumberEquals("12347").orElse(null));

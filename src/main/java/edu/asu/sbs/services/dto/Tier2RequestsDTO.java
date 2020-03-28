@@ -10,6 +10,9 @@ import java.time.Instant;
 public class Tier2RequestsDTO {
 
     @NotNull
+    private Long requestId;
+
+    @NotNull
     private Long transactionId;
 
     @NotNull

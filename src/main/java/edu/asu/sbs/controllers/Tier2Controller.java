@@ -11,9 +11,11 @@ import edu.asu.sbs.config.StatusType;
 import edu.asu.sbs.config.UserType;
 import edu.asu.sbs.errors.Exceptions;
 import edu.asu.sbs.errors.UnauthorizedAccessExcpetion;
+import edu.asu.sbs.globals.AccountType;
 import edu.asu.sbs.loader.HandlebarsTemplateLoader;
 import edu.asu.sbs.models.Request;
 import edu.asu.sbs.models.User;
+import edu.asu.sbs.services.AccountService;
 import edu.asu.sbs.services.RequestService;
 import edu.asu.sbs.services.TransactionService;
 import edu.asu.sbs.services.UserService;
@@ -41,6 +43,7 @@ public class Tier2Controller {
 
     private final UserService userService;
     private final RequestService requestService;
+    private final AccountService accountService;
     ObjectMapper mapper = new ObjectMapper();
 
     //@Autowired
@@ -48,10 +51,11 @@ public class Tier2Controller {
 
     private final TransactionService transactionService;
 
-    public Tier2Controller(UserService userService, TransactionService transactionService, RequestService requestService, HandlebarsTemplateLoader handlebarsTemplateLoader) {
+    public Tier2Controller(UserService userService, TransactionService transactionService, RequestService requestService, AccountService accountService, HandlebarsTemplateLoader handlebarsTemplateLoader) {
         this.userService = userService;
         this.transactionService = transactionService;
         this.requestService = requestService;
+        this.accountService = accountService;
         this.handlebarsTemplateLoader = handlebarsTemplateLoader;
     }
 
@@ -143,45 +147,59 @@ public class Tier2Controller {
     }
 
     @GetMapping("/editUser/{id}")
-    public String modifyUserDetail(UserDTO userDTO
-    ) throws Exceptions, IOException {
+    public String modifyUserDetail(UserDTO userDTO) throws Exceptions, IOException {
 
         Optional<User> user = userService.editUser(userDTO);
 
-        if (user == null) {
+        if (user.isPresent()) {
+            JsonNode result = mapper.valueToTree(user.get());
+            Template template = handlebarsTemplateLoader.getTemplate("tier2ViewUser");
+            return template.apply(handlebarsTemplateLoader.getContext(result));
+        } else {
             throw new Exceptions("404", " ");
         }
-        JsonNode result = mapper.valueToTree(user.get());
-        Template template = handlebarsTemplateLoader.getTemplate("tier2ViewUser");
-        return template.apply(handlebarsTemplateLoader.getContext(result));
     }
 
-    @PutMapping("/tier2Requests/approve/{id}")
+    @PostMapping("/approveTransaction/{id}")
     public void approveEdit(@PathVariable Long id) {
 
         Optional<Request> request = requestService.getRequest(id);
         User user = userService.getCurrentUser();
         request.ifPresent(req -> {
-            switch (req.getRequestType()) {
-                case RequestType.APPROVE_CRITICAL_TRANSACTION:
-                    requestService.modifyRequest(request, user, RequestType.APPROVE_CRITICAL_TRANSACTION, StatusType.APPROVED);
-                    break;
+            if (RequestType.APPROVE_CRITICAL_TRANSACTION.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
+                requestService.modifyRequest(req, user, RequestType.APPROVE_CRITICAL_TRANSACTION, StatusType.APPROVED);
             }
         });
     }
 
-    @PutMapping("/tier2Requests/decline/{id}")
-    public void declineEdit(@PathVariable Long id) {
+    @PostMapping("/denyTransaction/{id}")
+    public void denyTransaction(@PathVariable Long id) {
 
         Optional<Request> request = requestService.getRequest(id);
         User user = userService.getCurrentUser();
         request.ifPresent(req -> {
-            switch (req.getRequestType()) {
-                case RequestType.APPROVE_CRITICAL_TRANSACTION:
-                    requestService.modifyRequest(request, user, RequestType.APPROVE_CRITICAL_TRANSACTION, StatusType.DECLINED);
-                    break;
+            if (RequestType.APPROVE_CRITICAL_TRANSACTION.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
+                requestService.modifyRequest(req, user, RequestType.APPROVE_CRITICAL_TRANSACTION, StatusType.DECLINED);
             }
         });
+    }
+
+    @PutMapping("/modifyAccount")
+    public void modifyUserAccount(@PathVariable Long accountId, AccountType type) throws IllegalStateException {
+
+        switch (type) {
+            case CHECKING:
+                accountService.updateAccountType(accountId, AccountType.CHECKING);
+                break;
+            case SAVINGS:
+                accountService.updateAccountType(accountId, AccountType.SAVINGS);
+                break;
+            case CURRENT:
+                accountService.updateAccountType(accountId, AccountType.CURRENT);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + type);
+        }
     }
 
     /*
