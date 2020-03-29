@@ -61,7 +61,7 @@ public class AccountService {
     }
 
     public List<Account> getAccountsForUser(User user) {
-        return accountRepository.findByUser(user);
+        return accountRepository.findByUserAndIsActive(user, true);
     }
 
     @Transactional
