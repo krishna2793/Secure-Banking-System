@@ -158,6 +158,7 @@ public class Tier2Controller {
         return template.apply(handlebarsTemplateLoader.getContext(result));
     }
 
+    /*
     @GetMapping("/editUser/{id}")
     public String modifyUserDetail(UserDTO userDTO) throws Exceptions, IOException {
 
@@ -171,6 +172,7 @@ public class Tier2Controller {
             throw new Exceptions("404", " ");
         }
     }
+    */
 
     @PostMapping("/approveTransaction")
     public void approveEdit(Long id, HttpServletResponse response) throws IOException {

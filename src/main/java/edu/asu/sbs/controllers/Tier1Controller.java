@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -150,14 +151,24 @@ public class Tier1Controller {
 
     }
 
+    @GetMapping("/profileUpdateRequests")
+    public String getEmpProfileUpdaterRequest() throws IOException {
+        ArrayList<Request> allRequests = (ArrayList<Request>) requestService.getUserProfileUpdateRequests();
+        HashMap<String, ArrayList<Request>> resultMap = new HashMap<>();
+        resultMap.put("result", allRequests);
+        JsonNode result = mapper.valueToTree(resultMap);
+        Template template = handlebarsTemplateLoader.getTemplate("profileUpdateRequests");
+        return template.apply(handlebarsTemplateLoader.getContext(result));
+    }
+
     @PostMapping("/approveUpdateUserProfile/")
     @ResponseStatus(HttpStatus.ACCEPTED)
     private void approveUserProfile(Long requestId, RequestDTO requestDTO) {
         Optional<Request> request = requestService.getRequest(requestId);
         User user = userService.getCurrentUser();
         request.ifPresent(req -> {
-            if (RequestType.UPDATE_PROFILE.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
-                requestService.updateUserProfile(req, user, RequestType.UPDATE_PROFILE, StatusType.APPROVED, requestDTO);
+            if (RequestType.UPDATE_USER_PROFILE.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
+                requestService.updateUserProfile(req, user, RequestType.UPDATE_USER_PROFILE, StatusType.APPROVED, requestDTO);
             }
         });
     }
@@ -167,8 +178,8 @@ public class Tier1Controller {
         Optional<Request> request = requestService.getRequest(requestId);
         User user = userService.getCurrentUser();
         request.ifPresent(req -> {
-            if (RequestType.UPDATE_PROFILE.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
-                requestService.updateUserProfile(req, user, RequestType.UPDATE_PROFILE, StatusType.DECLINED, requestDTO);
+            if (RequestType.UPDATE_USER_PROFILE.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
+                requestService.updateUserProfile(req, user, RequestType.UPDATE_USER_PROFILE, StatusType.DECLINED, requestDTO);
             }
         });
     }

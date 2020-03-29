@@ -125,7 +125,7 @@ public class AdminController {
         return template.apply(handlebarsTemplateLoader.getContext(result));
     }
 
-    @GetMapping("/requests")
+    @GetMapping("/Requests")
     public String getAllUserRequest() throws IOException {
         ArrayList<Request> allRequests = (ArrayList<Request>) requestService.getAllAdminRequests();
         HashMap<String, ArrayList<Request>> resultMap = new HashMap<>();
@@ -193,13 +193,23 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/profileUpdateRequests")
+    public String getEmpProfileUpdaterRequest() throws IOException {
+        ArrayList<Request> allRequests = (ArrayList<Request>) requestService.getEmpProfileUpdateRequests();
+        HashMap<String, ArrayList<Request>> resultMap = new HashMap<>();
+        resultMap.put("result", allRequests);
+        JsonNode result = mapper.valueToTree(resultMap);
+        Template template = handlebarsTemplateLoader.getTemplate("adminHome");
+        return template.apply(handlebarsTemplateLoader.getContext(result));
+    }
+
     @PostMapping("/approveUpdateEmpProfile/{requestId}")
     private void approveEmployeeProfile(Long requestId, RequestDTO requestDTO) {
         Optional<Request> request = requestService.getRequest(requestId);
         User user = userService.getCurrentUser();
         request.ifPresent(req -> {
-            if (RequestType.UPDATE_PROFILE.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
-                requestService.updateUserProfile(req, user, RequestType.UPDATE_PROFILE, StatusType.APPROVED, requestDTO);
+            if (RequestType.UPDATE_EMP_PROFILE.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
+                requestService.updateUserProfile(req, user, RequestType.UPDATE_EMP_PROFILE, StatusType.APPROVED, requestDTO);
             }
         });
     }
@@ -209,8 +219,8 @@ public class AdminController {
         Optional<Request> request = requestService.getRequest(requestId);
         User user = userService.getCurrentUser();
         request.ifPresent(req -> {
-            if (RequestType.UPDATE_PROFILE.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
-                requestService.updateUserProfile(req, user, RequestType.UPDATE_PROFILE, StatusType.DECLINED, requestDTO);
+            if (RequestType.UPDATE_EMP_PROFILE.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
+                requestService.updateUserProfile(req, user, RequestType.UPDATE_EMP_PROFILE, StatusType.DECLINED, requestDTO);
             }
         });
     }

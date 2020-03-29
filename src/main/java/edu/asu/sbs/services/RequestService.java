@@ -43,6 +43,18 @@ public class RequestService {
         return requestList;
     }
 
+    public List<Request> getEmpProfileUpdateRequests() {
+        List<Request> requestList = Lists.newArrayList();
+        requestList.addAll(requestRepository.findByRequestTypeInAndIsDeleted(Lists.newArrayList(RequestType.UPDATE_EMP_PROFILE), false));
+        return requestList;
+    }
+
+    public List<Request> getUserProfileUpdateRequests() {
+        List<Request> requestList = Lists.newArrayList();
+        requestList.addAll(requestRepository.findByRequestTypeInAndIsDeleted(Lists.newArrayList(RequestType.UPDATE_USER_PROFILE), false));
+        return requestList;
+    }
+
     public Optional<Request> getRequest(Long id) {
         return requestRepository.findOneByRequestId(id);
     }
