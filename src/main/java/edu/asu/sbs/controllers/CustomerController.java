@@ -14,7 +14,7 @@ import edu.asu.sbs.services.AccountService;
 import edu.asu.sbs.services.RequestService;
 import edu.asu.sbs.services.TransactionService;
 import edu.asu.sbs.services.UserService;
-import edu.asu.sbs.services.dto.AccountDTO;
+import edu.asu.sbs.services.dto.CreateAccountDTO;
 import edu.asu.sbs.services.dto.CreditDebitDTO;
 import edu.asu.sbs.services.dto.TransactionDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -163,9 +163,9 @@ public class CustomerController {
 
     @PostMapping("/createAccount")
     @ResponseStatus(HttpStatus.CREATED)
-    void createAccount(@RequestBody AccountDTO accountDTO) {
+    void createAccount(@RequestBody CreateAccountDTO createAccountDTO) {
         User currentUser = userService.getCurrentUser();
-        accountService.createAccount(currentUser,accountDTO);
+        accountService.createAccount(currentUser, createAccountDTO);
     }
 
 }

@@ -7,8 +7,9 @@ import edu.asu.sbs.models.Account;
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.repositories.AccountRepository;
 import edu.asu.sbs.repositories.TransactionAccountLogRepository;
-import edu.asu.sbs.services.dto.AccountDTO;
+import edu.asu.sbs.services.dto.CreateAccountDTO;
 import edu.asu.sbs.services.dto.CreditDebitDTO;
+import edu.asu.sbs.services.dto.ViewAccountDTO;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -26,18 +27,25 @@ public class AccountService {
         this.transactionAccountLogRepository = transactionAccountLogRepository;
     }
 
-    public List<Account> getAccounts() {
-        List<Account> accountList = Lists.newArrayList();
-        accountRepository.findAll().forEach(accountList::add);
-        return accountList;
+    public List<ViewAccountDTO> getAccounts() {
+        List<ViewAccountDTO> viewAccountDTOList = Lists.newArrayList();
+        accountRepository.findAll().forEach(account -> {
+            ViewAccountDTO viewAccountDTO = new ViewAccountDTO();
+            viewAccountDTO.setAccountId(account.getId());
+            viewAccountDTO.setAccountType(account.getAccountType().name());
+            viewAccountDTO.setBalance(account.getAccountBalance());
+            viewAccountDTO.setUserId(account.getUser().getId());
+            viewAccountDTOList.add(viewAccountDTO);
+        });
+        return viewAccountDTOList;
     }
 
 
-    public void createAccount(User customer, AccountDTO accountDTO) {
+    public void createAccount(User customer, CreateAccountDTO createAccountDTO) {
         Account newAccount = new Account();
-        newAccount.setAccountBalance(accountDTO.getInitialDeposit());
-        newAccount.setAccountNumber(accountDTO.getAccountNumber());
-        newAccount.setAccountType(accountDTO.getAccountType());
+        newAccount.setAccountBalance(createAccountDTO.getInitialDeposit());
+        newAccount.setAccountNumber(createAccountDTO.getAccountNumber());
+        newAccount.setAccountType(createAccountDTO.getAccountType());
         newAccount.setUser(customer);
         accountRepository.save(newAccount);
     }

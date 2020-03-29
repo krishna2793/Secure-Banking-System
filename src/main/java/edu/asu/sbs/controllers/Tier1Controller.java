@@ -3,6 +3,8 @@ package edu.asu.sbs.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.jknack.handlebars.Template;
 import edu.asu.sbs.config.*;
 import edu.asu.sbs.errors.UnauthorizedAccessExcpetion;
@@ -13,9 +15,10 @@ import edu.asu.sbs.services.AccountService;
 import edu.asu.sbs.services.RequestService;
 import edu.asu.sbs.services.TransactionService;
 import edu.asu.sbs.services.UserService;
-import edu.asu.sbs.services.dto.AccountDTO;
+import edu.asu.sbs.services.dto.ChequeDTO;
 import edu.asu.sbs.services.dto.RequestDTO;
 import edu.asu.sbs.services.dto.TransactionDTO;
+import edu.asu.sbs.services.dto.ViewAccountDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -71,23 +74,36 @@ public class Tier1Controller {
     @GetMapping("/accounts")
     @ResponseBody
     public String getAccounts() throws IOException {
-        List accounts = accountService.getAccounts();
-        HashMap<String, List> resultMap = new HashMap<>();
+        List<ViewAccountDTO> accounts = accountService.getAccounts();
+        HashMap<String, List<ViewAccountDTO>> resultMap = new HashMap<>();
         resultMap.put("result", accounts);
         JsonNode result = mapper.valueToTree(resultMap);
-        System.out.println(result);
         Template template = handlebarsTemplateLoader.getTemplate("tier1UserAccounts");
+        return template.apply(handlebarsTemplateLoader.getContext(result));
+    }
+
+    @GetMapping("/cheques")
+    @ResponseBody
+    public String getCheques() throws IOException {
+        List<ChequeDTO> chequeDTOList = transactionService.getCheques();
+        log.info(chequeDTOList.toString());
+        HashMap<String, List<ChequeDTO>> resultMap = new HashMap<>();
+        resultMap.put("result", chequeDTOList);
+        JsonNode result = mapper.valueToTree(resultMap);
+        Template template = handlebarsTemplateLoader.getTemplate("tier1ViewCheques");
         return template.apply(handlebarsTemplateLoader.getContext(result));
     }
 
     @GetMapping("/transactions")
     @ResponseBody
     public String viewTransactions() throws IOException {
-        List transactions = transactionService.getTransactions();
-        HashMap<String, List> resultMap = new HashMap<>();
+        List<TransactionDTO> transactions = transactionService.getTransactions();
+        HashMap<String, List<TransactionDTO>> resultMap = new HashMap<>();
         resultMap.put("result", transactions);
+        JavaTimeModule module = new JavaTimeModule();
+        mapper.registerModule(module);
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         JsonNode result = mapper.valueToTree(resultMap);
-        System.out.println(result);
         Template template = handlebarsTemplateLoader.getTemplate("tier1TransactionRequests");
         return template.apply(handlebarsTemplateLoader.getContext(result));
     }
@@ -116,10 +132,16 @@ public class Tier1Controller {
         transactionService.issueCheque(transactionDTO);
     }
 
-    @PutMapping("/clearCheck")
+    @PostMapping("/clearCheque")
     @ResponseBody
-    public String clearCheck(@RequestParam Long chequeId) {
+    public String clearCheque(Long chequeId) {
         return transactionService.clearCheque(chequeId);
+    }
+
+    @PostMapping("/denyCheque")
+    @ResponseBody
+    public void denyCheck(Long chequeId) {
+        transactionService.denyCheque(chequeId);
     }
 
     @PostMapping("/raiseRequest")
@@ -128,33 +150,8 @@ public class Tier1Controller {
 
     }
 
-    @PostMapping("/approveNewAccountReq")
-    public void approveEdit(Long id, AccountDTO accountDTO, HttpServletResponse response) throws IOException {
-
-        Optional<Request> request = requestService.getRequest(id);
-        User user = userService.getCurrentUser();
-        request.ifPresent(req -> {
-            if (RequestType.CREATE_NEW_ACCOUNT.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
-                requestService.updateAccountCreationRequest(req, user, RequestType.CREATE_NEW_ACCOUNT, StatusType.APPROVED, accountDTO);
-            }
-        });
-        response.sendRedirect("transactions");
-    }
-
-    @PostMapping("/denyNewAccountReq")
-    public void denyTransaction(Long id, AccountDTO accountDTO, HttpServletResponse response) throws IOException {
-
-        Optional<Request> request = requestService.getRequest(id);
-        User user = userService.getCurrentUser();
-        request.ifPresent(req -> {
-            if (RequestType.CREATE_NEW_ACCOUNT.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
-                requestService.updateAccountCreationRequest(req, user, RequestType.CREATE_NEW_ACCOUNT, StatusType.DECLINED, accountDTO);
-            }
-        });
-        response.sendRedirect("transactions");
-    }
-
     @PostMapping("/approveUpdateUserProfile/")
+    @ResponseStatus(HttpStatus.ACCEPTED)
     private void approveUserProfile(Long requestId, RequestDTO requestDTO) {
         Optional<Request> request = requestService.getRequest(requestId);
         User user = userService.getCurrentUser();
