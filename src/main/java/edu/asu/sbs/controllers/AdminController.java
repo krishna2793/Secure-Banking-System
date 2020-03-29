@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jknack.handlebars.Template;
 import edu.asu.sbs.config.RequestType;
+import edu.asu.sbs.config.StatusType;
 import edu.asu.sbs.config.UserType;
 import edu.asu.sbs.errors.Exceptions;
 import edu.asu.sbs.errors.UnauthorizedAccessExcpetion;
@@ -12,6 +13,7 @@ import edu.asu.sbs.models.Request;
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.services.RequestService;
 import edu.asu.sbs.services.UserService;
+import edu.asu.sbs.services.dto.RequestDTO;
 import edu.asu.sbs.services.dto.UserDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -183,9 +185,28 @@ public class AdminController {
             while ((bytesRead = inputStream.read(buffer)) != -1) {
                 outStream.write(buffer, 0, bytesRead);
             }
-
         }
+    }
 
+    @PostMapping("/approveUpdateEmpProfile/{requestId}")
+    private void approveEmployeeProfile(Long requestId, RequestDTO requestDTO) {
+        Optional<Request> request = requestService.getRequest(requestId);
+        User user = userService.getCurrentUser();
+        request.ifPresent(req -> {
+            if (RequestType.UPDATE_PROFILE.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
+                requestService.updateUserProfile(req, user, RequestType.UPDATE_PROFILE, StatusType.APPROVED, requestDTO);
+            }
+        });
+    }
 
+    @PostMapping("/declineUpdateEmpProfile/{requestId}")
+    private void declineEmployeeProfile(Long requestId, RequestDTO requestDTO) {
+        Optional<Request> request = requestService.getRequest(requestId);
+        User user = userService.getCurrentUser();
+        request.ifPresent(req -> {
+            if (RequestType.UPDATE_PROFILE.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
+                requestService.updateUserProfile(req, user, RequestType.UPDATE_PROFILE, StatusType.DECLINED, requestDTO);
+            }
+        });
     }
 }

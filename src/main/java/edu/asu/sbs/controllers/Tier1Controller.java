@@ -4,15 +4,16 @@ package edu.asu.sbs.controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jknack.handlebars.Template;
-import edu.asu.sbs.config.TransactionStatus;
-import edu.asu.sbs.config.TransactionType;
-import edu.asu.sbs.config.UserType;
+import edu.asu.sbs.config.*;
 import edu.asu.sbs.errors.UnauthorizedAccessExcpetion;
 import edu.asu.sbs.loader.HandlebarsTemplateLoader;
+import edu.asu.sbs.models.Request;
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.services.AccountService;
+import edu.asu.sbs.services.RequestService;
 import edu.asu.sbs.services.TransactionService;
 import edu.asu.sbs.services.UserService;
+import edu.asu.sbs.services.dto.AccountDTO;
 import edu.asu.sbs.services.dto.RequestDTO;
 import edu.asu.sbs.services.dto.TransactionDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @PreAuthorize("hasAnyAuthority('" + UserType.EMPLOYEE_ROLE1 + "')")
@@ -37,13 +39,16 @@ public class Tier1Controller {
     private final HandlebarsTemplateLoader handlebarsTemplateLoader;
     private final TransactionService transactionService;
     private final UserService userService;
+    private final RequestService requestService;
+
     ObjectMapper mapper = new ObjectMapper();
 
-    public Tier1Controller(AccountService accountService, HandlebarsTemplateLoader handlebarsTemplateLoader, TransactionService transactionService, UserService userService) {
+    public Tier1Controller(AccountService accountService, HandlebarsTemplateLoader handlebarsTemplateLoader, TransactionService transactionService, UserService userService, RequestService requestService) {
         this.accountService = accountService;
         this.handlebarsTemplateLoader = handlebarsTemplateLoader;
         this.transactionService = transactionService;
         this.userService = userService;
+        this.requestService = requestService;
     }
 
     @GetMapping("/profile")
@@ -123,4 +128,51 @@ public class Tier1Controller {
 
     }
 
+    @PostMapping("/approveNewAccountReq")
+    public void approveEdit(Long id, AccountDTO accountDTO, HttpServletResponse response) throws IOException {
+
+        Optional<Request> request = requestService.getRequest(id);
+        User user = userService.getCurrentUser();
+        request.ifPresent(req -> {
+            if (RequestType.CREATE_NEW_ACCOUNT.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
+                requestService.updateAccountCreationRequest(req, user, RequestType.CREATE_NEW_ACCOUNT, StatusType.APPROVED, accountDTO);
+            }
+        });
+        response.sendRedirect("transactions");
+    }
+
+    @PostMapping("/denyNewAccountReq")
+    public void denyTransaction(Long id, AccountDTO accountDTO, HttpServletResponse response) throws IOException {
+
+        Optional<Request> request = requestService.getRequest(id);
+        User user = userService.getCurrentUser();
+        request.ifPresent(req -> {
+            if (RequestType.CREATE_NEW_ACCOUNT.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
+                requestService.updateAccountCreationRequest(req, user, RequestType.CREATE_NEW_ACCOUNT, StatusType.DECLINED, accountDTO);
+            }
+        });
+        response.sendRedirect("transactions");
+    }
+
+    @PostMapping("/approveUpdateUserProfile/")
+    private void approveUserProfile(Long requestId, RequestDTO requestDTO) {
+        Optional<Request> request = requestService.getRequest(requestId);
+        User user = userService.getCurrentUser();
+        request.ifPresent(req -> {
+            if (RequestType.UPDATE_PROFILE.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
+                requestService.updateUserProfile(req, user, RequestType.UPDATE_PROFILE, StatusType.APPROVED, requestDTO);
+            }
+        });
+    }
+
+    @PostMapping("/declineUpdateUserProfile/")
+    private void declineUsereProfile(Long requestId, RequestDTO requestDTO) {
+        Optional<Request> request = requestService.getRequest(requestId);
+        User user = userService.getCurrentUser();
+        request.ifPresent(req -> {
+            if (RequestType.UPDATE_PROFILE.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
+                requestService.updateUserProfile(req, user, RequestType.UPDATE_PROFILE, StatusType.DECLINED, requestDTO);
+            }
+        });
+    }
 }

@@ -77,4 +77,8 @@ public class Account implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "chequeToAccount")
     private Set<Cheque> toCheques = new HashSet<>();
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "linkedAccount")
+    private Set<Request> request = new HashSet<>();
+
 }

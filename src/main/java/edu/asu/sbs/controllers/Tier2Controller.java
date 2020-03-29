@@ -19,6 +19,7 @@ import edu.asu.sbs.services.AccountService;
 import edu.asu.sbs.services.RequestService;
 import edu.asu.sbs.services.TransactionService;
 import edu.asu.sbs.services.UserService;
+import edu.asu.sbs.services.dto.AccountDTO;
 import edu.asu.sbs.services.dto.Tier2RequestsDTO;
 import edu.asu.sbs.services.dto.UserDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -233,4 +234,31 @@ public class Tier2Controller {
         }
         response.sendRedirect("transactions");
     }
+
+    @PostMapping("/approveAdditionalAccountReq")
+    public void approveAdditionalAccount(Long id, AccountDTO accountDTO, HttpServletResponse response) throws IOException {
+
+        Optional<Request> request = requestService.getRequest(id);
+        User user = userService.getCurrentUser();
+        request.ifPresent(req -> {
+            if (RequestType.CREATE_ADDITIONAL_ACCOUNT.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
+                requestService.updateAccountCreationRequest(req, user, RequestType.CREATE_ADDITIONAL_ACCOUNT, StatusType.APPROVED, accountDTO);
+            }
+        });
+        response.sendRedirect("transactions");
+    }
+
+    @PostMapping("/denyAdditionalAccountReq")
+    public void declineAdditionalAccount(Long id, AccountDTO accountDTO, HttpServletResponse response) throws IOException {
+
+        Optional<Request> request = requestService.getRequest(id);
+        User user = userService.getCurrentUser();
+        request.ifPresent(req -> {
+            if (RequestType.CREATE_ADDITIONAL_ACCOUNT.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
+                requestService.updateAccountCreationRequest(req, user, RequestType.CREATE_ADDITIONAL_ACCOUNT, StatusType.DECLINED, accountDTO);
+            }
+        });
+        response.sendRedirect("transactions");
+    }
+
 }

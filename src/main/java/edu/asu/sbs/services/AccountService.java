@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AccountService {
@@ -88,19 +89,29 @@ public class AccountService {
         }
     }
 
-    public Account getAccountById(Long id) {
+    public Optional<Account> getAccountById(Long id) {
         return (accountRepository.getAccountById(id));
     }
 
     public void updateAccountType(Long accountId, AccountType accountType) {
-        Account account = getAccountById(accountId);
-        account.setAccountType(accountType);
+        Optional<Account> account = getAccountById(accountId);
+        account.ifPresent(account1 -> {
+            account1.setAccountType(accountType);
+            accountRepository.save(account1);
+        });
     }
 
     public void closeUserAccount(Long id) {
         if (id != null) {
-            Account account = getAccountById(id);
-            account.setActive(false);
+            Optional<Account> account = getAccountById(id);
+            account.ifPresent(account1 -> {
+                account1.setActive(false);
+                accountRepository.save(account1);
+            });
         }
+    }
+
+    public void deleteAccount(Account account) {
+        accountRepository.delete(account);
     }
 }
