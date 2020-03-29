@@ -4,7 +4,8 @@
 {{#partial "body"}}
     <div>
         <br>
-        <button class="btn btn-primary" onclick="location.href='/api/v1/tier1/createTransaction'">Create Transaction</button>
+        <button class="btn btn-primary" onclick="location.href='/api/v1/tier1/createTransaction'">Create Transaction
+        </button>
         <br>
         <br>
         <table id="results" class="display cell-border hover" width="100%">
@@ -13,11 +14,11 @@
                 <th align="center">Transaction ID</th>
                 <th align="center">Status</th>
                 <th align="center">Description</th>
-<!--                <th align="center">From Account</th>-->
-<!--                <th align="center">To Account</th>-->
+                <th align="center">From Account</th>
+                <th align="center">To Account</th>
                 <th align="center">Amount</th>
                 <th align="center">Type</th>
-<!--                <th align="center">Approve/Deny</th>-->
+                <!--                <th align="center">Approve/Deny</th>-->
             </tr>
             </thead>
             <tbody>
@@ -27,11 +28,10 @@
                         <td align="center">{{ transactionId }}</td>
                         <td align="center">{{ status }}</td>
                         <td align="center">{{ description }}</td>
-<!--                        <td align="center">{{ fromAccount }}</td>-->
-<!--                        <td align="center">{{ toAccount }}</td>-->
+                        <td align="center">{{ fromAccount }}</td>
+                        <td align="center">{{ toAccount }}</td>
                         <td align="center">{{ transactionAmount }}</td>
                         <td align="center">{{ transactionType }}</td>
-
                     </tr>
                 </form>
             {{/each}}

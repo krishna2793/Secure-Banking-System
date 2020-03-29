@@ -10,7 +10,7 @@ import edu.asu.sbs.repositories.RequestRepository;
 import edu.asu.sbs.repositories.TransactionAccountLogRepository;
 import edu.asu.sbs.repositories.TransactionRepository;
 import edu.asu.sbs.repositories.UserRepository;
-import edu.asu.sbs.services.dto.AccountDTO;
+import edu.asu.sbs.services.dto.CreateAccountDTO;
 import edu.asu.sbs.services.dto.RequestDTO;
 import edu.asu.sbs.services.dto.Tier2RequestsDTO;
 import org.springframework.stereotype.Service;
@@ -135,7 +135,7 @@ public class RequestService {
     }
 
     @Transactional
-    public void updateAccountCreationRequest(Request request, User approver, String requestType, String action, AccountDTO accountDTO) {
+    public void updateAccountCreationRequest(Request request, User approver, String requestType, String action, CreateAccountDTO createAccountDTO) {
         request.setRequestType(requestType);
         request.setApprovedBy(approver);
         request.setStatus(action);

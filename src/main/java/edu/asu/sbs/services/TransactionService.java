@@ -7,6 +7,7 @@ import edu.asu.sbs.config.TransactionType;
 import edu.asu.sbs.errors.GenericRuntimeException;
 import edu.asu.sbs.models.*;
 import edu.asu.sbs.repositories.*;
+import edu.asu.sbs.services.dto.ChequeDTO;
 import edu.asu.sbs.services.dto.TransactionDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,10 +35,25 @@ public class TransactionService {
         this.userService = userService;
     }
 
-    public List<Transaction> getTransactions() {
-        List<Transaction> transactionList = Lists.newArrayList();
-        transactionRepository.findAll().forEach(transactionList::add);
-        return transactionList;
+    public List<TransactionDTO> getTransactions() {
+        List<TransactionDTO> transactionDTOList = Lists.newArrayList();
+        transactionRepository.findAll().forEach(transaction -> {
+            TransactionDTO transactionDTO = new TransactionDTO();
+            transactionDTO.setTransactionId(transaction.getTransactionId());
+            transactionDTO.setStatus(transaction.getStatus());
+            transactionDTO.setDescription(transaction.getDescription());
+            transactionDTO.setTransactionType(transaction.getTransactionType());
+            transactionDTO.setTransactionAmount(transaction.getTransactionAmount());
+            transactionDTO.setFromAccount(transaction.getFromAccount().getId());
+            transactionDTO.setToAccount(transaction.getToAccount().getId());
+            if (transaction.getRequest() != null) {
+                transactionDTO.setRequestId(transaction.getRequest().getRequestId());
+            }
+            transactionDTO.setTransactionAccountLog(transaction.getLog().getLogNumber());
+            transactionDTOList.add(transactionDTO);
+        });
+
+        return transactionDTOList;
     }
 
     @Transactional
@@ -177,5 +193,20 @@ public class TransactionService {
                 requestRepository.save(request);
             }
         });
+    }
+
+    public List<ChequeDTO> getCheques() {
+        List<ChequeDTO> chequeDTOList = Lists.newArrayList();
+        chequeRepository.findAll().forEach(cheque -> {
+            ChequeDTO chequeDTO = new ChequeDTO();
+            chequeDTO.setChequeId(cheque.getChequeId());
+            chequeDTO.setAccountId(cheque.getTransaction().getFromAccount().getId());
+            chequeDTO.setUserId(cheque.getChequeFromAccount().getUser().getId());
+            chequeDTO.setTransactionId(cheque.getTransaction().getTransactionId());
+            chequeDTO.setTransactionStatus(cheque.getTransaction().getStatus());
+            chequeDTO.setChequeAmount(cheque.getAmount());
+            chequeDTOList.add(chequeDTO);
+        });
+        return chequeDTOList;
     }
 }

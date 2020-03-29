@@ -1,7 +1,5 @@
 package edu.asu.sbs.services.dto;
 
-import edu.asu.sbs.models.Request;
-import edu.asu.sbs.models.TransactionAccountLog;
 import lombok.Data;
 
 import javax.validation.constraints.Min;
@@ -30,8 +28,8 @@ public class TransactionDTO {
     @NotNull
     private Long toAccount;
 
-    private Request request;
+    private Long requestId;
 
-    private TransactionAccountLog log;
+    private Long transactionAccountLog;
 
 }
