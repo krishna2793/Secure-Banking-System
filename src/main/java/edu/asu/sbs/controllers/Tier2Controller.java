@@ -236,7 +236,7 @@ public class Tier2Controller {
         response.sendRedirect("transactions");
     }
 
-    @PostMapping("/approveAdditionalAccountReq")
+    @PostMapping("/approveCreateAccountReq")
     public void approveAdditionalAccount(Long id, CreateAccountDTO createAccountDTO, HttpServletResponse response) throws IOException {
 
         Optional<Request> request = requestService.getRequest(id);
@@ -249,7 +249,7 @@ public class Tier2Controller {
         response.sendRedirect("transactions");
     }
 
-    @PostMapping("/denyAdditionalAccountReq")
+    @PostMapping("/denyCreateAccountReq")
     public void declineAdditionalAccount(Long id, CreateAccountDTO createAccountDTO, HttpServletResponse response) throws IOException {
 
         Optional<Request> request = requestService.getRequest(id);
@@ -262,6 +262,7 @@ public class Tier2Controller {
         response.sendRedirect("transactions");
     }
 
+    /*
     @PostMapping("/approveNewAccountReq")
     public void approveEdit(Long id, CreateAccountDTO createAccountDTO, HttpServletResponse response) throws IOException {
 
@@ -287,5 +288,6 @@ public class Tier2Controller {
         });
         response.sendRedirect("transactions");
     }
+    */
 
 }

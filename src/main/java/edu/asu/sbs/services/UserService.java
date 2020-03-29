@@ -55,9 +55,10 @@ public class UserService {
     private final TransactionRepository transactionRepository;
     private final TransactionAccountLogRepository transactionAccountLogRepository;
     private final OTPService otpService;
+    private final AccountService accountService;
 
 
-    public UserService(UserRepository userRepository, AccountRepository accountRepository, TransactionRepository transactionRepository, AuthenticationManagerBuilder authenticationManagerBuilder, TokenProvider tokenProvider, PasswordEncoder passwordEncoder, TransactionAccountLogRepository transactionAccountLogRepository, OTPService otpService) {
+    public UserService(UserRepository userRepository, AccountRepository accountRepository, TransactionRepository transactionRepository, AuthenticationManagerBuilder authenticationManagerBuilder, TokenProvider tokenProvider, PasswordEncoder passwordEncoder, TransactionAccountLogRepository transactionAccountLogRepository, OTPService otpService, AccountService accountService) {
         this.userRepository = userRepository;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.tokenProvider = tokenProvider;
@@ -66,6 +67,7 @@ public class UserService {
         this.transactionRepository = transactionRepository;
         this.transactionAccountLogRepository = transactionAccountLogRepository;
         this.otpService = otpService;
+        this.accountService = accountService;
     }
 
     @Transactional
@@ -212,6 +214,8 @@ public class UserService {
         user.setPhoneNumber(userDTO.getPhoneNumber());
         log.info(user.toString());
         userRepository.save(user);
+        // create a default account for the user
+        accountService.createDefaultAccount(user);
         return user;
     }
 
@@ -322,14 +326,13 @@ public class UserService {
         return userRepository.findById(userDTO.getId())
                 .map(user -> {
                     user.setPhoneNumber(userDTO.getPhoneNumber());
+                    user.setUserName(userDTO.getUserName());
                     user.setFirstName(userDTO.getFirstName());
                     user.setLastName(userDTO.getLastName());
-                    //user.setAddressLine1(userDTO.getAddressLine1());
-                    //user.setAddressLine2(userDTO.getAddressLine2());
-                    //user.setCity(userDTO.getCity());
-                    //user.setState(userDTO.getState());
-                    //user.setZip(userDTO.getZip());
-                    //user.setModifiedOn(LocalDateTime.now());
+                    user.setDateOfBirth(userDTO.getDateOfBirth());
+                    user.setEmail(userDTO.getEmail());
+                    user.setSsn(userDTO.getSsn());
+                    user.setActive(true);
                     userRepository.save(user);
                     return user;
                 });

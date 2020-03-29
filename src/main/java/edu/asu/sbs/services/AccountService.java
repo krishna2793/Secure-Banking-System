@@ -1,6 +1,7 @@
 package edu.asu.sbs.services;
 
 import com.google.common.collect.Lists;
+import edu.asu.sbs.config.UserType;
 import edu.asu.sbs.globals.AccountType;
 import edu.asu.sbs.globals.CreditDebitType;
 import edu.asu.sbs.models.Account;
@@ -10,12 +11,18 @@ import edu.asu.sbs.repositories.TransactionAccountLogRepository;
 import edu.asu.sbs.services.dto.CreateAccountDTO;
 import edu.asu.sbs.services.dto.CreditDebitDTO;
 import edu.asu.sbs.services.dto.ViewAccountDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import static edu.asu.sbs.config.Constants.*;
+
+@Slf4j
 @Service
 public class AccountService {
 
@@ -122,5 +129,56 @@ public class AccountService {
 
     public void deleteAccount(Account account) {
         accountRepository.delete(account);
+    }
+
+    // generate account number
+    static String getNumericString(int n) {
+        String AlphaNumericString = "0123456789";
+
+        StringBuilder sb = new StringBuilder(n);
+
+        for (int i = 0; i < n; i++) {
+            int index
+                    = (int) (AlphaNumericString.length()
+                    * Math.random());
+
+            sb.append(AlphaNumericString
+                    .charAt(index));
+        }
+        return sb.toString();
+    }
+
+    public void createDefaultAccount(User newCustomer) {
+
+        // Give a default "CHECKING" account to the user with $500 in his account.
+        String accountNum = getNumericString(MAX_ACCOUNT_NUM_LEN);
+
+        // check if account number is existing.
+        AtomicBoolean accountCreation = new AtomicBoolean(true);
+        System.out.println("---------Checking if Account number is present-------");
+        accountRepository.findByAccountNumber(accountNum).ifPresent(account -> {
+            System.out.println("---------Account number is present-------");
+            accountCreation.set(false);
+            try {
+                throw new GeneralSecurityException("Account number already exists");
+            } catch (GeneralSecurityException e) {
+                e.printStackTrace();
+            }
+        });
+        /* if account number is unique, just create account and return the user. */
+        if (accountCreation.get() == true) {
+            Account newAccount = new Account();
+            newAccount.setAccountNumber(accountNum);
+            newAccount.setAccountBalance(INITIAL_DEPOSIT_AMOUNT);
+            if (newCustomer.getUserType() == UserType.MERCHANT_ROLE) {
+                newAccount.setAccountType(AccountType.CURRENT);
+            } else {
+                newAccount.setAccountType(DEFAULT_ACCOUNT_TYPE);
+            }
+            newAccount.setActive(true);
+            newAccount.setUser(newCustomer);
+            accountRepository.save(newAccount);
+            log.info(newAccount.toString());
+        }
     }
 }

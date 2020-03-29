@@ -209,4 +209,12 @@ public class AdminController {
             }
         });
     }
+
+    @PostMapping("/profile/edit")
+    private void updateAdminProfile(UserDTO userDTO) {
+        User user = userService.getCurrentUser();
+        if (user.getUserType() == UserType.ADMIN_ROLE) {
+            userService.editUser(userDTO);
+        }
+    }
 }
