@@ -3,7 +3,8 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:mysql://localhost:3306/sbs?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
     username: root
-    password: root
+    password:
+
     hikari:
       poolName: Hikari
       auto-commit: false
@@ -57,7 +58,7 @@ sbs:
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
   mail:
-    base-url: https://www.sbsbank.com
+    base-url: https://www.sbsbank.xyz
     enabled: true
     from: asecurebank@gmail.com
 

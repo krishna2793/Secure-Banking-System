@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/4.4.1-1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/webjars/datatables/1.10.20/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/4.4.1-1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/webjars/font-awesome/5.12.0/css/fontawesome.min.css"/>
+    <script type="text/javascript" src="/webjars/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/webjars/datatables/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/webjars/bootstrap/4.4.1-1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/dataTableHandler.js"></script>
+    <title>
+        Secure Banking System
+        {{#if title}}
+            - {{title}}
+        {{/if}}
+    </title>
+
+    {{#block "head"}}
+    {{!-- Custom <head> content per page could be added. --}}
+    {{/block}}
+</head>
+<body>
+<header>
+    <ul>
+        <li><a class="active" href="/api/v1/tier2/transactions">Secure Banking System</a></li>
+        <li><a href="/api/v1/tier2/transactions">View Transaction Requests</a></li>
+        <li><a href="/api/v1/tier2/allUsers">Access User Accounts</a></li>
+        <li><a href="/api/v1/tier2/details">Profile</a></li>
+        <li style="float:right"><a href="/logout">Log out</a></li>
+    </ul>
+</header>
+{{#block "body"}}
+{{!-- Hero content goes here. --}}
+{{/block}}
+
+{{#block "scripts"}}
+{{!-- Hero content goes here. --}}
+{{/block}}
+</body>
+</html>

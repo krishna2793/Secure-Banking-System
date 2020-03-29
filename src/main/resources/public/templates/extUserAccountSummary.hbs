@@ -1,0 +1,37 @@
+
+{{#partial "body"}}
+    <div>
+        <br>
+        <button class="btn btn-primary" onclick="location.href='/api/v1/customer/requestNewAccount'">Request New Account</button>
+        <br>
+        <br>
+        <table id="results" width="100%">
+            <thead>
+            <tr>
+                <th align="center">Account Number</th>
+                <th align="center">Account Type</th>
+                <th align="center">Account Balance</th>
+                <th align="center">Delete Account</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#each result }}
+                <form method="POST">
+                    <tr>
+                        <td align="center">{{ id }}</td>
+                        <td align="center">{{ accountType }}</td>
+                        <td align="center">{{ accountBalance }}</td>
+                        <td><input id="delete" class="btn btn-danger"  type="button" name="delete" onclick="location.href='/api/v1/customer/delete/{{ id }}'" value="Delete"/></td>
+                    </tr>
+                </form>
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
+{{/partial}}
+
+{{#block "scripts"}}
+    <script type="text/javascript" src="/js/dataTableHandler.js"></script>
+{{/block}}
+
+{{> extUserBase}}

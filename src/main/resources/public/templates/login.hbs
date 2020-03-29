@@ -1,20 +1,60 @@
-<Html>
-<Head>
-    <link rel="stylesheet" href="/css/style.css">
-    <title> Secure Banking System Login</title>
+<!doctype html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/4.4.1-1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <script type="text/javascript" src="/webjars/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/webjars/bootstrap/4.4.1-1/js/bootstrap.min.js"></script>
+    <title>
+        Secure Banking System
+        {{#if title}}
+            - {{title}}
+        {{/if}}
+    </title>
+
+    {{#block "head"}}
+    {{!-- Custom <head> content per page could be added. --}}
+    {{/block}}
 </head>
 <body>
-<div class="login-page">
-    <h1> Secure Banking System</h1>
-    <div class="form">
-        <form class="LoginForm" method="post" action="/api/v1/user/authenticate">
-            <input type="text" name="userName" placeholder="User Name" required/>
-            <input type="password" name="password" placeholder="Password"  required/>
-            <button>Login</button><br>
-            <p> Not a member yet?</p>
-            <div id="button"><a href="/api/v1/user/signup">SignUp</a></div>
-        </form>
-    </div>
+<header>
+    <ul>
+        <li><a class="active" href="/api/v1/user/login">Secure Banking System</a></li>
+    </ul>
+</header>
+
+<div class="container">
+    <form class="form-horizontal" method="post" action="login">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">User Name:</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text" id="userName" name="username">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">Password:</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="password" id="password" name="password">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Forgot Password?</label>
+            <div class="col-sm-5">
+                <a href="/api/v1/user/reset-password/init">Reset Password</a>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-8">
+                <input type="submit" class="btn btn-primary"  value="Login">
+                <span></span>
+                <input type="button" id="save" class="btn btn-primary" onclick="location.href='/api/v1/user/signup'" value="Signup">
+            </div>
+        </div>
+    </form>
 </div>
+
+{{#block "scripts"}}
+{{!-- Hero content goes here. --}}
+{{/block}}
 </body>
-</Html>
+</html>

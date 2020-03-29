@@ -1,13 +1,20 @@
 package edu.asu.sbs.models;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.time.Instant;
 
-@Data
+@Getter
+@Setter
 @Entity
 public class Transaction implements Serializable {
     private static final long serialVersionUID = -1L;
@@ -21,27 +28,45 @@ public class Transaction implements Serializable {
     private String status;
 
     @NotNull
+    @Column(nullable = false)
     private String description;
 
     @NotNull
+    @Column(nullable = false)
     private String transactionType;
-    private Timestamp createdTime;
-    private Double transactionAmount;
-    private Timestamp updatedTime;
 
+    @CreatedDate
+    private Instant createdTime;
+
+    @NotNull
+    @Column(nullable = false)
+    @Min(1)
+    private Double transactionAmount;
+
+    @LastModifiedDate
+    private Instant modifiedTime;
+
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(nullable = false)
     private Account fromAccount;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(nullable = false)
     private Account toAccount;
 
+    @JsonBackReference
     @OneToOne
     @JoinColumn(nullable = false)
     private TransactionAccountLog log;
 
-    @OneToOne(mappedBy="linkedTransaction")
+    @JsonManagedReference
+    @OneToOne(mappedBy = "linkedTransaction")
     private Request request;
+
+    @JsonManagedReference
+    @OneToOne(mappedBy = "transaction")
+    private Cheque cheque;
 
 }

@@ -1,0 +1,17 @@
+{{#partial "bodyHeader"}}
+    <ul>
+        <li><a class="active" href="/api/v1/customer/home">Secure Banking System</a></li>
+        <li><a href="/api/v1/customer/home">Account Summary</a></li>
+        <li><a href="/api/v1/customer/creditOrDebit">Credit or Debit</a></li>
+        <li><a href="/api/v1/customer/transferFunds">Transfer Funds</a></li>
+        <li><a href="/api/v1/customer/reviewRequests">Review Transfer Requests</a></li>
+        <li><a href="/api/v1/customer/profile">Profile</a></li>
+        <li style="float:right"><a href="/logout">Log out</a></li>
+    </ul>
+{{/partial}}
+
+{{#partial "profileExternalUser"}}
+    <input type="button" id="profileBtn" class="btn btn-primary" onclick="editProfile()" value="Edit Profile">
+{{/partial}}
+
+{{> profile}}

@@ -7,7 +7,7 @@
         <button class="btn btn-primary" onclick="location.href='/api/v1/admin/employee/add'">Add Employee</button>
         <br>
         <br>
-        <table id="results" width="100%">
+        <table id="results" class="display cell-border hover" width="100%">
             <thead>
             <tr>
                 <th align="center">Employee ID</th>
@@ -35,7 +35,7 @@
                         <td align="center">{{ ssn }}</td>
                         <td align="center">
                             <input id="update" class="btn btn-primary" type="button" name="update" onclick="location.href='/api/v1/admin/viewEmployee/{{ id }}'" value="Update"/>
-                            <input id="delete" class="btn btn-primary"  type="button" name="delete" onclick="location.href='/api/v1/admin/delete/{{ id }}'" value="Delete"/>
+                            <input id="delete" class="btn btn-danger"  type="button" name="delete" onclick="location.href='/api/v1/admin/delete/{{ id }}'" value="Delete"/>
                         </td>
                     </tr>
                 </form>
@@ -46,6 +46,6 @@
 {{/partial}}
 
 {{#partial "scripts"}}
-    <script type="text/javascript" src="/js/adminHandler.js"></script>
+    <script type="text/javascript" src="/js/dataTableHandler.js"></script>
 {{/partial}}
 {{> adminBase}}
