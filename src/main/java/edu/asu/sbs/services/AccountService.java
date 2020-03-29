@@ -53,7 +53,7 @@ public class AccountService {
     }
 
     public List<Account> getAccountsForUser(User user) {
-        return accountRepository.findByUser(user);
+        return accountRepository.findByUserAndIsActive(user, true);
     }
 
     @Transactional
@@ -102,6 +102,7 @@ public class AccountService {
     }
 
     public void closeUserAccount(Long id) {
+
         if (id != null) {
             Optional<Account> account = getAccountById(id);
             account.ifPresent(account1 -> {

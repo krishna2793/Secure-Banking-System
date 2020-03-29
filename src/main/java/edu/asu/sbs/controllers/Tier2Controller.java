@@ -208,21 +208,22 @@ public class Tier2Controller {
     }
 
     @PostMapping("/modifyAccount")
-    public void modifyUserAccount(Long accountId, AccountType type) throws IllegalStateException {
+    public void modifyUserAccount(Long id, AccountType accountType, HttpServletResponse response) throws IllegalStateException, IOException {
 
-        switch (type) {
+        switch (accountType) {
             case CHECKING:
-                accountService.updateAccountType(accountId, AccountType.CHECKING);
+                accountService.updateAccountType(id, AccountType.CHECKING);
                 break;
             case SAVINGS:
-                accountService.updateAccountType(accountId, AccountType.SAVINGS);
+                accountService.updateAccountType(id, AccountType.SAVINGS);
                 break;
             case CURRENT:
-                accountService.updateAccountType(accountId, AccountType.CURRENT);
+                accountService.updateAccountType(id, AccountType.CURRENT);
                 break;
             default:
-                throw new IllegalStateException("Unexpected value: " + type);
+                throw new IllegalStateException("Unexpected value: " + accountType);
         }
+        response.sendRedirect("transactions");
     }
 
     @PostMapping("/closeAccount")
