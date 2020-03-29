@@ -3,6 +3,8 @@ package edu.asu.sbs.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.jknack.handlebars.Template;
 import edu.asu.sbs.config.*;
 import edu.asu.sbs.errors.UnauthorizedAccessExcpetion;
@@ -98,6 +100,9 @@ public class Tier1Controller {
         List<TransactionDTO> transactions = transactionService.getTransactions();
         HashMap<String, List<TransactionDTO>> resultMap = new HashMap<>();
         resultMap.put("result", transactions);
+        JavaTimeModule module = new JavaTimeModule();
+        mapper.registerModule(module);
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         JsonNode result = mapper.valueToTree(resultMap);
         Template template = handlebarsTemplateLoader.getTemplate("tier1TransactionRequests");
         return template.apply(handlebarsTemplateLoader.getContext(result));

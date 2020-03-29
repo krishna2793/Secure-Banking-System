@@ -47,6 +47,8 @@ public class TransactionService {
             transactionDTO.setTransactionAmount(transaction.getTransactionAmount());
             transactionDTO.setFromAccount(transaction.getFromAccount().getId());
             transactionDTO.setToAccount(transaction.getToAccount().getId());
+            transactionDTO.setModifiedDate(transaction.getModifiedTime());
+            transactionDTO.setCreatedDate(transaction.getCreatedTime());
             if (transaction.getRequest() != null) {
                 transactionDTO.setRequestId(transaction.getRequest().getRequestId());
             }
@@ -72,6 +74,8 @@ public class TransactionService {
                             if (transactionDTO.getTransactionAmount() <= 1000 && !transactionStatus.equals(TransactionStatus.PENDING)) {
                                 toAccount.setAccountBalance(toAccount.getAccountBalance() + transactionDTO.getTransactionAmount());
                             }
+                        } else {
+                            throw new GenericRuntimeException("Account Balance not sufficient");
                         }
                         break;
                     case TransactionType.CREDIT:
@@ -80,6 +84,8 @@ public class TransactionService {
                             if (transactionDTO.getTransactionAmount() <= 1000 && !transactionStatus.equals(TransactionStatus.PENDING)) {
                                 fromAccount.setAccountBalance(fromAccount.getAccountBalance() + transactionDTO.getTransactionAmount());
                             }
+                        } else {
+                            throw new GenericRuntimeException("Account Balance not sufficient");
                         }
                         break;
                     default:
@@ -163,6 +169,8 @@ public class TransactionService {
                 if (transaction.getTransactionAmount() > 1000) {
                     Request request = transaction.getRequest();
                     if (!request.getStatus().equals(TransactionStatus.APPROVED)) {
+                        cheque.setDeleted(true);
+                        chequeRepository.save(cheque);
                         return "Transaction to be Approved by TIER2";
                     }
                 }
