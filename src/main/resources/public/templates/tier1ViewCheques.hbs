@@ -6,16 +6,12 @@
         <table id="results" width="100%">
             <thead>
             <tr>
-                <th align="center">Modified Date</th>
-                <th align="center">Created Date</th>
-                <th align="center">Request ID</th>
+                <th align="center">Cheque ID</th>
+                <th align="center">Account ID</th>
+                <th align="center">User ID</th>
                 <th align="center">Transaction ID</th>
                 <th align="center">Status</th>
-                <th align="center">Description</th>
-                <th align="center">From Account</th>
-                <th align="center">To Account</th>
-                <th align="center">Amount</th>
-                <th align="center">Type</th>
+                <th align="center">Cheque Amount</th>
                 <th align="center">Approve/Deny</th>
             </tr>
             </thead>
@@ -30,13 +26,13 @@
                     <td align="center">{{ transactionStatus }}</td>
                     <td align="center">{{ chequeAmount }}</td>
                     <td align="center">
-                        <form method="post" action="/api/v1/tier2/clearCheque" class="inline">
-                            <input type="text" name="id" value="{{chequeId}}" style="display: none">
+                        <form method="post" action="/api/v1/tier1/clearCheque" class="inline">
+                            <input type="text" name="chequeId" value="{{chequeId}}" style="display: none">
                             <input id="update" class="btn btn-primary" type="submit" name="approve"
                                    value="Approve"/>
                         </form>
-                        <form method="post" action="/api/v1/tier2/denyCheque" class="inline">
-                            <input type="text" name="id" value="{{chequeId}}" style="display: none">
+                        <form method="post" action="/api/v1/tier1/denyCheque" class="inline">
+                            <input type="text" name="chequeId" value="{{chequeId}}" style="display: none">
                             <input id="delete" class="btn btn-danger" type="submit" name="deny"
                                    value="Deny"/>
                         </form>

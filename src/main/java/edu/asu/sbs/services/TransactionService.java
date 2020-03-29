@@ -2,6 +2,7 @@ package edu.asu.sbs.services;
 
 import com.google.common.collect.Lists;
 import edu.asu.sbs.config.RequestType;
+import edu.asu.sbs.config.StatusType;
 import edu.asu.sbs.config.TransactionStatus;
 import edu.asu.sbs.config.TransactionType;
 import edu.asu.sbs.errors.GenericRuntimeException;
@@ -87,6 +88,7 @@ public class TransactionService {
                 TransactionAccountLog transactionAccountLog = new TransactionAccountLog();
                 transactionAccountLog.setLogDescription(transactionDTO.getDescription());
                 transactionAccountLog.setLogTime(Instant.now());
+                transactionAccountLog.setAccount(fromAccount);
                 transactionAccountLog = transactionAccountLogRepository.save(transactionAccountLog);
                 Transaction transaction = new Transaction();
                 transaction.setCreatedTime(Instant.now());
@@ -146,6 +148,9 @@ public class TransactionService {
         Cheque cheque = new Cheque();
         cheque.setAmount(transactionDTO.getTransactionAmount());
         cheque.setTransaction(transaction);
+        cheque.setChequeFromAccount(transaction.getFromAccount());
+        cheque.setChequeToAccount(transaction.getToAccount());
+        chequeRepository.save(cheque);
     }
 
     @Transactional
@@ -154,7 +159,7 @@ public class TransactionService {
         if (optionalCheque.isPresent()) {
             Cheque cheque = optionalCheque.get();
             Transaction transaction = cheque.getTransaction();
-            if (transaction.getTransactionType().equals(TransactionStatus.PENDING) && !cheque.isDeleted()) {
+            if (transaction.getStatus().equals(TransactionStatus.PENDING) && !cheque.isDeleted()) {
                 if (transaction.getTransactionAmount() > 1000) {
                     Request request = transaction.getRequest();
                     if (!request.getStatus().equals(TransactionStatus.APPROVED)) {
@@ -171,10 +176,11 @@ public class TransactionService {
                     transactionRepository.save(transaction);
                     chequeRepository.save(cheque);
                     transactionAccountLogRepository.save(transactionAccountLog);
+                    accountRepository.save(toAccount);
+                    return "Cheque Cleared";
                 }
             }
-            return "Cheque Cleared";
-
+            throw new GenericRuntimeException("Error clearing cheque, contact admin");
         } else {
             return "Cheque Not Found";
         }
@@ -208,5 +214,29 @@ public class TransactionService {
             chequeDTOList.add(chequeDTO);
         });
         return chequeDTOList;
+    }
+
+    @Transactional
+    public void denyCheque(Long chequeId) {
+        Optional<Cheque> optionalCheque = chequeRepository.findById(chequeId);
+        optionalCheque.ifPresent(cheque -> {
+            Transaction transaction = cheque.getTransaction();
+            if (transaction.getTransactionType().equals(TransactionStatus.PENDING) && !cheque.isDeleted()) {
+                TransactionAccountLog transactionAccountLog = transaction.getLog();
+                transactionAccountLog.setLogDescription("CHEQUE DECLINED");
+                transactionAccountLog.setLogTime(Instant.now());
+                Account fromAccount = cheque.getChequeFromAccount();
+                fromAccount.setAccountBalance(cheque.getChequeFromAccount().getAccountBalance() + cheque.getAmount());
+                cheque.setDeleted(true);
+                transaction.setModifiedTime(Instant.now());
+                transaction.setDescription("Transaction Declined");
+                transaction.setStatus(StatusType.DECLINED);
+                transactionRepository.save(transaction);
+                chequeRepository.save(cheque);
+                transactionAccountLogRepository.save(transactionAccountLog);
+                accountRepository.save(fromAccount);
+            }
+        });
+        throw new GenericRuntimeException("Issue with denying cheque, contact admin");
     }
 }

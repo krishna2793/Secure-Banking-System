@@ -84,6 +84,7 @@ public class Tier1Controller {
     @ResponseBody
     public String getCheques() throws IOException {
         List<ChequeDTO> chequeDTOList = transactionService.getCheques();
+        log.info(chequeDTOList.toString());
         HashMap<String, List<ChequeDTO>> resultMap = new HashMap<>();
         resultMap.put("result", chequeDTOList);
         JsonNode result = mapper.valueToTree(resultMap);
@@ -126,10 +127,16 @@ public class Tier1Controller {
         transactionService.issueCheque(transactionDTO);
     }
 
-    @PutMapping("/clearCheck")
+    @PostMapping("/clearCheque")
     @ResponseBody
-    public String clearCheck(@RequestParam Long chequeId) {
+    public String clearCheque(Long chequeId) {
         return transactionService.clearCheque(chequeId);
+    }
+
+    @PostMapping("/denyCheque")
+    @ResponseBody
+    public void denyCheck(Long chequeId) {
+        transactionService.denyCheque(chequeId);
     }
 
     @PostMapping("/raiseRequest")
