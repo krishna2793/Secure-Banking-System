@@ -47,11 +47,14 @@ public class AccountService {
         return viewAccountDTOList;
     }
 
+    public Account getDefaultAccount(User user){
+        return accountRepository.findAccountByUserAndDefaultAccount(user, true).get();
+    }
 
     public void createAccount(User customer, CreateAccountDTO createAccountDTO) {
         Account newAccount = new Account();
         newAccount.setAccountBalance(createAccountDTO.getInitialDeposit());
-        newAccount.setAccountNumber(createAccountDTO.getAccountNumber());
+//        newAccount.setAccountNumber(createAccountDTO.getAccountNumber());
         newAccount.setAccountType(createAccountDTO.getAccountType());
         newAccount.setUser(customer);
         accountRepository.save(newAccount);
@@ -150,25 +153,24 @@ public class AccountService {
 
     public void createDefaultAccount(User newCustomer) {
 
-        // Give a default "CHECKING" account to the user with $500 in his account.
-        String accountNum = getNumericString(MAX_ACCOUNT_NUM_LEN);
-
-        // check if account number is existing.
-        AtomicBoolean accountCreation = new AtomicBoolean(true);
-        System.out.println("---------Checking if Account number is present-------");
-        accountRepository.findByAccountNumber(accountNum).ifPresent(account -> {
-            System.out.println("---------Account number is present-------");
-            accountCreation.set(false);
-            try {
-                throw new GeneralSecurityException("Account number already exists");
-            } catch (GeneralSecurityException e) {
-                e.printStackTrace();
-            }
-        });
+//        // Give a default "CHECKING" account to the user with $500 in his account.
+//        String accountNum = getNumericString(MAX_ACCOUNT_NUM_LEN);
+//
+//        // check if account number is existing.
+//        AtomicBoolean accountCreation = new AtomicBoolean(true);
+//        System.out.println("---------Checking if Account number is present-------");
+//        accountRepository.findByAccountNumber(accountNum).ifPresent(account -> {
+//            System.out.println("---------Account number is present-------");
+//            accountCreation.set(false);
+//            try {
+//                throw new GeneralSecurityException("Account number already exists");
+//            } catch (GeneralSecurityException e) {
+//                e.printStackTrace();
+//            }
+//        });
         /* if account number is unique, just create account and return the user. */
-        if (accountCreation.get() == true) {
+//        if (accountCreation.get() == true) {
             Account newAccount = new Account();
-            newAccount.setAccountNumber(accountNum);
             newAccount.setAccountBalance(INITIAL_DEPOSIT_AMOUNT);
             if (newCustomer.getUserType() == UserType.MERCHANT_ROLE) {
                 newAccount.setAccountType(AccountType.CURRENT);
@@ -177,8 +179,10 @@ public class AccountService {
             }
             newAccount.setActive(true);
             newAccount.setUser(newCustomer);
+            newAccount.setDefaultAccount(true);
             accountRepository.save(newAccount);
             log.info(newAccount.toString());
-        }
+//        }
     }
+
 }
