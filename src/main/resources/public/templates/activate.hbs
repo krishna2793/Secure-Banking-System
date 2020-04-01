@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/4.4.1-1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/webjars/datatables/1.10.20/css/dataTables.bootstrap.min.css">
+    <script type="text/javascript" src="/webjars/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/webjars/bootstrap/4.4.1-1/js/bootstrap.min.js"></script>
+    <title>
+        Secure Banking System
+        {{#if title}}
+            - {{title}}
+        {{/if}}
+    </title>
+
+    {{#block "head"}}
+    {{!-- Custom <head> content per page could be added. --}}
+    {{/block}}
+</head>
+<body>
+<header>
+    <ul>
+        <li><a class="active" href="">Secure Banking System</a></li>
+    </ul>
+</header>
+
+<div class="container">
+    <form class="form-horizontal" method="POST" action="/api/v1/user/activate">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">Please enter the activation key sent to your email:</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text" id="key" name="key" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-8">
+                <input type="submit" class="btn btn-primary" value="Activate">
+                <span></span>
+                <input type="reset" class="btn btn-primary" value="Reset">
+            </div>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

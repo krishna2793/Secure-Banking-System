@@ -2,35 +2,33 @@ package edu.asu.sbs.config;
 
 import edu.asu.sbs.security.jwt.JWTConfigurer;
 import edu.asu.sbs.security.jwt.TokenProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.filter.CorsFilter;
-import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
-@Import(SecurityProblemSupport.class)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private CustomSuccessHandler successHandler;
 
     private final TokenProvider tokenProvider;
     private final CorsFilter corsFilter;
-    private final SecurityProblemSupport securityProblemSupport;
 
-    public SecurityConfiguration(TokenProvider tokenProvider, CorsFilter corsFilter, SecurityProblemSupport securityProblemSupport) {
+    public SecurityConfiguration(TokenProvider tokenProvider, CorsFilter corsFilter) {
         this.tokenProvider = tokenProvider;
         this.corsFilter = corsFilter;
-        this.securityProblemSupport = securityProblemSupport;
     }
 
     @Bean
@@ -56,31 +54,43 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatcher("/**")
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()
-//                    .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-////                    .authenticationEntryPoint(securityProblemSupport)
-//                    .accessDeniedHandler(securityProblemSupport)
                 .and()
-                    .headers()
-                    .contentSecurityPolicy("default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:")
+                .headers()
+                .contentSecurityPolicy("default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:")
                 .and()
-                    .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+                .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
                 .and()
-                    .featurePolicy("geolocation 'none'; midi 'none'; sync-xhr 'none'; microphone 'none'; camera 'none'; magnetometer 'none'; gyroscope 'none'; speaker 'none'; fullscreen 'self'; payment 'none'")
+                .featurePolicy("geolocation 'none'; midi 'none'; sync-xhr 'none'; microphone 'none'; camera 'none'; magnetometer 'none'; gyroscope 'none'; speaker 'none'; fullscreen 'self'; payment 'none'")
                 .and()
-                    .frameOptions()
-                    .deny()
+                .frameOptions()
+                .deny()
+//                .and()
+//                    .sessionManagement()
+//                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                    .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .authorizeRequests()
+                .antMatchers("/api/v1/user/reset-password/init", "/api/v1/user/reset-password/finish", "/api/v1/user/signup", "/api/v1/user/test", "/api/v1/user/login", "/api/v1/user/authenticate", "/api/v1/user/activate", "/api/v1/user/register", "/api/account/reset-password/init", "/api/account/password-reset/finish", "/swagger-ui.html", "/css/main.css", "/webjars/bootstrap/4.4.1-1/css/bootstrap.min.css", "/webjars/bootstrap/4.4.1-1/js/bootstrap.min.js", "/webjars/jquery/3.4.1/jquery.min.js", "/js/passwordValidation.js").permitAll()
+                .antMatchers("/ap1/v1/admin/**").hasAuthority(UserType.ADMIN_ROLE)
+                .antMatchers().permitAll()
+                .anyRequest().authenticated()
                 .and()
-                    .authorizeRequests()
-                    .antMatchers("/api/v1/user/authenticate", "/api/v1/user/activate", "/api/v1/user/register", "/api/account/reset-password/init", "/api/account/password-reset/finish", "/swagger-ui.html").permitAll()
-                    .antMatchers("/management/**").hasAuthority(UserType.ADMIN_ROLE)
-                    .anyRequest().authenticated()
+//                .httpBasic()
+                .formLogin()
+                .loginPage("/api/v1/user/login").successHandler(successHandler)
+//                .loginProcessingUrl("/process_login")
+//                .defaultSuccessUrl("/api/v1/user/authenticate")
+//                .and()
+//                .authorizeRequests()
+//                    .anyRequest().authenticated();
                 .and()
-                    .httpBasic()
+                .apply(securityConfigurerAdapter())
                 .and()
-                    .apply(securityConfigurerAdapter());
+                .logout()
+                .logoutUrl("/logout")
+                .invalidateHttpSession(false)
+                .deleteCookies("JSESSIONID")
+                .logoutSuccessUrl("/api/v1/user/login");
+
     }
 
     private JWTConfigurer securityConfigurerAdapter() {

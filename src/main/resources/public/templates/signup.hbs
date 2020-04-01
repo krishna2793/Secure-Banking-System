@@ -1,27 +1,94 @@
-<Html>
+<!doctype html>
+<html>
 <head>
-    <link rel="stylesheet" href="/css/signup_style.css">
-    <title> Secure Banking System Register</title>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/4.4.1-1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/webjars/datatables/1.10.20/css/dataTables.bootstrap.min.css">
+    <title>
+        Secure Banking System
+        {{#if title}}
+            - {{title}}
+        {{/if}}
+    </title>
+
+    {{#block "head"}}
+    {{!-- Custom <head> content per page could be added. --}}
+    {{/block}}
 </head>
 <body>
-<div class="Signup-page">
-    <div class="form">
-        <form method="post" class="Signup" action="/api/v1/user/register">
-            <input id="name" name="userName" type="text" placeholder="Name" required/>
-            <input name="firstName" type="text" placeholder="First Name">
-            <input name="lastName" type="text" placeholder="Last Name">
-            <input type="date" name="dateOfBirth" placeholder="Date Of Birth">
-            <input type="text" name="phoneNumber" placeholder="phoneNumber" pattern="^\D?(\d{3})\D?\D?(\d{3})\D?(\d{4})$" required>
-            <input type="text" name="email" placeholder="Email" pattern="\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b" required/>
-            <input type="password" id="password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%\^\&*\)\(+=._-])[A-Za-z\d@$!%*?&]{8,}$" placeholder="Password" required/>
-            <input type="password" id="confirmPassword" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%\^\&*\)\(+=._-])[A-Za-z\d@$!%*?&]{8,}$" placeholder="Confirm Password" required/>
-            <input type="text" id="SSN" name="ssn" maxlength="11" placeholder="SSN" pattern="^(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}$">
-            <input type="submit" id="submit"  value="Submit">
-        </form>
-    </div>
-</div>
+<header>
+    <ul>
+        <li><a class="active" href="/api/v1/user/login">Secure Banking System</a></li>
+    </ul>
+</header>
 
+<div class="container">
+    <form class="form-horizontal" method="POST" action="/api/v1/user/register">
+        <div class="form-group">
+            <label class="col-lg-3 control-label">User Name:</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text" id="userName" name="userName" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">First Name:</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text" id="firstName" name="firstName" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">Last Name:</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text" id="lastName" name="lastName" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">Email:</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="email" id="email" name="email" pattern="\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">Date Of Birth:</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="date" id="dateOfBirth" name="dateOfBirth" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">Phone Number:</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text" id="phoneNumber" name="phoneNumber" pattern="^\D?(\d{3})\D?\D?(\d{3})\D?(\d{4})$" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">SSN:</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="text" id="ssn" name="ssn" pattern="^(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}$">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">Password:</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="password" id="password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%\^\&*\)\(+=._-])[A-Za-z\d@$!%*?&]{8,}$" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-3 control-label">Confirm Password:</label>
+            <div class="col-lg-8">
+                <input class="form-control" type="password" id="confirmPassword" name="confirmPassword" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%\^\&*\)\(+=._-])[A-Za-z\d@$!%*?&]{8,}$" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-8">
+                <input type="submit" class="btn btn-primary" value="Register">
+                <span></span>
+                <input type="reset" class="btn btn-primary" value="Reset">
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript" src="/webjars/jquery/3.4.1/jquery.min.js"></script>
+<script type="text/javascript" src="/webjars/bootstrap/4.4.1-1/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/js/passwordValidation.js"></script>
 </body>
-</Html>
-
+</html>

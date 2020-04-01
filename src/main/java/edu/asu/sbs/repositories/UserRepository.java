@@ -8,9 +8,11 @@ import java.util.Optional;
 
 public interface UserRepository extends CrudRepository<User, Long> {
 
-    Optional<User> findOneWithAuthoritiesByEmailIgnoreCase(String username);
+    Optional<User> findOneWithAuthoritiesByEmailIgnoreCase(String email);
 
-    Optional<User> findOneWithUserTypeByUserName(String lowercaselogin);
+    Optional<User> findOneWithUserTypeByUserName(String userName);
+
+    Optional<User> findOneByUserNameAndIsActive(String userName, boolean isActive);
 
     Optional<User> findOneByUserName(String userName);
 
@@ -28,16 +30,19 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     Optional<User> findOneByResetKey(String key);
 
-
     User findByUserNameOrEmail(String userName, String email);
-
-    Optional<User> findById(Long id);
 
     List<User> findByUserType(String type);
 
-    List<User> findByUserTypeIn(List<String> typeList);
+    List<User> findByUserTypeInAndIsActive(List<String> typeList, boolean isActive);
 
     boolean findByEmail(String email);
 
     boolean findByPhoneNumber(String ph);
+
+    Optional<User> findByIdAndIsActive(Long id, boolean isActive);
+
+    Optional<User> findOneByEmailAndIsActive(String email, boolean isActive);
+
+    Optional<User> findOneByPhoneNumberAndIsActive(String phoneNumber, boolean isActive);
 }

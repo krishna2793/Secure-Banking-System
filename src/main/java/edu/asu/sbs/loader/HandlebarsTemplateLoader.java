@@ -1,15 +1,13 @@
 package edu.asu.sbs.loader;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.jknack.handlebars.Context;
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.JsonNodeValueResolver;
-import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.*;
 import com.github.jknack.handlebars.cache.GuavaTemplateCache;
 import com.github.jknack.handlebars.context.FieldValueResolver;
 import com.github.jknack.handlebars.context.JavaBeanValueResolver;
 import com.github.jknack.handlebars.context.MapValueResolver;
 import com.github.jknack.handlebars.context.MethodValueResolver;
+import com.github.jknack.handlebars.helper.ConditionalHelpers;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import com.github.jknack.handlebars.io.TemplateSource;
@@ -40,6 +38,10 @@ public class HandlebarsTemplateLoader {
         TemplateLoader loader = new ClassPathTemplateLoader("/public/templates", ".hbs");
         final Cache<TemplateSource, Template> templateCache = CacheBuilder.newBuilder().expireAfterWrite(10, TimeUnit.MINUTES).maximumSize(1000).build();
         setHandlebars(new Handlebars(loader).with((new GuavaTemplateCache(templateCache))));
+        this.handlebars = new Handlebars(loader);
+        for (ConditionalHelpers helper: ConditionalHelpers.values()) {
+            this.handlebars.registerHelper(helper.name(), helper);
+        }
     }
 
     public Handlebars getHandlebars() {

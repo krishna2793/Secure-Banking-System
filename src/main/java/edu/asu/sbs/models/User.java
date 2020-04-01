@@ -1,25 +1,24 @@
 package edu.asu.sbs.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import edu.asu.sbs.config.Constants;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-//import java.sql.Date;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class User implements Serializable {
     private static final long serialVersionUID = -1L;
 
@@ -51,8 +50,10 @@ public class User implements Serializable {
 
     @NotNull
     @Column(nullable = false)
-    @JsonIgnore
     private boolean isActive = false;
+
+    @Min(100000)
+    private int otp = 100000;
 
     @NotNull
     @Pattern(regexp = Constants.SSN_REGEX)
@@ -62,7 +63,6 @@ public class User implements Serializable {
 
     @NotNull
     @Column(nullable = false, length = 50)
-    @JsonIgnore
     private String userType;
 
     @NotNull
@@ -87,24 +87,6 @@ public class User implements Serializable {
     @JsonIgnore
     private String resetKey;
 
-
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy="user")
-    private Set<Account> accounts = new HashSet<>();
-
-    @JsonIgnore
-    @OneToOne(mappedBy="representative")
-    private Organization organization;
-
-    @JsonIgnore
-    @OneToOne(mappedBy="requestBy")
-    private Request request;
-
-    @JsonIgnore
-    @OneToOne(mappedBy="linkedUser")
-    private Session session;
-
-    @JsonIgnore
     private Instant resetDate = null;
 
     @Size(max = 20)
@@ -112,10 +94,24 @@ public class User implements Serializable {
     @JsonIgnore
     private String activationKey;
 
-    @JsonIgnore
     private Instant createdOn;
 
-    @JsonIgnore
     private Instant expireOn;
+
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private Set<Account> accounts = new HashSet<>();
+
+    @JsonManagedReference
+    @OneToOne(mappedBy = "representative")
+    private Organization organization;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "requestBy", cascade = CascadeType.ALL)
+    private Set<Request> requests = new HashSet<>();
+
+    @JsonManagedReference
+    @OneToOne(mappedBy = "linkedUser")
+    private Session session;
 
 }

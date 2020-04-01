@@ -1,0 +1,37 @@
+{{#partial "head"}}
+
+{{/partial}}
+{{#partial "body"}}
+    <div >
+        <table id="results" width="100%">
+            <thead>
+            <tr>
+                <th>From Account</th>
+                <th>To Account</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Approve/Deny</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#each result }}
+            <tr>
+                <td align="center">{{ fromAccountId }}</td>
+                <td align="center">{{ toAccountId }}</td>
+                <td align="center">{{ description }}</td>
+                <td align="center">{{ amount }}</td>
+                <td align="center">
+                    <button class="inline"> <a href=""> Approve </a> </button>
+                    <button class="inline"> <a href=""> Deny </a> </button>
+                </td>
+            </tr>
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
+{{/partial}}
+
+{{#partial "scripts"}}
+    <script type="text/javascript" src="/js/profileHandler.js"></script>
+{{/partial}}
+{{> extUserBase}}

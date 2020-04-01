@@ -1,6 +1,9 @@
 package edu.asu.sbs.models;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -10,7 +13,8 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.Instant;
 
-@Data
+@Getter
+@Setter
 @Entity
 public class Transaction implements Serializable {
     private static final long serialVersionUID = -1L;
@@ -40,23 +44,28 @@ public class Transaction implements Serializable {
     private Double transactionAmount;
 
     @LastModifiedDate
-    private Instant updatedTime;
+    private Instant modifiedTime;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(nullable = false)
     private Account fromAccount;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(nullable = false)
     private Account toAccount;
 
+    @JsonBackReference
     @OneToOne
     @JoinColumn(nullable = false)
     private TransactionAccountLog log;
 
+    @JsonManagedReference
     @OneToOne(mappedBy = "linkedTransaction")
     private Request request;
 
+    @JsonManagedReference
     @OneToOne(mappedBy = "transaction")
     private Cheque cheque;
 

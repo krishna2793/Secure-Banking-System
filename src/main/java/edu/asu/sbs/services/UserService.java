@@ -1,17 +1,23 @@
 package edu.asu.sbs.services;
 
 import com.google.common.collect.Lists;
+import edu.asu.sbs.config.TransactionStatus;
+import edu.asu.sbs.config.TransactionType;
 import edu.asu.sbs.config.UserType;
 import edu.asu.sbs.errors.*;
 import edu.asu.sbs.globals.AccountType;
 import edu.asu.sbs.models.Account;
 import edu.asu.sbs.models.Transaction;
+import edu.asu.sbs.models.TransactionAccountLog;
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.repositories.AccountRepository;
+import edu.asu.sbs.repositories.TransactionAccountLogRepository;
 import edu.asu.sbs.repositories.TransactionRepository;
 import edu.asu.sbs.repositories.UserRepository;
 import edu.asu.sbs.security.jwt.JWTFilter;
 import edu.asu.sbs.security.jwt.TokenProvider;
+import edu.asu.sbs.services.dto.TransactionDTO;
+import edu.asu.sbs.services.dto.TransferOrRequestDTO;
 import edu.asu.sbs.services.dto.UserDTO;
 import edu.asu.sbs.util.RandomUtil;
 import edu.asu.sbs.vm.LoginVM;
@@ -27,9 +33,12 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.Calendar;
@@ -44,44 +53,91 @@ public class UserService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
     private final PasswordEncoder passwordEncoder;
-    final AccountRepository accountRepository;
-    final TransactionRepository transactionRepository;
+    private final AccountRepository accountRepository;
+    private final TransactionRepository transactionRepository;
+    private final TransactionAccountLogRepository transactionAccountLogRepository;
+    private final OTPService otpService;
+    private final AccountService accountService;
 
 
-    public UserService(UserRepository userRepository, AccountRepository accountRepository, TransactionRepository transactionRepository, AuthenticationManagerBuilder authenticationManagerBuilder, TokenProvider tokenProvider, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, AccountRepository accountRepository, TransactionRepository transactionRepository, AuthenticationManagerBuilder authenticationManagerBuilder, TokenProvider tokenProvider, PasswordEncoder passwordEncoder, TransactionAccountLogRepository transactionAccountLogRepository, OTPService otpService, AccountService accountService) {
         this.userRepository = userRepository;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.tokenProvider = tokenProvider;
         this.passwordEncoder = passwordEncoder;
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
+        this.transactionAccountLogRepository = transactionAccountLogRepository;
+        this.otpService = otpService;
+        this.accountService = accountService;
     }
 
     @Transactional
-    public void createUpdateUser(User user) {
+    public void createUpdateUser() {
 
         User u = new User();
-        u.setUserName("admin");
+        u.setUserName("tier2");
         u.setFirstName("R");
         u.setLastName("R");
         u.setPhoneNumber("9994621912");
         u.setSsn("123-45-6789");
         u.setDateOfBirth(new Date(Calendar.getInstance().getTime().getTime()));
-        u.setEmail("93@asu,edu");
-        u.setPasswordHash(passwordEncoder.encode("admin"));
-        u.setUserType("t2");
+        u.setEmail("93@asu.edu");
+        u.setPasswordHash(passwordEncoder.encode("tier2"));
+        u.setUserType(UserType.EMPLOYEE_ROLE2);
+        u.setActive(true);
         userRepository.save(u);
 
         u = new User();
-        u.setUserName("user");
+        u.setUserName("admin");
+        u.setActive(true);
+        u.setFirstName("K");
+        u.setLastName("K");
+        u.setPhoneNumber("7708316841");
+        u.setSsn("123-45-5674");
+        u.setDateOfBirth(new Date(Calendar.getInstance().getTime().getTime()));
+        u.setEmail("76761@asu.edu");
+        u.setPasswordHash(passwordEncoder.encode("admin"));
+        u.setUserType(UserType.ADMIN_ROLE);
+        userRepository.save(u);
+
+        u = new User();
+        u.setUserName("tier1");
+        u.setActive(true);
         u.setFirstName("K");
         u.setLastName("K");
         u.setPhoneNumber("7708316840");
         u.setSsn("123-45-5675");
         u.setDateOfBirth(new Date(Calendar.getInstance().getTime().getTime()));
         u.setEmail("7676@asu.edu");
-        u.setPasswordHash(passwordEncoder.encode("user"));
-        u.setUserType("t2");
+        u.setPasswordHash(passwordEncoder.encode("tier1"));
+        u.setUserType(UserType.EMPLOYEE_ROLE1);
+        userRepository.save(u);
+
+        u = new User();
+        u.setUserName("user1");
+        u.setActive(true);
+        u.setFirstName("K");
+        u.setLastName("K");
+        u.setPhoneNumber("6708316840");
+        u.setSsn("123-45-5775");
+        u.setDateOfBirth(new Date(Calendar.getInstance().getTime().getTime()));
+        u.setEmail("776@asu.edu");
+        u.setPasswordHash(passwordEncoder.encode("user1"));
+        u.setUserType(UserType.USER_ROLE);
+        userRepository.save(u);
+
+        u = new User();
+        u.setUserName("user2");
+        u.setActive(true);
+        u.setFirstName("K");
+        u.setLastName("K");
+        u.setPhoneNumber("6508316840");
+        u.setSsn("123-45-5785");
+        u.setDateOfBirth(new Date(Calendar.getInstance().getTime().getTime()));
+        u.setEmail("7746@asu.edu");
+        u.setPasswordHash(passwordEncoder.encode("user2"));
+        u.setUserType(UserType.USER_ROLE);
         userRepository.save(u);
 
         Account a = new Account();
@@ -89,7 +145,7 @@ public class UserService {
         a.setAccountNumber("12345");
         a.setAccountType(AccountType.SAVINGS);
         a.setActive(true);
-        a.setUser(userRepository.findOneWithUserTypeByUserName("admin").orElse(null));
+        a.setUser(userRepository.findOneWithUserTypeByUserName("user2").orElse(null));
         accountRepository.save(a);
 
         a = new Account();
@@ -97,7 +153,7 @@ public class UserService {
         a.setAccountNumber("12347");
         a.setAccountType(AccountType.CHECKING);
         a.setActive(true);
-        a.setUser(userRepository.findOneWithUserTypeByUserName("admin").orElse(null));
+        a.setUser(userRepository.findOneWithUserTypeByUserName("user2").orElse(null));
         accountRepository.save(a);
 
         a = new Account();
@@ -105,18 +161,22 @@ public class UserService {
         a.setAccountNumber("12346");
         a.setAccountType(AccountType.CHECKING);
         a.setActive(true);
-        a.setUser(userRepository.findOneWithUserTypeByUserName("user").orElse(null));
+        a.setUser(userRepository.findOneWithUserTypeByUserName("user1").orElse(null));
         accountRepository.save(a);
 
         Transaction t = new Transaction();
         t.setCreatedTime(Instant.now());
         t.setDescription("Dummy transfer");
-        t.setStatus("SUCCESS");
+        t.setStatus(TransactionStatus.APPROVED);
         t.setTransactionAmount(100.0);
-        t.setUpdatedTime(Instant.now());
-        t.setTransactionType("Internal");
+        t.setModifiedTime(Instant.now());
+        t.setTransactionType(TransactionType.DEBIT);
         t.setFromAccount(accountRepository.findOneByAccountNumberEquals("12346").orElse(null));
         t.setToAccount(accountRepository.findOneByAccountNumberEquals("12347").orElse(null));
+        TransactionAccountLog transactionAccountLog = new TransactionAccountLog();
+        transactionAccountLog.setLogDescription(t.getDescription());
+        TransactionAccountLog tlog = transactionAccountLogRepository.save(transactionAccountLog);
+        t.setLog(tlog);
         transactionRepository.save(t);
 
     }
@@ -193,8 +253,11 @@ public class UserService {
 
     @Transactional
     public Optional<User> activateRegistration(String key) {
+        Optional<User> optionalUser = userRepository.findOneByActivationKey(key);
         log.debug("Activating user for activation key {}", key);
-        return userRepository.findOneByActivationKey(key)
+        // create a default account for the user
+        accountService.createDefaultAccount(optionalUser.get());
+        return optionalUser
                 .map(user -> {
                     user.setActive(true);
                     user.setActivationKey(null);
@@ -236,6 +299,10 @@ public class UserService {
         userRepository.save(requestBy);
     }
 
+    public Object getAllUsers() {
+        return userRepository.findByUserTypeInAndIsActive(Lists.newArrayList(UserType.USER_ROLE), true);
+    }
+
     @Getter
     @Setter
     public static class JWTToken {
@@ -253,50 +320,39 @@ public class UserService {
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
             currentUserName = authentication.getName();
         }
-        System.out.println("Loggendin user: "+currentUserName);
-        Optional<User> user = userRepository.findOneByUserName(currentUserName);
-        if (userRepository.findOneByUserName(currentUserName).isPresent()) {
-            return user.get();
-        } else {
-            return null;
-        }
+        log.debug("Logged in User: '{}'", currentUserName);
+        return userRepository.findOneByUserName(currentUserName).orElse(null);
     }
 
     @Transactional
-    public Optional<User> editUser(User userDTO) {
+    public Optional<User> editUser(UserDTO userDTO) {
         return userRepository.findById(userDTO.getId())
                 .map(user -> {
                     user.setPhoneNumber(userDTO.getPhoneNumber());
+                    user.setUserName(userDTO.getUserName());
                     user.setFirstName(userDTO.getFirstName());
                     user.setLastName(userDTO.getLastName());
-                    //user.setAddressLine1(userDTO.getAddressLine1());
-                    //user.setAddressLine2(userDTO.getAddressLine2());
-                    //user.setCity(userDTO.getCity());
-                    //user.setState(userDTO.getState());
-                    //user.setZip(userDTO.getZip());
-                    //user.setModifiedOn(LocalDateTime.now());
-                    user.setUserType(userDTO.getUserType());
-                    userRepository.save(userDTO);
+                    user.setDateOfBirth(userDTO.getDateOfBirth());
+                    user.setEmail(userDTO.getEmail());
+                    user.setSsn(userDTO.getSsn());
+                    user.setActive(true);
+                    userRepository.save(user);
                     return user;
                 });
     }
 
 
     public List<User> getAllEmployees() {
-        return userRepository.findByUserTypeIn(Lists.newArrayList(UserType.EMPLOYEE_ROLE1, UserType.EMPLOYEE_ROLE2));
+        return userRepository.findByUserTypeInAndIsActive(Lists.newArrayList(UserType.EMPLOYEE_ROLE1, UserType.EMPLOYEE_ROLE2), true);
     }
 
-    public Optional<User> getUserByIdAndActive(Long id) {
+    public User getUserByIdAndActive(Long id) {
         log.info("Getting user by id and isActive=true");
-        Optional<User> user = userRepository.findById(id);
-
-        if (user.get().isActive() == true)
-            return user;
-        else
-            return null;
+        Optional<User> optionalUser = userRepository.findByIdAndIsActive(id, true);
+        return optionalUser.orElse(null);
     }
 
-
+    @Transactional
     public void deleteUser(Long id) {
         Optional<User> current = userRepository.findById(id);
         current.ifPresent(user -> {
@@ -306,4 +362,64 @@ public class UserService {
         });
     }
 
+
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        User user = getCurrentUser();
+        otpService.clearOTP(user.getEmail());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            otpService.clearOTP(user.getEmail());
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+        return "redirect:/login?logout";
+    }
+
+    public User getUserByUserName(String userName){
+        return userRepository.findOneByUserName(userName).get();
+    }
+
+    public User getUserByEmail(String email){
+        return userRepository.findOneByEmailAndIsActive(email,true).get();
+    }
+
+    public User getUserByPhoneNumber(String phoneNumber){
+        return userRepository.findOneByPhoneNumberAndIsActive(phoneNumber,true).get();
+    }
+
+    public TransactionDTO transferByEmailOrPhone(TransferOrRequestDTO transferOrRequestDTO){
+        User user = this.getCurrentUser();
+        TransactionDTO transactionDTO = new TransactionDTO();
+        transactionDTO.setFromAccount(accountService.getDefaultAccount(user).getId());
+        transactionDTO.setDescription(transferOrRequestDTO.getDescription());
+        transactionDTO.setTransactionAmount(transferOrRequestDTO.getAmount());
+        transactionDTO.setTransactionType(TransactionType.DEBIT);
+        switch (transferOrRequestDTO.getMode()) {
+            case "account":
+                if (!accountService.getDefaultAccount(user).equals(transferOrRequestDTO.getToAccount())){
+                    transactionDTO.setToAccount(transferOrRequestDTO.getToAccount());}
+                else{
+                    throw new GenericRuntimeException("You can not Transfer Money to same Account");
+                }
+                break;
+            case "email":
+                if (!user.getEmail().equals(transferOrRequestDTO.getEmail())) {
+                    User toUserEmail = this.getUserByEmail(transferOrRequestDTO.getEmail());
+                    transactionDTO.setToAccount(accountService.getDefaultAccount(toUserEmail).getId());
+                } else {
+                    throw new GenericRuntimeException("You can not Transfer Money to same Account");
+                }
+                break;
+            case "phoneNumber":
+                if (!user.getPhoneNumber().equals(transferOrRequestDTO.getPhoneNumber())) {
+                    User toUserPhone = this.getUserByPhoneNumber(transferOrRequestDTO.getPhoneNumber());
+                    transactionDTO.setToAccount(accountService.getDefaultAccount(toUserPhone).getId());
+                } else {
+                    throw new GenericRuntimeException("You can not Transfer Money to same Account");
+                }
+                break;
+            default:
+                throw new GenericRuntimeException("Invalid mode of Transfer");
+        }
+        return transactionDTO;
+    }
 }

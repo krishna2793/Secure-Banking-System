@@ -9,5 +9,7 @@ import java.util.Optional;
 public interface RequestRepository extends CrudRepository<Request, Long> {
     List<Request> findAll();
 
+    List<Request> findByRequestTypeInAndIsDeleted(List<String> requestType, boolean isDeleted);
+
     Optional<Request> findOneByRequestId(Long requestId);
 }
