@@ -2,6 +2,7 @@ package edu.asu.sbs.services;
 
 import com.google.common.collect.Lists;
 import edu.asu.sbs.config.UserType;
+import edu.asu.sbs.errors.GenericRuntimeException;
 import edu.asu.sbs.globals.AccountType;
 import edu.asu.sbs.globals.CreditDebitType;
 import edu.asu.sbs.models.Account;
@@ -47,7 +48,7 @@ public class AccountService {
         return viewAccountDTOList;
     }
 
-    public Account getDefaultAccount(User user){
+    public Account getDefaultAccount(User user) {
         return accountRepository.findAccountByUserAndDefaultAccount(user, true).get();
     }
 
@@ -123,10 +124,14 @@ public class AccountService {
 
         if (id != null) {
             Optional<Account> account = getAccountById(id);
-            account.ifPresent(account1 -> {
-                account1.setActive(false);
-                accountRepository.save(account1);
-            });
+            if (!account.get().isDefaultAccount()) {
+                account.ifPresent(account1 -> {
+                    account1.setActive(false);
+                    accountRepository.save(account1);
+                });
+            } else {
+                throw new GenericRuntimeException("Cannot close the default account");
+            }
         }
     }
 
@@ -153,36 +158,37 @@ public class AccountService {
 
     public void createDefaultAccount(User newCustomer) {
 
-//        // Give a default "CHECKING" account to the user with $500 in his account.
-//        String accountNum = getNumericString(MAX_ACCOUNT_NUM_LEN);
-//
-//        // check if account number is existing.
-//        AtomicBoolean accountCreation = new AtomicBoolean(true);
-//        System.out.println("---------Checking if Account number is present-------");
-//        accountRepository.findByAccountNumber(accountNum).ifPresent(account -> {
-//            System.out.println("---------Account number is present-------");
-//            accountCreation.set(false);
-//            try {
-//                throw new GeneralSecurityException("Account number already exists");
-//            } catch (GeneralSecurityException e) {
-//                e.printStackTrace();
-//            }
-//        });
-        /* if account number is unique, just create account and return the user. */
-//        if (accountCreation.get() == true) {
-            Account newAccount = new Account();
-            newAccount.setAccountBalance(INITIAL_DEPOSIT_AMOUNT);
-            if (newCustomer.getUserType() == UserType.MERCHANT_ROLE) {
-                newAccount.setAccountType(AccountType.CURRENT);
-            } else {
-                newAccount.setAccountType(DEFAULT_ACCOUNT_TYPE);
+        // Give a default "CHECKING" account to the user with $500 in his account.
+        String accountNum = getNumericString(MAX_ACCOUNT_NUM_LEN);
+
+        // check if account number is existing.
+        AtomicBoolean accountCreation = new AtomicBoolean(true);
+        System.out.println("---------Checking if Account number is present-------");
+        accountRepository.findByAccountNumber(accountNum).ifPresent(account -> {
+            System.out.println("---------Account number is present-------");
+            accountCreation.set(false);
+            try {
+                throw new GeneralSecurityException("Account number already exists");
+            } catch (GeneralSecurityException e) {
+                e.printStackTrace();
             }
-            newAccount.setActive(true);
-            newAccount.setUser(newCustomer);
-            newAccount.setDefaultAccount(true);
-            accountRepository.save(newAccount);
-            log.info(newAccount.toString());
-//        }
+        });
+        /* if account number is unique, just create account and return the user. */
+        if (accountCreation.get() == true) {
+        Account newAccount = new Account();
+        newAccount.setAccountNumber(accountNum);
+        newAccount.setAccountBalance(INITIAL_DEPOSIT_AMOUNT);
+        if (newCustomer.getUserType() == UserType.MERCHANT_ROLE) {
+            newAccount.setAccountType(AccountType.CURRENT);
+        } else {
+            newAccount.setAccountType(DEFAULT_ACCOUNT_TYPE);
+        }
+        newAccount.setActive(true);
+        newAccount.setUser(newCustomer);
+        newAccount.setDefaultAccount(true);
+        accountRepository.save(newAccount);
+        log.info(newAccount.toString());
+        }
     }
 
 }
