@@ -184,15 +184,6 @@ public class Tier2Controller {
         response.sendRedirect("transactions");
     }
 
-    @GetMapping("/modifyAccount/{id}")
-    public String getModifyAccountTemplate(@PathVariable Long id) throws IOException {
-        HashMap<String, Long> resultMap = Maps.newHashMap();
-        resultMap.put("id", id);
-        JsonNode result = mapper.valueToTree(resultMap);
-        Template template = handlebarsTemplateLoader.getTemplate("tier2ModifyAccount");
-        return template.apply(handlebarsTemplateLoader.getContext(result));
-    }
-
     @PostMapping("/modifyAccount")
     public void modifyUserAccount(Long id, AccountType accountType, HttpServletResponse response) throws IllegalStateException, IOException {
 
@@ -259,12 +250,6 @@ public class Tier2Controller {
     }
 
     @GetMapping("/raiseChangeRoleRequest")
-    public String createChangeRoleRequest() throws IOException {
-        Template template = handlebarsTemplateLoader.getTemplate("tier2ChangeRole");
-        return template.apply("");
-    }
-
-    @PostMapping("/raiseChangeRoleRequest")
     @ResponseStatus(HttpStatus.ACCEPTED)
     private void createChangeRoleRequestPost(HttpServletResponse response) throws IOException {
         if (userService.getCurrentUser().getUserType().equals(UserType.EMPLOYEE_ROLE2)) {
