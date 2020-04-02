@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AccountRepository extends CrudRepository<Account, Long> {
-    Optional<Account> findOneByAccountNumberEquals(String s);
+    @Query("select bankAccount from Account bankAccount where bankAccount.id = :accountNumber")
+    Optional<Account> findOneByAccountNumberEquals(@Param("accountNumber") String s);
 
     List<Account> findByUserAndIsActive(@Param("user") User user, boolean isActive);
 

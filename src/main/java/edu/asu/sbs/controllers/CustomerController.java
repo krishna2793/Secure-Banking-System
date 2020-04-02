@@ -14,9 +14,10 @@ import edu.asu.sbs.services.AccountService;
 import edu.asu.sbs.services.RequestService;
 import edu.asu.sbs.services.TransactionService;
 import edu.asu.sbs.services.UserService;
-import edu.asu.sbs.services.dto.CreateAccountDTO;
+import edu.asu.sbs.services.dto.NewAccountRequestDTO;
 import edu.asu.sbs.services.dto.CreditDebitDTO;
 import edu.asu.sbs.services.dto.TransactionDTO;
+import edu.asu.sbs.services.dto.ViewAccountDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -109,6 +110,13 @@ public class CustomerController {
         Template template = handlebarsTemplateLoader.getTemplate("extUserRequestNewAccount");
         return template.apply("");
     }
+    @PostMapping("/requestAccount")
+    @ResponseStatus(HttpStatus.CREATED)
+    String createAccount(NewAccountRequestDTO newAccountRequestDTO) throws IOException {
+        User currentUser = userService.getCurrentUser();
+        NewAccountRequestDTO newAccountResponseDTO = accountService.createAccount(currentUser, newAccountRequestDTO);
+        return getAccountRequests();
+    }
 
     @GetMapping("/transferFunds")
     @ResponseBody
@@ -161,11 +169,19 @@ public class CustomerController {
 
     }
 
-    @PostMapping("/createAccount")
-    @ResponseStatus(HttpStatus.CREATED)
-    void createAccount(@RequestBody CreateAccountDTO createAccountDTO) {
+    @GetMapping("/newAccountRequests")
+    @ResponseBody
+    public String getAccountRequests() throws IOException {
+
         User currentUser = userService.getCurrentUser();
-        accountService.createAccount(currentUser, createAccountDTO);
+        List<NewAccountRequestDTO> newAccountRequests = accountService.getPendingAccountsForUser(currentUser);
+        HashMap<String, List<NewAccountRequestDTO>> resultMap = new HashMap<>();
+        resultMap.put("newAccountRequests", newAccountRequests);
+        JsonNode result = mapper.valueToTree(resultMap);
+        Template template = handlebarsTemplateLoader.getTemplate("extUserViewNewAccountRequests");
+        return template.apply(handlebarsTemplateLoader.getContext(result));
     }
+
+
 
 }

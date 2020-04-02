@@ -1,18 +1,24 @@
 package edu.asu.sbs.services;
 
 import com.google.common.collect.Lists;
+import edu.asu.sbs.config.RequestType;
+import edu.asu.sbs.config.StatusType;
 import edu.asu.sbs.globals.AccountType;
 import edu.asu.sbs.globals.CreditDebitType;
 import edu.asu.sbs.models.Account;
+import edu.asu.sbs.models.Request;
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.repositories.AccountRepository;
+import edu.asu.sbs.repositories.RequestRepository;
 import edu.asu.sbs.repositories.TransactionAccountLogRepository;
-import edu.asu.sbs.services.dto.CreateAccountDTO;
+import edu.asu.sbs.services.dto.NewAccountRequestDTO;
 import edu.asu.sbs.services.dto.CreditDebitDTO;
 import edu.asu.sbs.services.dto.ViewAccountDTO;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,10 +27,12 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final TransactionAccountLogRepository transactionAccountLogRepository;
+    private RequestRepository accountRequestRepository;
 
-    public AccountService(AccountRepository accountRepository, TransactionAccountLogRepository transactionAccountLogRepository) {
+    public AccountService(AccountRepository accountRepository, TransactionAccountLogRepository transactionAccountLogRepository, RequestRepository accountRequestRepository) {
         this.accountRepository = accountRepository;
         this.transactionAccountLogRepository = transactionAccountLogRepository;
+        this.accountRequestRepository = accountRequestRepository;
     }
 
     public List<ViewAccountDTO> getAccounts() {
@@ -40,14 +48,26 @@ public class AccountService {
         return viewAccountDTOList;
     }
 
-
-    public void createAccount(User customer, CreateAccountDTO createAccountDTO) {
+    public NewAccountRequestDTO createAccount(User customer, NewAccountRequestDTO newAccountRequestDTO) {
         Account newAccount = new Account();
-        newAccount.setAccountBalance(createAccountDTO.getInitialDeposit());
-        newAccount.setAccountNumber(createAccountDTO.getAccountNumber());
-        newAccount.setAccountType(createAccountDTO.getAccountType());
+        newAccount.setAccountBalance(newAccountRequestDTO.getInitialDeposit());
+        newAccount.setAccountType(newAccountRequestDTO.getAccountType());
         newAccount.setUser(customer);
+        if(newAccountRequestDTO.getAccountNumber() != null) {
+            //If we allow user to set her desired account number, then we need to handle if DB save fails
+            newAccount.setAccountNumber(newAccountRequestDTO.getAccountNumber());
+        }
         accountRepository.save(newAccount);
+        Request accountRequest = new Request();
+        accountRequest.setRequestType(RequestType.CREATE_NEW_ACCOUNT);
+        accountRequest.setCreatedDate(Instant.now());
+        accountRequest.setDescription("New account request by user "+customer.getUserName());
+        accountRequest.setLinkedAccount(newAccount);
+        accountRequest.setRequestBy(customer);
+        accountRequest.setStatus(StatusType.PENDING);
+        accountRequestRepository.save(accountRequest);
+        newAccountRequestDTO.setAccountNumber(newAccount.getAccountNumber());
+        return newAccountRequestDTO;
     }
 
     public void credit(Account account, Double amount) throws Exception {
@@ -121,5 +141,18 @@ public class AccountService {
 
     public void deleteAccount(Account account) {
         accountRepository.delete(account);
+    }
+
+    public List<NewAccountRequestDTO> getPendingAccountsForUser(User currentUser) {
+        List<Account> pendingAccounts = accountRepository.findByUserAndIsActive(currentUser, false);
+        List<NewAccountRequestDTO> pendingAccountDTOList= new ArrayList<NewAccountRequestDTO>();
+        for(Account pendingAccount:pendingAccounts) {
+            NewAccountRequestDTO pendingAccountDTO = new NewAccountRequestDTO();
+            pendingAccountDTO.setAccountNumber(pendingAccount.getAccountNumber());
+            pendingAccountDTO.setAccountType(pendingAccount.getAccountType());
+            pendingAccountDTO.setInitialDeposit(pendingAccount.getAccountBalance());
+            pendingAccountDTOList.add(pendingAccountDTO);
+        }
+        return pendingAccountDTOList;
     }
 }
