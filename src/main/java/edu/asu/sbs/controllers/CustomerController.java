@@ -10,6 +10,7 @@ import edu.asu.sbs.errors.GenericRuntimeException;
 import edu.asu.sbs.errors.UnauthorizedAccessExcpetion;
 import edu.asu.sbs.globals.CreditDebitType;
 import edu.asu.sbs.loader.HandlebarsTemplateLoader;
+import edu.asu.sbs.models.Account;
 import edu.asu.sbs.models.Transaction;
 import edu.asu.sbs.models.User;
 import edu.asu.sbs.repositories.UserRepository;
@@ -124,8 +125,14 @@ public class CustomerController {
     @PostMapping("/transferFunds")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void createTransaction(TransactionDTO transactionDTO, HttpServletResponse response) throws IOException {
-        transactionDTO.setTransactionType(TransactionType.DEBIT);
-        transactionService.createTransaction(transactionDTO, TransactionStatus.APPROVED);
+        User user = userService.getCurrentUser();
+        User fromUser = accountService.getAccountById(transactionDTO.getFromAccount()).get().getUser();
+        if (user == fromUser){
+            transactionDTO.setTransactionType(TransactionType.DEBIT);
+            transactionService.createTransaction(transactionDTO, TransactionStatus.APPROVED);
+        }else{
+            throw new GenericRuntimeException("Please give your account number");
+        }
         response.sendRedirect("home");
     }
 
