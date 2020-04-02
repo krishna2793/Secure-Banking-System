@@ -95,6 +95,7 @@ public class UserController {
         return template.apply("");
     }
 
+
     @PostMapping(path = "/reset-password/init")
     public String requestPasswordReset(String email) throws IOException {
         Optional<User> user = userService.requestPasswordReset(email);

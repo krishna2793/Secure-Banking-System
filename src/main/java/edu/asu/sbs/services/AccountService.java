@@ -138,12 +138,9 @@ public class AccountService {
         StringBuilder sb = new StringBuilder(n);
 
         for (int i = 0; i < n; i++) {
-            int index
-                    = (int) (AlphaNumericString.length()
-                    * Math.random());
+            int index = (int) (AlphaNumericString.length() * Math.random());
 
-            sb.append(AlphaNumericString
-                    .charAt(index));
+            sb.append(AlphaNumericString.charAt(index));
         }
         return sb.toString();
     }
@@ -155,9 +152,7 @@ public class AccountService {
 
         // check if account number is existing.
         AtomicBoolean accountCreation = new AtomicBoolean(true);
-        System.out.println("---------Checking if Account number is present-------");
         accountRepository.findByAccountNumber(accountNum).ifPresent(account -> {
-            System.out.println("---------Account number is present-------");
             accountCreation.set(false);
             try {
                 throw new GeneralSecurityException("Account number already exists");

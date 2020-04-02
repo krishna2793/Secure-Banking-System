@@ -24,13 +24,13 @@
                     <td align="center">{{ userId }}</td>
                     <td align="center">{{ description }}</td>
                     <td align="center">
-                        <form method="post" action="/api/v1/tier1/approveModification" class="inline">
-                            <input type="text" name="id" value="{{requestId}}" style="display: none">
+                        <form method="post" action="/api/v1/tier1/approveUpdateUserProfile" class="inline">
+                            <input type="text" name="requestId" value="{{requestId}}" style="display: none">
                             <input id="update" class="btn btn-primary" type="submit" name="approve"
                                    value="Approve"/>
                         </form>
-                        <form method="post" action="/api/v1/tier1/denyModification" class="inline">
-                            <input type="text" name="id" value="{{requestId}}" style="display: none">
+                        <form method="post" action="/api/v1/tier1/declineUpdateUserProfile" class="inline">
+                            <input type="text" name="requestId" value="{{requestId}}" style="display: none">
                             <input id="delete" class="btn btn-danger" type="submit" name="deny"
                                    value="Deny"/>
                         </form>
