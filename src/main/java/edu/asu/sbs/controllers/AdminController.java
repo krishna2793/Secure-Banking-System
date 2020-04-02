@@ -150,6 +150,7 @@ public class AdminController {
                     break;
                 case RequestType.UPDATE_EMP_PROFILE:
                     requestService.updateUserProfile(req, userService.getCurrentUser(), RequestType.UPDATE_EMP_PROFILE, StatusType.APPROVED);
+                    break;
                 default:
                     throw new IllegalStateException("Unexpected RequestType: " + req.getRequestType());
             }

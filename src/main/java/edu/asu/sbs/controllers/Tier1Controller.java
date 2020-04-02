@@ -144,15 +144,6 @@ public class Tier1Controller {
         transactionService.denyCheque(chequeId);
     }
 
-    @PostMapping("/raiseProfileUpdateRequest")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public void raiseProfileUpdateRequest(ProfileRequestDTO requestDTO, HttpServletResponse response) throws IOException {
-        if (userService.getCurrentUser().getUserType() == UserType.EMPLOYEE_ROLE1) {
-            requestService.createProfileUpdateRequest(requestDTO, RequestType.UPDATE_EMP_PROFILE);
-        }
-        response.sendRedirect("profileUpdateRequests");
-    }
-
     @GetMapping("/viewAccountRequests")
     public String geUserProfileUpdaterRequests() throws IOException {
         List<ProfileRequestDTO> allRequests;
@@ -187,12 +178,21 @@ public class Tier1Controller {
         });
     }
 
+    @PostMapping("/raiseProfileUpdateRequest")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void raiseProfileUpdateRequest(ProfileRequestDTO requestDTO, HttpServletResponse response) throws IOException {
+        if (userService.getCurrentUser().getUserType() == UserType.EMPLOYEE_ROLE1) {
+            requestService.createProfileUpdateRequest(requestDTO, RequestType.UPDATE_EMP_PROFILE);
+        }
+        response.sendRedirect("transactions");
+    }
+
     @PostMapping("/raiseChangeRoleRequest")
     @ResponseStatus(HttpStatus.ACCEPTED)
     private void createChangeRoleRequest(HttpServletResponse response) throws IOException {
         if (UserType.EMPLOYEE_ROLE1.equals(userService.getCurrentUser().getUserType())) {
             requestService.createChangeRoleRequest(RequestType.TIER1_TO_TIER2);
         }
-        response.sendRedirect("raiseChangeRoleRequest");
+        response.sendRedirect("transactions");
     }
 }

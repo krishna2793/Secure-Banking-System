@@ -20,14 +20,17 @@ public class ProfileRequest implements Serializable {
     boolean changeRoleRequest = false;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long RequestId;
+    private Long requestId;
+
     @Pattern(regexp = Constants.PHONE_NUMBER_REGEX)
     @Column(unique = true)
     private String phoneNumber;
+
     @Email
     @Size(min = 5, max = 254)
     @Column(unique = true, length = 254)
     private String email;
+
     @JsonManagedReference
     @OneToOne(mappedBy = "linkedProfileRequest")
     private Request request;

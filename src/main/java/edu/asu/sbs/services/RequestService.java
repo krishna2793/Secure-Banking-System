@@ -27,8 +27,9 @@ public class RequestService {
     private final UserRepository userRepository;
     private final UserService userService;
     private final ProfileRequestRepository profileRequestRepository;
+    private final AccountRepository accountRepository;
 
-    public RequestService(RequestRepository requestRepository, TransactionRepository transactionRepository, TransactionAccountLogRepository transactionAccountLogRepository, AccountService accountService, UserRepository userRepository, UserService userService, ProfileRequestRepository profileRequestRepository) {
+    public RequestService(RequestRepository requestRepository, TransactionRepository transactionRepository, TransactionAccountLogRepository transactionAccountLogRepository, AccountService accountService, UserRepository userRepository, UserService userService, ProfileRequestRepository profileRequestRepository, AccountRepository accountRepository) {
         this.requestRepository = requestRepository;
         this.transactionRepository = transactionRepository;
         this.transactionAccountLogRepository = transactionAccountLogRepository;
@@ -36,6 +37,7 @@ public class RequestService {
         this.userRepository = userRepository;
         this.userService = userService;
         this.profileRequestRepository = profileRequestRepository;
+        this.accountRepository = accountRepository;
     }
 
     public List<ProfileRequestDTO> getAllAdminRequests() {
@@ -162,6 +164,7 @@ public class RequestService {
         switch (action) {
             case StatusType.APPROVED:
                 account.setActive(true);
+                accountRepository.save(account);
                 break;
             case StatusType.DECLINED:
                 accountService.deleteAccount(account);
