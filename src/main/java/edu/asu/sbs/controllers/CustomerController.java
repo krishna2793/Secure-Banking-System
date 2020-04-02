@@ -3,6 +3,7 @@ package edu.asu.sbs.controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jknack.handlebars.Template;
+import edu.asu.sbs.config.RequestType;
 import edu.asu.sbs.config.TransactionStatus;
 import edu.asu.sbs.config.TransactionType;
 import edu.asu.sbs.config.UserType;
@@ -20,6 +21,7 @@ import edu.asu.sbs.services.TransactionService;
 import edu.asu.sbs.services.UserService;
 import edu.asu.sbs.services.dto.CreateAccountDTO;
 import edu.asu.sbs.services.dto.CreditDebitDTO;
+import edu.asu.sbs.services.dto.ProfileRequestDTO;
 import edu.asu.sbs.services.dto.TransactionDTO;
 import edu.asu.sbs.services.dto.TransferOrRequestDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -106,13 +108,6 @@ public class CustomerController {
             System.out.println(e.getMessage());
         }
         response.sendRedirect("home");
-    }
-
-    @GetMapping("/requestNewAccount")
-    @ResponseBody
-    public String getRequestNewAccountTemplate() throws IOException {
-        Template template = handlebarsTemplateLoader.getTemplate("extUserRequestNewAccount");
-        return template.apply("");
     }
 
     @GetMapping("/transferFunds")
@@ -202,6 +197,15 @@ public class CustomerController {
     void createAccount(@RequestBody CreateAccountDTO createAccountDTO) {
         User currentUser = userService.getCurrentUser();
         accountService.createAccount(currentUser, createAccountDTO);
+    }
+
+    @PostMapping("/raiseProfileUpdateRequest")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void raiseProfileUpdateRequest(ProfileRequestDTO requestDTO, HttpServletResponse response) throws IOException {
+        if (userService.getCurrentUser().getUserType().equals(UserType.USER_ROLE) || userService.getCurrentUser().getUserType().equals(UserType.MERCHANT_ROLE)) {
+            requestService.createProfileUpdateRequest(requestDTO, RequestType.UPDATE_USER_PROFILE);
+        }
+        response.sendRedirect("home");
     }
 
 }
