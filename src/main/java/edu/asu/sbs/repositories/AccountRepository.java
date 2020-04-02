@@ -23,4 +23,6 @@ public interface AccountRepository extends CrudRepository<Account, Long> {
     Optional<Account> getAccountById(Long id);
 
     Optional<Account> findByAccountNumber(String accountNumber);
+
+    Optional<Account> findAccountByUserAndDefaultAccount(User user,boolean defaultAccount);
 }

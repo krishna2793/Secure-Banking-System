@@ -13,8 +13,8 @@ public final class Constants {
     public static final String ACCOUNT_NUMBER_REGEX = "^\\w{1,17}$";
     public static final int EXPIRE_MINS = 10;
     public static final int MAX_ACCOUNT_NUM_LEN = 17;
-    public static final double INITIAL_DEPOSIT_AMOUNT = 500;
-    public static final AccountType DEFAULT_ACCOUNT_TYPE = AccountType.CHECKING;
+    public static final double INITIAL_DEPOSIT_AMOUNT = 100;
+    public static final AccountType DEFAULT_ACCOUNT_TYPE = AccountType.SAVINGS;
 
     private Constants() {
 
