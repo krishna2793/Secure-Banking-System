@@ -95,8 +95,9 @@ public class UserController {
         return template.apply("");
     }
 
+
     @PostMapping(path = "/reset-password/init")
-    public String requestPasswordReset(String email) throws IOException {
+    public void requestPasswordReset(String email, HttpServletResponse response) throws IOException {
         Optional<User> user = userService.requestPasswordReset(email);
         if (user.isPresent()) {
             mailService.sendPasswordResetMail(user.get());
@@ -105,6 +106,11 @@ public class UserController {
             // but log that an invalid attempt has been made
             log.warn("Password reset requested for non existing mail '{}'", email);
         }
+        response.sendRedirect("/reset-password/finish");
+    }
+
+    @GetMapping(value = "/reset-password/finish", produces = "text/html")
+    public String getResetPasswordFinishTemplate() throws IOException {
         Template template = handlebarsTemplateLoader.getTemplate("forgotPasswordFinish");
         return template.apply("");
     }

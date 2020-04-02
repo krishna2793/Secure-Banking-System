@@ -3,15 +3,12 @@ package edu.asu.sbs.services;
 import com.google.common.collect.Lists;
 import edu.asu.sbs.config.RequestType;
 import edu.asu.sbs.config.StatusType;
+import edu.asu.sbs.config.TransactionStatus;
 import edu.asu.sbs.config.TransactionType;
 import edu.asu.sbs.errors.GenericRuntimeException;
 import edu.asu.sbs.models.*;
-import edu.asu.sbs.repositories.RequestRepository;
-import edu.asu.sbs.repositories.TransactionAccountLogRepository;
-import edu.asu.sbs.repositories.TransactionRepository;
-import edu.asu.sbs.repositories.UserRepository;
-import edu.asu.sbs.services.dto.CreateAccountDTO;
-import edu.asu.sbs.services.dto.RequestDTO;
+import edu.asu.sbs.repositories.*;
+import edu.asu.sbs.services.dto.ProfileRequestDTO;
 import edu.asu.sbs.services.dto.Tier2RequestsDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,31 +25,37 @@ public class RequestService {
     private final TransactionAccountLogRepository transactionAccountLogRepository;
     private final AccountService accountService;
     private final UserRepository userRepository;
+    private final UserService userService;
+    private final ProfileRequestRepository profileRequestRepository;
+    private final AccountRepository accountRepository;
 
-    public RequestService(RequestRepository requestRepository, TransactionRepository transactionRepository, TransactionAccountLogRepository transactionAccountLogRepository, AccountService accountService, UserRepository userRepository) {
+    public RequestService(RequestRepository requestRepository, TransactionRepository transactionRepository, TransactionAccountLogRepository transactionAccountLogRepository, AccountService accountService, UserRepository userRepository, UserService userService, ProfileRequestRepository profileRequestRepository, AccountRepository accountRepository) {
         this.requestRepository = requestRepository;
         this.transactionRepository = transactionRepository;
         this.transactionAccountLogRepository = transactionAccountLogRepository;
         this.accountService = accountService;
         this.userRepository = userRepository;
+        this.userService = userService;
+        this.profileRequestRepository = profileRequestRepository;
+        this.accountRepository = accountRepository;
     }
 
-    public List<Request> getAllAdminRequests() {
-        List<Request> requestList = Lists.newArrayList();
-        requestList.addAll(requestRepository.findByRequestTypeInAndIsDeleted(Lists.newArrayList(RequestType.TIER1_TO_TIER2, RequestType.TIER2_TO_TIER1), false));
-        return requestList;
-    }
-
-    public List<Request> getEmpProfileUpdateRequests() {
-        List<Request> requestList = Lists.newArrayList();
-        requestList.addAll(requestRepository.findByRequestTypeInAndIsDeleted(Lists.newArrayList(RequestType.UPDATE_EMP_PROFILE), false));
-        return requestList;
-    }
-
-    public List<Request> getUserProfileUpdateRequests() {
-        List<Request> requestList = Lists.newArrayList();
-        requestList.addAll(requestRepository.findByRequestTypeInAndIsDeleted(Lists.newArrayList(RequestType.UPDATE_USER_PROFILE), false));
-        return requestList;
+    public List<ProfileRequestDTO> getAllAdminRequests() {
+        List<ProfileRequestDTO> RequestDTOList = Lists.newArrayList();
+        List<Request> requestList = requestRepository.findByRequestTypeInAndIsDeleted(Lists.newArrayList(RequestType.TIER1_TO_TIER2, RequestType.TIER2_TO_TIER1, RequestType.UPDATE_EMP_PROFILE), false);
+        for (Request request : requestList) {
+            ProfileRequestDTO RequestDTO = new ProfileRequestDTO();
+            RequestDTO.setEmail(request.getLinkedProfileRequest().getEmail());
+            RequestDTO.setPhoneNumber(request.getLinkedProfileRequest().getPhoneNumber());
+            RequestDTO.setRequestId(request.getRequestId());
+            RequestDTO.setStatus(request.getStatus());
+            RequestDTO.setRoleChange(request.getLinkedProfileRequest().isChangeRoleRequest());
+            RequestDTO.setDescription(request.getDescription());
+            RequestDTO.setCreatedDate(request.getCreatedDate());
+            RequestDTO.setModifiedDate(request.getModifiedDate());
+            RequestDTOList.add(RequestDTO);
+        }
+        return RequestDTOList;
     }
 
     public Optional<Request> getRequest(Long id) {
@@ -116,9 +119,9 @@ public class RequestService {
     }
 
     @Transactional
-    public void updateUserProfile(Request request, User approver, String requestType, String action, RequestDTO requestDTO) {
+    public void updateUserProfile(Request request, User approver, String requestType, String action) {
 
-        if (requestDTO.getEmail().isEmpty() && requestDTO.getPhoneNumber().isEmpty()) {
+        if (request.getLinkedProfileRequest().getPhoneNumber().isEmpty() && request.getLinkedProfileRequest().getEmail().isEmpty()) {
             throw new GenericRuntimeException("Both phone number and email are empty");
         }
 
@@ -126,15 +129,17 @@ public class RequestService {
         request.setApprovedBy(approver);
         request.setStatus(action);
         request.setModifiedDate(Instant.now());
+        request.setDeleted(true);
+        requestRepository.save(request);
 
         User user = request.getRequestBy();
         switch (action) {
             case StatusType.APPROVED:
-                if (!requestDTO.getPhoneNumber().isEmpty()) {
-                    user.setPhoneNumber(requestDTO.getPhoneNumber());
+                if (!request.getLinkedProfileRequest().getPhoneNumber().isEmpty()) {
+                    user.setPhoneNumber(request.getLinkedProfileRequest().getPhoneNumber());
                 }
-                if (!requestDTO.getEmail().isEmpty()) {
-                    user.setEmail(requestDTO.getEmail());
+                if (!request.getLinkedProfileRequest().getEmail().isEmpty()) {
+                    user.setEmail(request.getLinkedProfileRequest().getEmail());
                 }
                 userRepository.save(user);
                 break;
@@ -147,26 +152,108 @@ public class RequestService {
     }
 
     @Transactional
-    public void updateAccountCreationRequest(Request request, User approver, String requestType, String action, CreateAccountDTO createAccountDTO) {
+    public void updateAccountCreationRequest(Request request, User approver, String requestType, String action) {
         request.setRequestType(requestType);
         request.setApprovedBy(approver);
         request.setStatus(action);
         request.setModifiedDate(Instant.now());
+        requestRepository.save(request);
 
-        //User customer = request.getRequestBy();
         Account account = request.getLinkedAccount();
 
         switch (action) {
             case StatusType.APPROVED:
-                //accountService.createAccount(customer, accountDTO);
                 account.setActive(true);
+                accountRepository.save(account);
                 break;
             case StatusType.DECLINED:
-                // do nothing
                 accountService.deleteAccount(account);
                 break;
             default:
                 throw new GenericRuntimeException("Invalid Action");
         }
     }
+
+    public List<ProfileRequestDTO> getAllProfileUpdateRequests(String requestType) {
+        List<ProfileRequestDTO> RequestDTOList = Lists.newArrayList();
+        List<Request> requestList = requestRepository.findByRequestTypeInAndIsDeleted(Lists.newArrayList(requestType), false);
+        for (Request request : requestList) {
+            ProfileRequestDTO RequestDTO = new ProfileRequestDTO();
+            RequestDTO.setEmail(request.getLinkedProfileRequest().getEmail());
+            RequestDTO.setPhoneNumber(request.getLinkedProfileRequest().getPhoneNumber());
+            RequestDTO.setRequestId(request.getRequestId());
+            RequestDTO.setStatus(request.getStatus());
+            RequestDTO.setDescription(request.getDescription());
+            RequestDTO.setCreatedDate(request.getCreatedDate());
+            RequestDTO.setModifiedDate(request.getModifiedDate());
+            RequestDTOList.add(RequestDTO);
+        }
+        return RequestDTOList;
+    }
+
+    @Transactional
+    public void createProfileUpdateRequest(ProfileRequestDTO requestDTO, String requestType) {
+
+        Request request = new Request();
+        request.setCreatedDate(Instant.now());
+        request.setDeleted(false);
+        request.setDescription(requestType);
+        request.setStatus(TransactionStatus.PENDING);
+        request.setRequestType(requestType);
+        request.setRequestBy(userService.getCurrentUser());
+
+        ProfileRequest profileRequest = new ProfileRequest();
+        profileRequest.setRequest(request);
+        profileRequest.setEmail(requestDTO.getEmail());
+        profileRequest.setPhoneNumber(requestDTO.getPhoneNumber());
+        request.setLinkedProfileRequest(profileRequest);
+        requestRepository.save(request);
+        profileRequestRepository.save(profileRequest);
+    }
+
+    @Transactional
+    public void createChangeRoleRequest(String requestType) {
+        Request request = new Request();
+        request.setCreatedDate(Instant.now());
+        request.setDeleted(false);
+        request.setDescription(requestType);
+        request.setStatus(TransactionStatus.PENDING);
+        request.setRequestType(requestType);
+        request.setRequestBy(userService.getCurrentUser());
+
+        ProfileRequest profileRequest = new ProfileRequest();
+        profileRequest.setRequest(request);
+        profileRequest.setChangeRoleRequest(true);
+        request.setLinkedProfileRequest(profileRequest);
+        requestRepository.save(request);
+        profileRequestRepository.save(profileRequest);
+
+    }
+
+    @Transactional
+    public void updateChangeRoleRequest(Request request, String status, User approver) {
+        request.setStatus(status);
+        request.setApprovedBy(approver);
+        request.setModifiedDate(Instant.now());
+        requestRepository.save(request);
+    }
+
+    /*
+    public void createAdditionalAccountRequest(CreateAccountDTO createAccountDTO, String requestType) {
+
+        Request request = new Request();
+        request.setCreatedDate(Instant.now());
+        request.setDeleted(false);
+        request.setDescription(requestType);
+        request.setStatus(TransactionStatus.PENDING);
+        request.setRequestType(requestType);
+        request.setRequestBy(userService.getCurrentUser());
+
+        String accNum = accountService.getNumericString(MAX_ACCOUNT_NUM_LEN);
+        createAccountDTO.setAccountNumber(accNum);
+        Account account = accountService.createAccount(userService.getCurrentUser(), createAccountDTO);
+        request.setLinkedAccount();
+        requestRepository.save(request);
+    }
+    */
 }

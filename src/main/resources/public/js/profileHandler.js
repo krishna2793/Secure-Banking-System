@@ -7,18 +7,20 @@ var email = document.getElementById("email")
 var ssn = document.getElementById("ssn")
 var save = document.getElementById("save")
 var profileBtn = document.getElementById("profileBtn")
-var ssnBtn =document.getElementById("ssnBtn")
+var ssnBtn = document.getElementById("ssnBtn")
 
 function modify(x) {
-    if (x.readOnly){
-        x.readOnly=false;}
-    else { x.readOnly=true;}
+    if (x.disabled) {
+        x.disabled = false;
+    } else {
+        x.disabled = true;
+    }
 }
 
 function editProfile() {
     modify(phoneNumber);
     modify(email);
-    if (save.disabled){
+    if (save.disabled) {
         save.disabled = false;
     }
     profileBtn.disabled = true;
@@ -26,7 +28,7 @@ function editProfile() {
 
 function editSSN() {
     modify(ssn);
-    if (save.disabled){
+    if (save.disabled) {
         save.disabled = false;
     }
     ssnBtn.disabled = true;
@@ -38,3 +40,4 @@ function editAll() {
     modify(lastName);
     modify(dateOfBirth);
 }
+

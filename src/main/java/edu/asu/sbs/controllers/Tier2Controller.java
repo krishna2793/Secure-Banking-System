@@ -19,7 +19,7 @@ import edu.asu.sbs.services.AccountService;
 import edu.asu.sbs.services.RequestService;
 import edu.asu.sbs.services.TransactionService;
 import edu.asu.sbs.services.UserService;
-import edu.asu.sbs.services.dto.CreateAccountDTO;
+import edu.asu.sbs.services.dto.ProfileRequestDTO;
 import edu.asu.sbs.services.dto.Tier2RequestsDTO;
 import edu.asu.sbs.services.dto.UserDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -158,22 +158,6 @@ public class Tier2Controller {
         return template.apply(handlebarsTemplateLoader.getContext(result));
     }
 
-    /*
-    @GetMapping("/editUser/{id}")
-    public String modifyUserDetail(UserDTO userDTO) throws Exceptions, IOException {
-
-        Optional<User> user = userService.editUser(userDTO);
-
-        if (user.isPresent()) {
-            JsonNode result = mapper.valueToTree(user.get());
-            Template template = handlebarsTemplateLoader.getTemplate("tier2ViewUser");
-            return template.apply(handlebarsTemplateLoader.getContext(result));
-        } else {
-            throw new Exceptions("404", " ");
-        }
-    }
-    */
-
     @PostMapping("/approveTransaction")
     public void approveEdit(Long id, HttpServletResponse response) throws IOException {
 
@@ -198,15 +182,6 @@ public class Tier2Controller {
             }
         });
         response.sendRedirect("transactions");
-    }
-
-    @GetMapping("/modifyAccount/{id}")
-    public String getModifyAccountTemplate(@PathVariable Long id) throws IOException {
-        HashMap<String, Long> resultMap = Maps.newHashMap();
-        resultMap.put("id", id);
-        JsonNode result = mapper.valueToTree(resultMap);
-        Template template = handlebarsTemplateLoader.getTemplate("tier2ModifyAccount");
-        return template.apply(handlebarsTemplateLoader.getContext(result));
     }
 
     @PostMapping("/modifyAccount")
@@ -239,57 +214,47 @@ public class Tier2Controller {
     }
 
     @PostMapping("/approveCreateAccountReq")
-    public void approveAdditionalAccount(Long id, CreateAccountDTO createAccountDTO, HttpServletResponse response) throws IOException {
+    public void approveAdditionalAccount(Long id, HttpServletResponse response) throws IOException {
 
         Optional<Request> request = requestService.getRequest(id);
         User user = userService.getCurrentUser();
         request.ifPresent(req -> {
             if (RequestType.CREATE_ADDITIONAL_ACCOUNT.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
-                requestService.updateAccountCreationRequest(req, user, RequestType.CREATE_ADDITIONAL_ACCOUNT, StatusType.APPROVED, createAccountDTO);
+                requestService.updateAccountCreationRequest(req, user, RequestType.CREATE_ADDITIONAL_ACCOUNT, StatusType.APPROVED);
             }
         });
         response.sendRedirect("transactions");
     }
 
     @PostMapping("/denyCreateAccountReq")
-    public void declineAdditionalAccount(Long id, CreateAccountDTO createAccountDTO, HttpServletResponse response) throws IOException {
+    public void declineAdditionalAccount(Long id, HttpServletResponse response) throws IOException {
 
         Optional<Request> request = requestService.getRequest(id);
         User user = userService.getCurrentUser();
         request.ifPresent(req -> {
             if (RequestType.CREATE_ADDITIONAL_ACCOUNT.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
-                requestService.updateAccountCreationRequest(req, user, RequestType.CREATE_ADDITIONAL_ACCOUNT, StatusType.DECLINED, createAccountDTO);
+                requestService.updateAccountCreationRequest(req, user, RequestType.CREATE_ADDITIONAL_ACCOUNT, StatusType.DECLINED);
             }
         });
         response.sendRedirect("transactions");
     }
 
-    /*
-    @PostMapping("/approveNewAccountReq")
-    public void approveEdit(Long id, CreateAccountDTO createAccountDTO, HttpServletResponse response) throws IOException {
+    @PostMapping("/raiseProfileUpdateRequest")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void raiseProfileUpdateRequest(ProfileRequestDTO requestDTO, HttpServletResponse response) throws IOException {
 
-        Optional<Request> request = requestService.getRequest(id);
-        User user = userService.getCurrentUser();
-        request.ifPresent(req -> {
-            if (RequestType.CREATE_NEW_ACCOUNT.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
-                requestService.updateAccountCreationRequest(req, user, RequestType.CREATE_NEW_ACCOUNT, StatusType.APPROVED, createAccountDTO);
-            }
-        });
+        if (userService.getCurrentUser().getUserType().equals(UserType.EMPLOYEE_ROLE2)) {
+            requestService.createProfileUpdateRequest(requestDTO, RequestType.UPDATE_EMP_PROFILE);
+        }
         response.sendRedirect("transactions");
     }
 
-    @PostMapping("/denyNewAccountReq")
-    public void denyTransaction(Long id, CreateAccountDTO createAccountDTO, HttpServletResponse response) throws IOException {
-
-        Optional<Request> request = requestService.getRequest(id);
-        User user = userService.getCurrentUser();
-        request.ifPresent(req -> {
-            if (RequestType.CREATE_NEW_ACCOUNT.equals(req.getRequestType()) && req.getStatus().equals(StatusType.PENDING)) {
-                requestService.updateAccountCreationRequest(req, user, RequestType.CREATE_NEW_ACCOUNT, StatusType.DECLINED, createAccountDTO);
-            }
-        });
+    @GetMapping("/raiseChangeRoleRequest")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    private void createChangeRoleRequestPost(HttpServletResponse response) throws IOException {
+        if (userService.getCurrentUser().getUserType().equals(UserType.EMPLOYEE_ROLE2)) {
+            requestService.createChangeRoleRequest(RequestType.TIER2_TO_TIER1);
+        }
         response.sendRedirect("transactions");
     }
-    */
-
 }
