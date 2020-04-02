@@ -150,14 +150,17 @@ public class Tier1Controller {
         allRequests = requestService.getAllProfileUpdateRequests(RequestType.UPDATE_USER_PROFILE);
         HashMap<String, List<ProfileRequestDTO>> resultMap = new HashMap<>();
         resultMap.put("result", allRequests);
+        JavaTimeModule module = new JavaTimeModule();
+        mapper.registerModule(module);
         JsonNode result = mapper.valueToTree(resultMap);
-        Template template = handlebarsTemplateLoader.getTemplate("viewAccountRequests");
+        Template template = handlebarsTemplateLoader.getTemplate("tier1ViewAccountRequests");
         return template.apply(handlebarsTemplateLoader.getContext(result));
     }
 
-    @PostMapping("/approveUpdateUserProfile/")
+    @PostMapping("/approveUpdateUserProfile")
     @ResponseStatus(HttpStatus.ACCEPTED)
     private void approveUserProfile(Long requestId) {
+        System.out.println(requestId);
         Optional<Request> request = requestService.getRequest(requestId);
         User user = userService.getCurrentUser();
         request.ifPresent(req -> {
@@ -167,7 +170,7 @@ public class Tier1Controller {
         });
     }
 
-    @PostMapping("/declineUpdateUserProfile/")
+    @PostMapping("/declineUpdateUserProfile")
     private void declineUserProfile(Long requestId) {
         Optional<Request> request = requestService.getRequest(requestId);
         User user = userService.getCurrentUser();
@@ -187,7 +190,7 @@ public class Tier1Controller {
         response.sendRedirect("transactions");
     }
 
-    @PostMapping("/raiseChangeRoleRequest")
+    @GetMapping("/raiseChangeRoleRequest")
     @ResponseStatus(HttpStatus.ACCEPTED)
     private void createChangeRoleRequest(HttpServletResponse response) throws IOException {
         if (UserType.EMPLOYEE_ROLE1.equals(userService.getCurrentUser().getUserType())) {

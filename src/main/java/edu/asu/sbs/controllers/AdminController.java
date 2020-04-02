@@ -128,13 +128,14 @@ public class AdminController {
         ArrayList<ProfileRequestDTO> allRequests = (ArrayList<ProfileRequestDTO>) requestService.getAllAdminRequests();
         HashMap<String, ArrayList<ProfileRequestDTO>> resultMap = new HashMap<>();
         resultMap.put("result", allRequests);
+        System.out.println(resultMap);
         JsonNode result = mapper.valueToTree(resultMap);
         Template template = handlebarsTemplateLoader.getTemplate("adminHome");
         return template.apply(handlebarsTemplateLoader.getContext(result));
     }
 
-    @PutMapping("/requests/approve/{id}")
-    public void approveEdit(@PathVariable Long id) throws IllegalStateException {
+    @PostMapping("/requests/approve")
+    public void approveEdit(Long id) throws IllegalStateException {
 
         Optional<Request> request = requestService.getRequest(id);
         User user = userService.getCurrentUser();
@@ -157,8 +158,8 @@ public class AdminController {
         });
     }
 
-    @PutMapping("/requests/decline/{id}")
-    public void declineEdit(@PathVariable Long id) throws IllegalStateException {
+    @PostMapping("/requests/decline")
+    public void declineEdit(Long id) throws IllegalStateException {
 
         Optional<Request> request = requestService.getRequest(id);
         User user = userService.getCurrentUser();

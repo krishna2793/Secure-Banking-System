@@ -35,6 +35,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @PreAuthorize("hasAnyAuthority('" + UserType.USER_ROLE + "')")
@@ -208,4 +209,17 @@ public class CustomerController {
         response.sendRedirect("home");
     }
 
+    @GetMapping("/modify/{id}")
+    @ResponseBody
+    public String getModifyAccountTemplate(@PathVariable long id) throws IOException {
+        User user = userService.getCurrentUser();
+        Account account = accountService.getAccountById(id).get();
+        if (account.getUser().equals(user)){
+            JsonNode result = mapper.valueToTree(account);
+            Template template = handlebarsTemplateLoader.getTemplate("extUserModifyAccount");
+            return template.apply(handlebarsTemplateLoader.getContext(result));
+        }else{
+            throw new GenericRuntimeException("You can only modify your account");
+        }
+    }
 }
