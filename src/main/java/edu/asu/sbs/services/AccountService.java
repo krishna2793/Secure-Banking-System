@@ -52,13 +52,14 @@ public class AccountService {
         return accountRepository.findAccountByUserAndDefaultAccount(user, true).get();
     }
 
-    public void createAccount(User customer, CreateAccountDTO createAccountDTO) {
+    public Account createAccount(User customer, CreateAccountDTO createAccountDTO) {
         Account newAccount = new Account();
         newAccount.setAccountBalance(createAccountDTO.getInitialDeposit());
-//        newAccount.setAccountNumber(createAccountDTO.getAccountNumber());
+        newAccount.setAccountNumber(createAccountDTO.getAccountNumber());
         newAccount.setAccountType(createAccountDTO.getAccountType());
         newAccount.setUser(customer);
         accountRepository.save(newAccount);
+        return newAccount;
     }
 
     public void credit(Account account, Double amount) throws Exception {
@@ -140,7 +141,7 @@ public class AccountService {
     }
 
     // generate account number
-    static String getNumericString(int n) {
+    public String getNumericString(int n) {
         String AlphaNumericString = "0123456789";
 
         StringBuilder sb = new StringBuilder(n);

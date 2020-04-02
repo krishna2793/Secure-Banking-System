@@ -11,18 +11,12 @@ import edu.asu.sbs.errors.GenericRuntimeException;
 import edu.asu.sbs.errors.UnauthorizedAccessExcpetion;
 import edu.asu.sbs.globals.CreditDebitType;
 import edu.asu.sbs.loader.HandlebarsTemplateLoader;
-import edu.asu.sbs.models.Transaction;
 import edu.asu.sbs.models.User;
-import edu.asu.sbs.repositories.UserRepository;
 import edu.asu.sbs.services.AccountService;
 import edu.asu.sbs.services.RequestService;
 import edu.asu.sbs.services.TransactionService;
 import edu.asu.sbs.services.UserService;
-import edu.asu.sbs.services.dto.CreateAccountDTO;
-import edu.asu.sbs.services.dto.CreditDebitDTO;
-import edu.asu.sbs.services.dto.ProfileRequestDTO;
-import edu.asu.sbs.services.dto.TransactionDTO;
-import edu.asu.sbs.services.dto.TransferOrRequestDTO;
+import edu.asu.sbs.services.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -192,10 +186,20 @@ public class CustomerController {
         accountService.createAccount(currentUser, createAccountDTO);
     }
 
+    /*
+    @PostMapping("/createAdditoinalAccRequest")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void createAdditoinalRequest(CreateAccountDTO createAccountDTO, HttpServletResponse response) throws IOException {
+        if (userService.getCurrentUser().getUserType().equals(UserType.USER_ROLE) || userService.getCurrentUser().getUserType().equals(UserType.MERCHANT_ROLE)) {
+            requestService.createAdditionalAccountRequest(createAccountDTO, RequestType.CREATE_ADDITIONAL_ACCOUNT);
+        }
+        response.sendRedirect("home");
+    }*/
+
     @PostMapping("/raiseProfileUpdateRequest")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void raiseProfileUpdateRequest(ProfileRequestDTO requestDTO, HttpServletResponse response) throws IOException {
-        if (userService.getCurrentUser().getUserType().equals(UserType.USER_ROLE) || userService.getCurrentUser().getUserType().equals(UserType.MERCHANT_ROLE)) {
+        if (userService.getCurrentUser().getUserType().equals(UserType.USER_ROLE)) {
             requestService.createProfileUpdateRequest(requestDTO, RequestType.UPDATE_USER_PROFILE);
         }
         response.sendRedirect("home");

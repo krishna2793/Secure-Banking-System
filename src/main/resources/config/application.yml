@@ -81,4 +81,9 @@ logging:
     org:
       hibernate:
         SQL: DEBUG
-        type: TRACE
+        type:
+  file:
+    name: '/home/ankit/CSE_545_SBS/Secure-Banking-System/src/main/java/edu/asu/sbs/logs/application.log'
+  pattern:
+    file: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%'
+

@@ -238,4 +238,22 @@ public class RequestService {
         requestRepository.save(request);
     }
 
+    /*
+    public void createAdditionalAccountRequest(CreateAccountDTO createAccountDTO, String requestType) {
+
+        Request request = new Request();
+        request.setCreatedDate(Instant.now());
+        request.setDeleted(false);
+        request.setDescription(requestType);
+        request.setStatus(TransactionStatus.PENDING);
+        request.setRequestType(requestType);
+        request.setRequestBy(userService.getCurrentUser());
+
+        String accNum = accountService.getNumericString(MAX_ACCOUNT_NUM_LEN);
+        createAccountDTO.setAccountNumber(accNum);
+        Account account = accountService.createAccount(userService.getCurrentUser(), createAccountDTO);
+        request.setLinkedAccount();
+        requestRepository.save(request);
+    }
+    */
 }

@@ -17,6 +17,7 @@ import edu.asu.sbs.services.UserService;
 import edu.asu.sbs.services.dto.ProfileRequestDTO;
 import edu.asu.sbs.services.dto.UserDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -45,14 +45,16 @@ public class AdminController {
     private final RequestService requestService;
     private final HandlebarsTemplateLoader handlebarsTemplateLoader;
     private final AccountService accountService;
+    private final Environment env;
 
     ObjectMapper mapper = new ObjectMapper();
 
-    public AdminController(UserService userService, RequestService requestService, HandlebarsTemplateLoader handlebarsTemplateLoader, AccountService accountService) {
+    public AdminController(UserService userService, RequestService requestService, HandlebarsTemplateLoader handlebarsTemplateLoader, AccountService accountService, Environment env) {
         this.userService = userService;
         this.requestService = requestService;
         this.handlebarsTemplateLoader = handlebarsTemplateLoader;
         this.accountService = accountService;
+        this.env = env;
     }
 
     // Details of the admin.
@@ -76,8 +78,8 @@ public class AdminController {
 
     @GetMapping("/employee/add")
     public String getLoginTemplate() throws IOException {
-        Template template = handlebarsTemplateLoader.getTemplate("extUserTransferRequests");
-        return template.apply("");
+        Template template = handlebarsTemplateLoader.getTemplate("adminAddNewEmployee");
+        return template.apply("adminAddNewEmployee");
     }
 
     @PostMapping("/employee/add")
@@ -182,13 +184,13 @@ public class AdminController {
                            HttpServletResponse response) throws IOException {
 
         final int BUFFER_SIZE = 4096;
-        String filePath = "logs/application.log";
+        String filePath = env.getProperty("logging.file.name");
         ServletContext context = request.getServletContext();
-        ClassLoader classLoader = getClass().getClassLoader();
 
         // construct the complete absolute path of the file
-        File downloadFile = new File(Objects.requireNonNull(classLoader.getResource(filePath)).getFile());
-        try (FileInputStream inputStream = new FileInputStream(downloadFile); OutputStream outStream = response.getOutputStream()) {
+        File downloadFile = new File(filePath);
+        try (FileInputStream inputStream = new FileInputStream(downloadFile);
+             OutputStream outStream = response.getOutputStream()) {
             // get MIME type of the file
             String mimeType = context.getMimeType("text/plain");
             if (mimeType == null) {
